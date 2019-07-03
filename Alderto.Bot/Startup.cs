@@ -26,7 +26,7 @@ namespace Alderto.Bot
             Client = new DiscordSocketClient();
 
             // Database
-           
+            
         }
 
         public async Task Run()

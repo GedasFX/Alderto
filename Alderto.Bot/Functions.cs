@@ -9,5 +9,10 @@ namespace Alderto.Bot
         {
             return msg.Channel.SendMessageAsync("Pong!");
         }
+
+        public static Task Give(SocketMessage msg)
+        {
+
+        }
     }
 }

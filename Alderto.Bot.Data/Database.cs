@@ -18,7 +18,8 @@ namespace Alderto.Bot.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Member>()
-                .HasKey(k => new { k.Id, k.GuildId });
+                .HasMany(m => m.MembersRecruited)
+                .WithOne(m => m.RecruitedByMember);
 
             base.OnModelCreating(modelBuilder);
         }
