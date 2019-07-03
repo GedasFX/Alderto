@@ -6,7 +6,6 @@ namespace Alderto.Bot.Data
     public class SqliteDbContext : DbContext
     {
         public DbSet<Member> Members { get; set; }
-        public DbSet<Guild> Guilds { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -19,7 +18,11 @@ namespace Alderto.Bot.Data
         {
             modelBuilder.Entity<Member>()
                 .HasMany(m => m.MembersRecruited)
-                .WithOne(m => m.RecruitedByMember);
+                .WithOne(m => m.RecruitedByMember)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Member>()
+                .HasIndex(m => new { m.MemberId, m.GuildId });
 
             base.OnModelCreating(modelBuilder);
         }

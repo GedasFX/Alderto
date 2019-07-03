@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Alderto.Bot.Data.Migrations
 {
     [DbContext(typeof(SqliteDbContext))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    partial class SqliteDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -16,47 +16,36 @@ namespace Alderto.Bot.Data.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
-            modelBuilder.Entity("Alderto.Bot.Data.Models.Guild", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Guilds");
-                });
-
             modelBuilder.Entity("Alderto.Bot.Data.Models.Member", b =>
                 {
-                    b.Property<Guid>("Id");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("CurrencyCount");
 
                     b.Property<DateTime?>("CurrencyLastClaimed");
 
-                    b.Property<string>("GuildId");
+                    b.Property<ulong>("GuildId");
 
-                    b.Property<string>("MemberId");
+                    b.Property<ulong>("MemberId");
 
-                    b.Property<string>("RecruitedByMemberId");
+                    b.Property<Guid?>("RecruitedByMemberId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GuildId");
+                    b.HasIndex("RecruitedByMemberId");
+
+                    b.HasIndex("MemberId", "GuildId");
 
                     b.ToTable("Members");
                 });
 
             modelBuilder.Entity("Alderto.Bot.Data.Models.Member", b =>
                 {
-                    b.HasOne("Alderto.Bot.Data.Models.Guild", "Guild")
-                        .WithMany()
-                        .HasForeignKey("GuildId");
-
                     b.HasOne("Alderto.Bot.Data.Models.Member", "RecruitedByMember")
                         .WithMany("MembersRecruited")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("RecruitedByMemberId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 #pragma warning restore 612, 618
         }
