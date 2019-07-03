@@ -14,8 +14,7 @@ namespace Alderto.Bot
 
         static MessageReceivedHandler()
         {
-            Actions["$ping"] = m => m.Channel.SendMessageAsync("Pong!");
-
+            Actions["$ping"] = Functions.Ping;
         }
 
         public static async Task OnMessageReceived(SocketMessage message)
