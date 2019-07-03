@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alderto.Bot.Data.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(SqliteDbContext))]
     partial class DatabaseModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

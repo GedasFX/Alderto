@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alderto.Bot.Data.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(SqliteDbContext))]
     [Migration("20190703145714_InitialCreate")]
     partial class InitialCreate
     {

@@ -7,21 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="config.debug.json" />
-    <None Remove="config.json" />
+    <None Remove="token" />
+    <None Remove="token.debug" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="config.json">
+    <Content Include="token">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="config.debug.json">
+    <Content Include="token.debug">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Alderto.Bot.Data\Alderto.Bot.Data.csproj" />
   </ItemGroup>
 
 </Project>
