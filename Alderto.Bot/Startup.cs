@@ -8,8 +8,8 @@ namespace Alderto.Bot
 {
     public class Startup
     {
-        public IConfiguration Config { get; private set; }
-        public DiscordSocketClient Client { get; private set; }
+        public IConfiguration Config { get; }
+        public DiscordSocketClient Client { get; }
 
         public Startup()
         {
@@ -24,6 +24,9 @@ namespace Alderto.Bot
 
             // Discord Bot API
             Client = new DiscordSocketClient();
+
+            // Database
+           
         }
 
         public async Task Run()
@@ -37,8 +40,7 @@ namespace Alderto.Bot
 
             // Event handlers
             Client.MessageReceived += MessageReceivedHandler.OnMessageReceived;
-
-
+            
             // Lock main thread to run indefinetly
             await Task.Delay(-1);
         }
