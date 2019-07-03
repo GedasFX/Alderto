@@ -1,32 +1,33 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 
 namespace Alderto.Bot
 {
     public class Startup
     {
-        public IConfiguration Config { get; }
+        private string Token { get; }
         public DiscordSocketClient Client { get; }
 
         public Startup()
         {
-            // Configuration for the application
-            Config = new ConfigurationBuilder()
-#if DEBUG
-                .AddJsonFile("config.debug.json", optional: false, reloadOnChange: true)
-#else
-                .AddJsonFile("config.json", optional: false, reloadOnChange: true)
-#endif
-                .Build();
+            // Get the bot token
+            Token = GetConfiguration();
 
             // Discord Bot API
             Client = new DiscordSocketClient();
+        }
 
-            // Database
-            
+        private static string GetConfiguration()
+        {
+#if DEBUG
+            const string tokenPath = "token.debug";
+#else
+            const string tokenPath = "token";
+#endif
+            return File.ReadAllText(tokenPath);
         }
 
         public async Task Run()
@@ -35,12 +36,12 @@ namespace Alderto.Bot
             Client.Log += Log;
 
             // Start bot
-            await Client.LoginAsync(TokenType.Bot, Config["Token"]);
+            await Client.LoginAsync(TokenType.Bot, Token);
             await Client.StartAsync();
 
             // Event handlers
             Client.MessageReceived += MessageReceivedHandler.OnMessageReceived;
-            
+
             // Lock main thread to run indefinetly
             await Task.Delay(-1);
         }

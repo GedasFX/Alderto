@@ -5,6 +5,8 @@ namespace Alderto.Bot.Data
 {
     public class Database : DbContext
     {
+        public static Database Instance { get; } = new Database();
+
         public DbSet<Member> Members { get; set; }
         public DbSet<Guild> Guilds { get; set; }
 
