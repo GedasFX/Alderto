@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Discord.WebSocket;
 
 namespace Alderto.Bot
 {
     class Program
     {
         static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
+            => new Startup().Run()
+                .GetAwaiter().GetResult();
     }
 }
