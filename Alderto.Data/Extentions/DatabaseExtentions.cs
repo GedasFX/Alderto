@@ -27,9 +27,11 @@ namespace Alderto.Data.Extentions
                 await context.Guilds.AddAsync(guild);
             }
 
-            return (await context.Members.AddAsync(member)).Entity;
-            
+            var entity = await context.Members.AddAsync(member);
 
+            await context.SaveChangesAsync();
+
+            return entity.Entity;
         }
     }
 }

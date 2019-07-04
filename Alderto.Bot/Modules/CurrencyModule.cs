@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Extentions;
@@ -22,19 +23,44 @@ namespace Alderto.Bot.Modules
         [Summary("Gives an amount of points to the listed users")]
         [RequireRole("Admin")]
         public async Task GiveAsync([Summary("Amount of points to give")] int qty,
-            [Summary("People to give points to")] params IGuildUser[] users)
+            [Summary("Users to give points to")] params IGuildUser[] users)
         {
-            foreach (var user in users)
+            // This is for giving, not taking
+            if (qty <= 0)
+                return;
+
+            var reply = await ModifyAsyncExec(qty, users);
+            await ReplyAsync(reply);
+        }
+
+        [Command("Take")]
+        [Summary("Takes an amount of points from the listed users")]
+        [RequireRole("Admin")]
+        public async Task TakeAsync([Summary("Amount of points to take")] int qty,
+            [Summary("Users to take points from")] params IGuildUser[] users)
+        {
+            // This is for taking, not giving
+            if (qty <= 0)
+                return;
+
+            var reply = await ModifyAsyncExec(-qty, users);
+            await ReplyAsync(reply);
+        }
+
+        public async Task<string> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
+        {
+            foreach (var user in guildUsers)
             {
                 var dbUser =
-                    await _context.Members.SingleOrDefaultAsync(m => m.MemberId == user.Id && m.GuildId == Context.Guild.Id) ??
-                    await _context.AddMemberAsync(new Member(user.GuildId, user.Id));
+                    await _context.Members.SingleOrDefaultAsync(m => m.MemberId == user.Id && m.GuildId == user.GuildId) ??
+                    await _context.AddMemberAsync(new Member(guildId: user.GuildId, memberId: user.Id));
 
                 dbUser.CurrencyCount += qty;
             }
 
-            var totalChanges = await _context.SaveChangesAsync();
-            await ReplyAsync($"{totalChanges} user(s) have been granted {qty} points.");
+            await _context.SaveChangesAsync();
+
+            return $"```Member(s) have been awarded {qty} points.```";
         }
 
         [Command("$")]
@@ -42,7 +68,7 @@ namespace Alderto.Bot.Modules
         public async Task CheckAsync([Summary("Person to check. If none provided, checks personal points.")] IGuildUser user = null)
         {
             if (user == null)
-                user = (IGuildUser) Context.Message.Author;
+                user = (IGuildUser)Context.Message.Author;
 
             var dbUser =
                 await _context.Members.SingleOrDefaultAsync(m => m.MemberId == user.Id && m.GuildId == Context.Guild.Id) ??

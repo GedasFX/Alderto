@@ -4,6 +4,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <StartupObject>Alderto.Bot.Program</StartupObject>
+    <Configurations>Debug;Release;Testing</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|AnyCPU'">
+    <DefineConstants>TRACE;TEST</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +33,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="store.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
