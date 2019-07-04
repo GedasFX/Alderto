@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Alderto.Bot.Data\Alderto.Bot.Data.csproj" />
+    <ProjectReference Include="..\Alderto.Bot.Data\Alderto.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

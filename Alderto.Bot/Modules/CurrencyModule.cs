@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Alderto.Bot.Data;
-using Alderto.Bot.Data.Models;
 using Alderto.Bot.Preconditions;
+using Alderto.Data;
+using Alderto.Data.Models;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;

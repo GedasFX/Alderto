@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Alderto.Bot.Data
+namespace Alderto.Data
 {
     class Program
     {

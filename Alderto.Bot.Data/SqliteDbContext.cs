@@ -1,11 +1,12 @@
-﻿using Alderto.Bot.Data.Models;
+﻿using Alderto.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Bot.Data
+namespace Alderto.Data
 {
     public class SqliteDbContext : DbContext
     {
         public DbSet<Member> Members { get; set; }
+        public DbSet<Guild> Guilds { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,7 +23,13 @@ namespace Alderto.Bot.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Member>()
-                .HasIndex(m => new { m.MemberId, m.GuildId });
+                .HasIndex(m => new { m.MemberId, m.GuildId })
+                .IsUnique();
+
+            modelBuilder.Entity<Guild>()
+                .HasMany(g => g.Members)
+                .WithOne(m => m.Guild)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

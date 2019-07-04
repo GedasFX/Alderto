@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Alderto.Bot.Data.Models
+namespace Alderto.Data.Models
 {
     public class Member
     {
@@ -20,6 +20,9 @@ namespace Alderto.Bot.Data.Models
 
         [ForeignKey(nameof(RecruitedByMemberId))]
         public virtual Member RecruitedByMember { get; set; }
+
+        [ForeignKey(nameof(GuildId))]
+        public virtual Guild Guild { get; set; }
 
         public virtual ICollection<Member> MembersRecruited { get; set; }
     }

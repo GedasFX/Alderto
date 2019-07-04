@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Bot", "Alderto.Bot\Alderto.Bot.csproj", "{413603EA-D515-469A-B055-757528FEDDA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Bot.Data", "Alderto.Bot.Data\Alderto.Bot.Data.csproj", "{13535E42-876C-42E9-88BB-27D291B47C19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Data", "Alderto.Bot.Data\Alderto.Data.csproj", "{13535E42-876C-42E9-88BB-27D291B47C19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

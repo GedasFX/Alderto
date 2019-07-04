@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
 
@@ -11,12 +13,16 @@ namespace Alderto.Bot
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        private readonly SqliteDbContext _context;
+
+        private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
 
         public CommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services)
         {
             _client = client;
             _commands = commands;
             _services = services;
+            _context = _services.GetService(typeof(SqliteDbContext)) as SqliteDbContext;
         }
 
         public async Task InstallCommandsAsync()
@@ -41,10 +47,26 @@ namespace Alderto.Bot
             if (!(messageParam is SocketUserMessage message)) return;
 
             // Create a number to track where the prefix ends and the command begins
-            int argPos = 0;
+            var argPos = 0;
+
+            // Get the prefix preference of a guild (if applicable)
+            var prefix = '.';
+            if (message.Author is SocketGuildUser guildUser)
+            {
+                var guildId = guildUser.Guild.Id;
+                if (!_guildPrefixes.TryGetValue(guildId, out prefix))
+                {
+                    var guild = await _context.Guilds.FindAsync(guildId);
+                    if (guild == null)
+                        _guildPrefixes[guildId] = '.';
+                    else
+                        _guildPrefixes[guildId] = guild.Prefix ?? '.';
+                }
+
+            }
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix('$', ref argPos) ||
+            if (!(message.HasCharPrefix(prefix, ref argPos) ||
                   message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
