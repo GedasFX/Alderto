@@ -6,9 +6,9 @@ using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Alderto.Bot
+namespace Alderto.Bot.Services
 {
-    public class CommandHandler
+    public class CommandHandlingService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
@@ -17,7 +17,7 @@ namespace Alderto.Bot
 
         private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services)
+        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services)
         {
             _client = client;
             _commands = commands;

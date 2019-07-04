@@ -1,68 +1,85 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Alderto.Bot.Services;
 using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Alderto.Bot
 {
     public class Startup
     {
-        private readonly CommandService _commands;
         private readonly DiscordSocketClient _client;
-        private IServiceProvider _services;
+        private readonly IConfiguration _config;
 
-        public Startup(DiscordSocketClient client = null, CommandService commands = null)
+        public Startup()
         {
-            _commands = commands ?? new CommandService();
-            _client = client ?? new DiscordSocketClient();
+            _config = BuildConfig();
 
-            _services = ConfigureServices(new ServiceCollection());
+            _client = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                // Set the log level
+                LogLevel = LogSeverity.Debug
+            });
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices()
         {
-            services.AddDbContext<SqliteDbContext>();
+            return new ServiceCollection()
+                // Add database
+                .AddDbContext<SqliteDbContext>()
 
-            services.AddSingleton(_commands);
-            services.AddSingleton(_client);
-            
-            return services.BuildServiceProvider();
+                // Add discord socket client
+                .AddSingleton(_client)
+
+                // Add command handling services
+                .AddSingleton<CommandService>()
+                .AddSingleton<CommandHandlingService>()
+
+                // Add logger service
+                .AddLogging(lb => { lb.AddConsole(); })
+                .AddSingleton<LogService>()
+
+                // Add configuration
+                .AddSingleton(_config)
+
+                // Build
+                .BuildServiceProvider();
         }
 
-        private static string GetToken()
+        public async Task RunAsync()
         {
-#if DEBUG
-            const string tokenPath = "token.debug";
-#else
-            const string tokenPath = "token";
-#endif
-            return File.ReadAllText(tokenPath);
-        }
+            var services = ConfigureServices();
 
-        public async Task Run()
-        {
-            // Add logger
-            _client.Log += Log;
+            // Enable logging
+            await services.GetService<LogService>().InstallLogger();
 
             // Start bot
-            await _client.LoginAsync(TokenType.Bot, GetToken());
+            await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
 
-            // Command handler
-            await new CommandHandler(_client, _commands, _services).InstallCommandsAsync();
+            // Install Command handler
+            await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
 
             // Lock main thread to run indefinetly
             await Task.Delay(-1);
         }
 
-        private static Task Log(LogMessage msg)
+        private static IConfiguration BuildConfig()
         {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+#if DEBUG
+                .AddJsonFile("config.json.debug")
+#else
+                .AddJsonFile("config.json")
+#endif
+                .Build();
         }
     }
 }

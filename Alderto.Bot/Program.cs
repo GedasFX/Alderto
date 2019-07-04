@@ -5,7 +5,7 @@ namespace Alderto.Bot
     class Program
     {
         static void Main(string[] args)
-            => new Startup().Run()
+            => new Startup().RunAsync()
                 .GetAwaiter().GetResult();
     }
 }
