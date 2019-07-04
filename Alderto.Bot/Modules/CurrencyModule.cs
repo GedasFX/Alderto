@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
@@ -23,7 +21,7 @@ namespace Alderto.Bot.Modules
         [Summary("Gives an amount of points to the listed users")]
         [RequireRole("Admin")]
         public async Task GiveAsync([Summary("Amount of points to give")] int qty,
-            [Summary("People to give points to")] params SocketUser[] users)
+            [Summary("People to give points to")] params IUser[] users)
         {
             var totalChanges = 0;
             foreach (var user in users)

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Bot", "Alderto.Bot\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Data", "Alderto.Data\Alderto.Data.csproj", "{13535E42-876C-42E9-88BB-27D291B47C19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alderto.Tests", "Alderto.Tests\Alderto.Tests.csproj", "{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{13535E42-876C-42E9-88BB-27D291B47C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13535E42-876C-42E9-88BB-27D291B47C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13535E42-876C-42E9-88BB-27D291B47C19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
