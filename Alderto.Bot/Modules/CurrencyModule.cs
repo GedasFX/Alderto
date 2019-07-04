@@ -34,7 +34,6 @@ namespace Alderto.Bot.Modules
                 {
                     dbUser = new Member
                     {
-                        Id = Guid.NewGuid(),
                         GuildId = Context.Guild.Id,
                         MemberId = user.Id
                     };

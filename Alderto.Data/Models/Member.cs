@@ -8,7 +8,7 @@ namespace Alderto.Data.Models
     public class Member
     {
         [Key]
-        public Guid Id { get; set; }
+        public uint Id { get; set; }
 
         public ulong MemberId { get; set; }
         public ulong GuildId { get; set; }
@@ -16,7 +16,7 @@ namespace Alderto.Data.Models
         public DateTime? CurrencyLastClaimed { get; set; }
         public int CurrencyCount { get; set; }
         
-		public Guid? RecruitedByMemberId { get; set; }
+		public uint? RecruitedByMemberId { get; set; }
 
         [ForeignKey(nameof(RecruitedByMemberId))]
         public virtual Member RecruitedByMember { get; set; }

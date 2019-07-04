@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Alderto.Data.Migrations
 {
-    public partial class init : Migration
+    public partial class db : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,12 +24,13 @@ namespace Alderto.Data.Migrations
                 name: "Members",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<uint>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     MemberId = table.Column<ulong>(nullable: false),
                     GuildId = table.Column<ulong>(nullable: false),
                     CurrencyLastClaimed = table.Column<DateTime>(nullable: true),
                     CurrencyCount = table.Column<int>(nullable: false),
-                    RecruitedByMemberId = table.Column<Guid>(nullable: true)
+                    RecruitedByMemberId = table.Column<uint>(nullable: true)
                 },
                 constraints: table =>
                 {

@@ -1,4 +1,6 @@
-﻿using Alderto.Data.Models;
+﻿using System;
+using System.Reflection;
+using Alderto.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data
@@ -11,7 +13,7 @@ namespace Alderto.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=store.db");
-
+            
             base.OnConfiguring(optionsBuilder);
         }
 
