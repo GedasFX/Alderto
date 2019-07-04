@@ -1,5 +1,10 @@
 ﻿using System;
+using System.ComponentModel.Design;
+using Alderto.Data;
 using Alderto.Tests.MockedEntities;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Alderto.Tests
 {
@@ -10,7 +15,11 @@ namespace Alderto.Tests
 
         public static MockGuild Guild { get; }
 
+        public static SqliteDbContext Database { get; }
+
         public static MockSocketCommandContext SocketCommandContext { get; }
+
+        public static IServiceProvider ServiceProvider { get; }
 
         static Dummies()
         {
@@ -30,10 +39,14 @@ namespace Alderto.Tests
                 Id = 5
             };
 
-            SocketCommandContext = new MockSocketCommandContext
+            SocketCommandContext = new MockSocketCommandContext(null, Mock.Of<SocketUserMessage>())
             {
                 Guild = Guild
             };
+
+            ServiceProvider = new ServiceCollection()
+                .AddDbContext<SqliteDbContext>()
+                .BuildServiceProvider();
         }
     }
 }

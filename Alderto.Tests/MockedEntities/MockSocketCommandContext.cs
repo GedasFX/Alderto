@@ -14,10 +14,13 @@ namespace Alderto.Tests.MockedEntities
 
         public MockSocketCommandContext() : base(null, null)
         {
+            
         }
 
         public MockSocketCommandContext(DiscordSocketClient client, SocketUserMessage msg) : base(client, msg)
         {
+            Client = client;
+            Message = msg;
         }
     }
 }

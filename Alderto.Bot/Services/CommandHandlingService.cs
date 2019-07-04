@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Bot.Services
 {
@@ -13,7 +14,7 @@ namespace Alderto.Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly SqliteDbContext _context;
+        private readonly IAldertoDbContext _context;
 
         private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
 
@@ -22,7 +23,7 @@ namespace Alderto.Bot.Services
             _client = client;
             _commands = commands;
             _services = services;
-            _context = _services.GetService(typeof(SqliteDbContext)) as SqliteDbContext;
+            _context = _services.GetService<IAldertoDbContext>();
         }
 
         public async Task InstallCommandsAsync()
@@ -57,10 +58,9 @@ namespace Alderto.Bot.Services
                 if (!_guildPrefixes.TryGetValue(guildId, out prefix))
                 {
                     var guild = await _context.Guilds.FindAsync(guildId);
-                    if (guild == null)
-                        _guildPrefixes[guildId] = '.';
-                    else
-                        _guildPrefixes[guildId] = guild.Prefix ?? '.';
+
+                    // If guild is null or its prefix is null do prefix of '.', otherwise use whatever the guild has set.
+                    _guildPrefixes[guildId] = guild?.Prefix ?? '.';
                 }
 
             }
@@ -88,8 +88,10 @@ namespace Alderto.Bot.Services
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
+#if DEBUG
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync(result.ErrorReason);
+#endif
         }
     }
 }

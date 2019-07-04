@@ -18,8 +18,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
                 {
-                    b.Property<ulong>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<ulong>("Id");
 
                     b.Property<char?>("Prefix");
 
@@ -30,7 +29,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Alderto.Data.Models.Member", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("CurrencyCount");
@@ -41,7 +40,7 @@ namespace Alderto.Data.Migrations
 
                     b.Property<ulong>("MemberId");
 
-                    b.Property<uint?>("RecruitedByMemberId");
+                    b.Property<Guid?>("RecruitedByMemberId");
 
                     b.HasKey("Id");
 

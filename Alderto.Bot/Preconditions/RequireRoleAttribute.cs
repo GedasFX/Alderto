@@ -27,7 +27,7 @@ namespace Alderto.Bot.Preconditions
                     // Since no async work is done, the result has to be wrapped with `Task.FromResult` to avoid compiler errors
                     return Task.FromResult(PreconditionResult.FromSuccess());
                 // If it wasn't, fail
-                return Task.FromResult(PreconditionResult.FromError($"You do not have the appropriate roles required to run this command."));
+                return Task.FromResult(PreconditionResult.FromError("You do not have the appropriate roles required to run this command."));
             }
 
             return Task.FromResult(PreconditionResult.FromError("You must be in a guild to run this command."));

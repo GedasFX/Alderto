@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(SqliteDbContext))]
-    [Migration("20190704093115_db")]
-    partial class db
+    [Migration("20190704164444_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,8 +20,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
                 {
-                    b.Property<ulong>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<ulong>("Id");
 
                     b.Property<char?>("Prefix");
 
@@ -32,7 +31,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Alderto.Data.Models.Member", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("CurrencyCount");
@@ -43,7 +42,7 @@ namespace Alderto.Data.Migrations
 
                     b.Property<ulong>("MemberId");
 
-                    b.Property<uint?>("RecruitedByMemberId");
+                    b.Property<Guid?>("RecruitedByMemberId");
 
                     b.HasKey("Id");
 
