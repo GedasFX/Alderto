@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data.Extentions
 {
-    public static class DatabaseExtentions
+    public static class AldertoDbContextExtentions
     {
         /// <summary>
         /// Adds a member to <see cref="IAldertoDbContext.Members"/> and, if needed, creates a guild in <see cref="IAldertoDbContext.Guilds"/>

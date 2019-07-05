@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Alderto.Bot.Extentions;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Extentions;
@@ -29,7 +29,8 @@ namespace Alderto.Bot.Modules
                 return;
 
             var reply = await ModifyAsyncExec(qty, users);
-            await ReplyAsync(reply);
+
+            await ReplyAsync(embed: reply);
         }
 
         [Command("Take")]
@@ -43,12 +44,16 @@ namespace Alderto.Bot.Modules
                 return;
 
             var reply = await ModifyAsyncExec(-qty, users);
-            await ReplyAsync(reply);
+
+            await ReplyAsync(embed: reply);
         }
 
-        public async Task<string> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
+        public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
-            var sb = new StringBuilder();
+            var reply = new EmbedBuilder()
+                .AddDefault()
+                .WithDescription("**The following changes have been made:**");
+
             foreach (var user in guildUsers)
             {
                 // Get the user
@@ -58,15 +63,13 @@ namespace Alderto.Bot.Modules
                 dbUser.CurrencyCount += qty;
 
                 // Format a nice output
-                sb.Append($"{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}], ");
+                reply.AddField($"{user.Mention} [{user.Username}#{user.Discriminator}]",    
+                    $"{dbUser.CurrencyCount - qty} -> {dbUser.CurrencyCount} :gp:");
             }
 
             await _context.SaveChangesAsync();
 
-            // Remove the last ", " from the string
-            sb.Length -= 2;
-
-            return $"```{sb} has been awarded {qty} points.```";
+            return reply.Build();
         }
 
         [Command("$")]

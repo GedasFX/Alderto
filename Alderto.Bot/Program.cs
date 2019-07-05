@@ -1,11 +1,8 @@
-﻿using Discord.WebSocket;
-
-namespace Alderto.Bot
+﻿namespace Alderto.Bot
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-            => new Startup().RunAsync()
-                .GetAwaiter().GetResult();
+        private static void Main(string[] args)
+            => new Startup().RunAsync().Wait();
     }
 }
