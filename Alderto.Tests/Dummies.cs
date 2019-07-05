@@ -1,11 +1,7 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using Alderto.Data;
 using Alderto.Tests.MockedEntities;
-using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 
 namespace Alderto.Tests
 {
@@ -15,10 +11,6 @@ namespace Alderto.Tests
         public static MockGuildUser Bob { get; }
 
         public static MockGuild Guild { get; }
-
-        public static IAldertoDbContext Database { get; }
-
-        public static MockSocketCommandContext SocketCommandContext { get; }
 
         public static IServiceProvider ServiceProvider { get; }
 
@@ -40,9 +32,7 @@ namespace Alderto.Tests
             {
                 Id = 5
             };
-
-            Database = new MockDbContext();
-
+            
             ServiceProvider = new ServiceCollection()
                 .AddDbContext<IAldertoDbContext, MockDbContext>()
                 .AddDbContext<SqliteDbContext>()

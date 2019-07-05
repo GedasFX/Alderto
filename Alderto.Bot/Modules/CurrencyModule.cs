@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Extentions;
-using Alderto.Data.Models;
 using Discord;
 using Discord.Commands;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
@@ -49,18 +48,25 @@ namespace Alderto.Bot.Modules
 
         public async Task<string> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
+            var sb = new StringBuilder();
             foreach (var user in guildUsers)
             {
-                var dbUser =
-                    await _context.Members.SingleOrDefaultAsync(m => m.MemberId == user.Id && m.GuildId == user.GuildId) ??
-                    await _context.AddMemberAsync(new Member(guildId: user.GuildId, memberId: user.Id));
+                // Get the user
+                var dbUser = await _context.GetMemberAsync(guildId: user.GuildId, memberId: user.Id, addIfNonExistant: true);
 
+                // Add currency to the user
                 dbUser.CurrencyCount += qty;
+
+                // Format a nice output
+                sb.Append($"{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}], ");
             }
 
             await _context.SaveChangesAsync();
 
-            return $"```Member(s) have been awarded {qty} points.```";
+            // Remove the last ", " from the string
+            sb.Length -= 2;
+
+            return $"```{sb} has been awarded {qty} points.```";
         }
 
         [Command("$")]
@@ -70,9 +76,7 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var dbUser =
-                await _context.Members.SingleOrDefaultAsync(m => m.MemberId == user.Id && m.GuildId == Context.Guild.Id) ??
-                new Member(user.GuildId, user.Id);
+            var dbUser = await _context.GetMemberAsync(guildId: user.GuildId, memberId: user.Id);
 
             await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
         }

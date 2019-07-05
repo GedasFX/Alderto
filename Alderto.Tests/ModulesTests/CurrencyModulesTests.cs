@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Modules;
 using Alderto.Data;
-using Discord;
+using Alderto.Tests.MockedEntities;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -10,21 +10,20 @@ namespace Alderto.Tests.ModulesTests
     public class CurrencyModulesTests
     {
         private readonly CurrencyModule _module;
-        private readonly IAldertoDbContext _database;
+        private readonly IAldertoDbContext _context;
 
         public CurrencyModulesTests()
         {
-            _database = Dummies.Database;
-            _module = new CurrencyModule(_database);
+            _context = new MockDbContext();
+            _module = new CurrencyModule(_context);
         }
 
         [Fact]
         public async Task Give()
         {
             var user = Dummies.Alice;
-
             await _module.ModifyAsyncExec(20, new[] { Dummies.Alice, Dummies.Alice });
-            var dbUser = await _database.Members.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
+            var dbUser = await _context.Members.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
             Assert.Equal(40, dbUser.CurrencyCount);
         }
 
