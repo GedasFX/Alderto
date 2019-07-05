@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 declare var $: any;
 @Component({
-  selector: 'app-notifications',
-  templateUrl: './notifications.component.html',
-  styleUrls: ['./notifications.component.css']
+  selector: "app-notifications",
+  templateUrl: "./notifications.component.html",
+  styleUrls: ["./notifications.component.css"]
 })
 export class NotificationsComponent implements OnInit {
 
   constructor() { }
   showNotification(from, align){
-      const type = ['','info','success','warning','danger'];
+      const type = ["","info","success","warning","danger"];
 
       const color = Math.floor((Math.random() * 4) + 1);
 
@@ -31,9 +31,9 @@ export class NotificationsComponent implements OnInit {
             '<span data-notify="message">{2}</span>' +
             '<div class="progress" data-notify="progressbar">' +
               '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
-            '</div>' +
+            "</div>" +
             '<a href="{3}" target="{4}" data-notify="url"></a>' +
-          '</div>'
+          "</div>"
       });
   }
   ngOnInit() {

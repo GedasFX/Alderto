@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Alderto.Web": {
+    "material-dashboard-angular": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
