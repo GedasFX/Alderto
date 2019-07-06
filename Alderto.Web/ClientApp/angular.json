@@ -25,10 +25,13 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/@coreui/coreui/dist/css/coreui.min.css",
-              "src/styles.css"
+              "node_modules/@coreui/coreui/dist/css/coreui.css",
+              "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/@coreui/coreui/dist/js/coreui.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -119,5 +122,10 @@
       }
     }
   },
-  "defaultProject": "Alderto"
+  "defaultProject": "Alderto",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "scss"
+    }
+  }
 }
