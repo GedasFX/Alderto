@@ -24,6 +24,8 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/@coreui/coreui/dist/css/coreui.min.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -115,6 +117,7 @@
           }
         }
       }
-    }},
-  "defaultProject": "wwwroot"
+    }
+  },
+  "defaultProject": "Alderto"
 }

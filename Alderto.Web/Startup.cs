@@ -61,8 +61,8 @@ namespace Alderto.Web
 
                 if (env.IsDevelopment())
                 {
-                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-                    spa.UseAngularCliServer("start");
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    //spa.UseAngularCliServer("start");
                 }
             });
         }
