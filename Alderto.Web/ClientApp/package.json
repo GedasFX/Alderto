@@ -21,8 +21,11 @@
     "@angular/router": "~8.1.0",
     "@coreui/coreui": "^2.1.12",
     "bootstrap": "^4.3.1",
+    "chartjs": "^0.3.24",
     "jquery": "^3.4.1",
+    "perfect-scrollbar": "^1.4.0",
     "rxjs": "~6.4.0",
+    "simple-line-icons": "^2.4.1",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"
   },

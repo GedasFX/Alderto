@@ -25,11 +25,13 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/simple-line-icons/css/simple-line-icons.css",
               "node_modules/@coreui/coreui/dist/css/coreui.css",
               "src/styles.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.js",
               "node_modules/@coreui/coreui/dist/js/coreui.js"
             ]
           },
