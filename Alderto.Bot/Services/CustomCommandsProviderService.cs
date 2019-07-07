@@ -31,14 +31,14 @@ namespace Alderto.Bot.Services
             _luaState.DoString("import = function () end");
         }
 
-        public async Task RunCommandAsync(ulong guildId, string cmdName, string args)
+        public async Task<object[]> RunCommandAsync(ulong guildId, string cmdName, string args)
         {
             _commands.TryGetValue(ValueTuple.Create(guildId, cmdName), out var func);
 
             using (var c = new CancellationTokenSource())
             {
                 c.CancelAfter(CustomCommandExecTimeout);
-                await Task.Run(() => func?.Call(args), c.Token);
+                return await Task.Run(() => func?.Call(args), c.Token);
             }
         }
 

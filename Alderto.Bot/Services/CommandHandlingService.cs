@@ -6,26 +6,25 @@ using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using NLua;
 
 namespace Alderto.Bot.Services
 {
     public class CommandHandlingService
     {
+        private const char DefaultCommandPrefix = '.';
+
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly Lua _luaCode;
         private readonly IAldertoDbContext _context;
 
         private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
 
-        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services, Lua luaCode)
+        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services)
         {
             _client = client;
             _commands = commands;
             _services = services;
-            _luaCode = luaCode;
             _context = _services.GetService<IAldertoDbContext>();
         }
 
@@ -54,7 +53,7 @@ namespace Alderto.Bot.Services
             var argPos = 0;
 
             // Get the prefix preference of a guild (if applicable)
-            var prefix = '.';
+            var prefix = DefaultCommandPrefix;
             if (message.Author is SocketGuildUser guildUser)
             {
                 var guildId = guildUser.Guild.Id;
@@ -62,8 +61,9 @@ namespace Alderto.Bot.Services
                 {
                     var guild = await _context.Guilds.FindAsync(guildId);
 
-                    // If guild is null or its prefix is null do prefix of '.', otherwise use whatever the guild has set.
-                    _guildPrefixes[guildId] = guild?.Prefix ?? '.';
+                    // If guild is null or its prefix is null, use default prefix, otherwise, use whatever the guild has set.
+                    prefix = guild?.Prefix ?? DefaultCommandPrefix;
+                    _guildPrefixes[guildId] = prefix;
                 }
             }
 
