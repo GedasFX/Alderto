@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using NLua;
 
 namespace Alderto.Bot.Services
 {
@@ -14,15 +16,17 @@ namespace Alderto.Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        private readonly Lua _luaCode;
         private readonly IAldertoDbContext _context;
 
         private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
 
-        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services)
+        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services, Lua luaCode)
         {
             _client = client;
             _commands = commands;
             _services = services;
+            _luaCode = luaCode;
             _context = _services.GetService<IAldertoDbContext>();
         }
 
@@ -40,6 +44,13 @@ namespace Alderto.Bot.Services
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _services);
+
+            // Load Lua code
+            _luaCode.LoadCLRPackage();
+            _luaCode.DoString("import ('Alderto.Bot', 'Alderto.Bot.Commands')");
+
+            // Prevent additional namespaces to be added
+            _luaCode.DoString("import = function () end");
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -62,7 +73,6 @@ namespace Alderto.Bot.Services
                     // If guild is null or its prefix is null do prefix of '.', otherwise use whatever the guild has set.
                     _guildPrefixes[guildId] = guild?.Prefix ?? '.';
                 }
-
             }
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
@@ -79,10 +89,7 @@ namespace Alderto.Bot.Services
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: _services);
+            var result = await _commands.ExecuteAsync(context: context, argPos: argPos, services: _services);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,

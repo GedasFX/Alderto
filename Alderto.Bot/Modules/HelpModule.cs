@@ -24,7 +24,7 @@ namespace Alderto.Bot.Modules
         public async Task Help()
         {
             var embed = new EmbedBuilder()
-                .AddDefault();
+                .WithDefault();
             foreach (var command in _commands.Commands)
             {
                 embed.AddField(command.Name, command.Summary);

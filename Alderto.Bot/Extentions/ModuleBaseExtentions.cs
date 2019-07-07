@@ -9,8 +9,8 @@ namespace Alderto.Bot.Extentions
         public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module, string description) where T : class, ICommandContext
         {
             var builder = new EmbedBuilder()
-                .WithDescription(description)
-                .WithColor(new Color(0x2B9738));
+                .WithDefault()
+                .WithDescription(description);
             var embed = builder.Build();
             await module.Context.Channel.SendMessageAsync(text: null, embed: embed)
                 .ConfigureAwait(false);

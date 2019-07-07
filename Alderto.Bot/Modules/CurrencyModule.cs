@@ -51,7 +51,7 @@ namespace Alderto.Bot.Modules
         public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
             var reply = new EmbedBuilder()
-                .AddDefault()
+                .WithDefault()
                 .WithDescription("**The following changes have been made:**");
 
             foreach (var user in guildUsers)
