@@ -20,19 +20,6 @@ namespace Alderto.Bot
 
         public Startup()
         {
-            var luacode = new Lua();
-            for (int i = 0; i < 10000000; i++)
-                luacode.DoString(@"
-function _" + "dawdawd" + @" (val1, val2)
-	if val1 > val2 then
-        CurrencyCommands.Yeet()
-		return val1 + 1
-	else
-		return val2 - 1
-	end
-end
-");
-            return;
             _config = BuildConfig();
 
             _client = new DiscordSocketClient(new DiscordSocketConfig
@@ -55,7 +42,7 @@ end
                 .AddSingleton<CommandHandlingService>()
 
                 // Add Lua command handler
-                .AddSingleton<Lua>()
+                .AddSingleton<CustomCommandsProviderService>()
 
                 // Add logger service
                 .AddLogging(lb => { lb.AddConsole(); })
@@ -70,11 +57,7 @@ end
 
         public async Task RunAsync()
         {
-            return;
             var services = ConfigureServices();
-
-            var s = _config["commands"];
-            Console.WriteLine(s);
 
             // Enable logging
             await services.GetService<LoggingService>().InstallLogger();

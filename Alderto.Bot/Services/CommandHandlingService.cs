@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Discord.Commands;
@@ -44,13 +43,6 @@ namespace Alderto.Bot.Services
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _services);
-
-            // Load Lua code
-            _luaCode.LoadCLRPackage();
-            _luaCode.DoString("import ('Alderto.Bot', 'Alderto.Bot.Commands')");
-
-            // Prevent additional namespaces to be added
-            _luaCode.DoString("import = function () end");
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)

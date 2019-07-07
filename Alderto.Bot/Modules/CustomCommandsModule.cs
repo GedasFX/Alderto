@@ -1,10 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Bot.Services;
-using Discord;
 using Discord.Commands;
-using NLua;
 
 namespace Alderto.Bot.Modules
 {
@@ -19,18 +15,15 @@ namespace Alderto.Bot.Modules
         }
 
         [Command]
-        public void ExecuteAsync([Remainder] string args)
+        public async Task ExecuteAsync([Remainder] string args)
         {
+            await _cmdProvider.RunCommandAsync(Context.Guild.Id, args.Split(' ')[0], args);
+        }
 
-            
-                c.CancelAfter(500);
-                await Task.Run(, c.Token);
-
-                var luaFunction = _luaCode["ScriptFunc"] as LuaFunction;
-                var r = luaFunction?.Call(5, 2);
-
-                Console.WriteLine(r);
-            }
+        [Command("Reload")]
+        public async Task ReloadAsync()
+        {
+            await _cmdProvider.ReloadCommands(Context.Guild.Id);
         }
     }
 }

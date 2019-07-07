@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Alderto.Data.Models
 {
@@ -7,6 +8,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Unique command identifier.
         /// </summary>
+        [Key]
         public Guid Id { get; set; }
 
         /// <summary>
@@ -20,7 +22,7 @@ namespace Alderto.Data.Models
         public string TriggerKeyword { get; set; }
 
         /// <summary>
-        /// Command's code.
+        /// Command's code. Does not include the function header. Starts in body's first line.
         /// </summary>
         public string LuaCode { get; set; }
 
