@@ -23,7 +23,7 @@ namespace Alderto.Tests.ModulesTests
         {
             var user = Dummies.Alice;
             await _module.ModifyAsyncExec(20, new[] { Dummies.Alice, Dummies.Alice });
-            var dbUser = await _context.Members.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
+            var dbUser = await _context.GuildMembers.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
             Assert.Equal(40, dbUser.CurrencyCount);
         }
 

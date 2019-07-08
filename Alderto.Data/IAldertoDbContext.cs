@@ -13,7 +13,7 @@ namespace Alderto.Data
 {
     public interface IAldertoDbContext
     {
-        DbSet<Member> Members { get; }
+        DbSet<GuildMember> GuildMembers { get; }
         DbSet<Guild> Guilds { get; }
         DbSet<CustomCommand> CustomCommands { get; }
 

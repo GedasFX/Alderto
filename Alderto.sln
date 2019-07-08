@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Data", "Alderto.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Tests", "Alderto.Tests\Alderto.Tests.csproj", "{F323C9A6-42F2-44D4-B02D-30D290ECF3A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alderto.Web", "Alderto.Web\Alderto.Web.csproj", "{815977C3-0731-47EF-BF1D-291114E51468}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Web", "Alderto.Web\Alderto.Web.csproj", "{815977C3-0731-47EF-BF1D-291114E51468}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -26,7 +26,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// A collection of members the guild contains.
         /// </summary>
-        public virtual IEnumerable<Member> Members { get; set; }
+        public virtual IEnumerable<GuildMember> Members { get; set; }
 
         /// <summary>
         /// A collection of all custom commands registered to the guild.

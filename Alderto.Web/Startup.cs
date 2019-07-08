@@ -26,6 +26,12 @@ namespace Alderto.Web
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddAuthentication().AddDiscord(options =>
+            {
+                options.ClientId = Configuration["DiscordAuth:ClientId"];
+                options.ClientSecret = Configuration["DiscordAuth:ClientSecret"];
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +50,8 @@ namespace Alderto.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
