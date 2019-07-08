@@ -27,8 +27,9 @@ namespace Alderto.Bot.Services
             _commands = new Dictionary<string, LuaFunction>();
 
             // Load Lua code
-            _luaState.LoadCLRPackage();
-            _luaState.DoString("import ('Alderto.Bot', 'Alderto.Bot.Commands')");
+            // TODO: Load lua code. Uncomment below
+            //_luaState.LoadCLRPackage();
+            //_luaState.DoString("import ('Alderto.Bot', 'Alderto.Bot.Commands')");
 
             // Prevent additional namespaces to be added
             _luaState.DoString("import = function () end");

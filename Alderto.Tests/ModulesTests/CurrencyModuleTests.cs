@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Alderto.Tests.ModulesTests
 {
-    public class CustomCommandsProviderServiceTests
+    public class CurrencyModuleTests
     {
         private readonly CurrencyModule _module;
         private readonly IAldertoDbContext _context;
 
-        public CustomCommandsProviderServiceTests()
+        public CurrencyModuleTests()
         {
             _context = new MockDbContext();
             _module = new CurrencyModule(_context);
