@@ -30,6 +30,5 @@ namespace Alderto.Data.Models
         /// Guild which owns and can run this command.
         /// </summary>
         public virtual Guild Guild { get; set; }
-
     }
 }

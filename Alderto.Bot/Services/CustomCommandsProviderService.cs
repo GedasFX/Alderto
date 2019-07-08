@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
@@ -15,13 +13,13 @@ namespace Alderto.Bot.Services
 
         private readonly IAldertoDbContext _context;
         private readonly Lua _luaState;
-        private readonly Dictionary<(ulong, string), LuaFunction> _commands;
+        private readonly Dictionary<string, LuaFunction> _commands;
 
         public CustomCommandsProviderService(IAldertoDbContext context)
         {
             _context = context;
             _luaState = new Lua();
-            _commands = new Dictionary<(ulong, string), LuaFunction>();
+            _commands = new Dictionary<string, LuaFunction>();
 
             // Load Lua code
             _luaState.LoadCLRPackage();
@@ -33,7 +31,12 @@ namespace Alderto.Bot.Services
 
         public async Task<object[]> RunCommandAsync(ulong guildId, string cmdName, string args)
         {
-            _commands.TryGetValue(ValueTuple.Create(guildId, cmdName), out var func);
+            return await RunCommandAsync($"_{guildId}_{cmdName}", args);
+        }
+
+        public async Task<object[]> RunCommandAsync(string functionName, string args)
+        {
+            _commands.TryGetValue(functionName, out var func);
 
             using (var c = new CancellationTokenSource())
             {
@@ -52,21 +55,20 @@ namespace Alderto.Bot.Services
             {
                 foreach (var cmd in guild.CustomCommands)
                 {
-                    await RegisterCommand(guildId: guildId, cmdName: cmd.TriggerKeyword, code: cmd.LuaCode);
+                    await RegisterCommand(functionName: $"_{guildId}_{cmd.TriggerKeyword}", code: cmd.LuaCode);
                 }
             }
         }
 
-        public async Task RegisterCommand(ulong guildId, string cmdName, string code)
+        public async Task RegisterCommand(string functionName, string code)
         {
-            var functionName = $"_{(uint)_commands.First().Key.GetHashCode()}";
             using (var c = new CancellationTokenSource())
             {
                 c.CancelAfter(CustomCommandExecTimeout);
                 await Task.Run(action: () =>
                 {
                     _luaState.DoString($"function {functionName} (args) {code} end");
-                    _commands[(guildId, cmdName)] = _luaState.GetFunction(functionName);
+                    _commands[functionName] = _luaState.GetFunction(functionName);
                 }, cancellationToken: c.Token);
             }
         }

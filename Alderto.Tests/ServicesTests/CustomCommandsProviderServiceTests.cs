@@ -35,6 +35,7 @@ else
 end
 "
             });
+            await _context.Guilds.AddAsync(new Guild(1));
             await _context.SaveChangesAsync();
 
             await _service.ReloadCommands(1);
