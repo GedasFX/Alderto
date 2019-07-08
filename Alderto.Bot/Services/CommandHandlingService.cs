@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Alderto.Bot.TypeReaders;
 using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -11,6 +12,8 @@ namespace Alderto.Bot.Services
 {
     public class CommandHandlingService
     {
+        private const char DefaultCommandPrefix = '.';
+
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
@@ -30,6 +33,8 @@ namespace Alderto.Bot.Services
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;
+
+            _commands.AddTypeReader(typeof(object), new ObjectTypeReader());
 
             // Here we discover all of the command modules in the entry 
             // assembly and load them. Starting from Discord.NET 2.0, a
@@ -51,7 +56,7 @@ namespace Alderto.Bot.Services
             var argPos = 0;
 
             // Get the prefix preference of a guild (if applicable)
-            var prefix = '.';
+            var prefix = DefaultCommandPrefix;
             if (message.Author is SocketGuildUser guildUser)
             {
                 var guildId = guildUser.Guild.Id;
@@ -59,10 +64,10 @@ namespace Alderto.Bot.Services
                 {
                     var guild = await _context.Guilds.FindAsync(guildId);
 
-                    // If guild is null or its prefix is null do prefix of '.', otherwise use whatever the guild has set.
-                    _guildPrefixes[guildId] = guild?.Prefix ?? '.';
+                    // If guild is null or its prefix is null, use default prefix, otherwise, use whatever the guild has set.
+                    prefix = guild?.Prefix ?? DefaultCommandPrefix;
+                    _guildPrefixes[guildId] = prefix;
                 }
-
             }
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
@@ -79,10 +84,7 @@ namespace Alderto.Bot.Services
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: _services);
+            var result = await _commands.ExecuteAsync(context: context, argPos: argPos, services: _services);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,

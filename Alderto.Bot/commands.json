@@ -1,0 +1,12 @@
+{
+  "Commands": {
+    "h": {
+      "Cmd": "help h",
+      "Desc": "Either shows a help for a single command, or DMs you help link if no parameters are specified.",
+      "Usage": [
+        "{0}h {0}cmds",
+        "{0}h"
+      ]
+    }
+  }
+}

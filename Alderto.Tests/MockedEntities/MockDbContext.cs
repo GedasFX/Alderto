@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Alderto.Data;
+﻿using Alderto.Data;
 using Alderto.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Tests.MockedEntities
 {
-    class MockDbContext : DbContext, IAldertoDbContext
+    internal class MockDbContext : DbContext, IAldertoDbContext
     {
         public DbSet<Member> Members { get; set; }
         public DbSet<Guild> Guilds { get; set; }
+        public DbSet<CustomCommand> CustomCommands { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -19,7 +17,5 @@ namespace Alderto.Tests.MockedEntities
 
             base.OnConfiguring(optionsBuilder);
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) => base.OnModelCreating(modelBuilder);
     }
 }

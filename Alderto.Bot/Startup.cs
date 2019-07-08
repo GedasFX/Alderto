@@ -6,6 +6,7 @@ using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,34 +24,33 @@ namespace Alderto.Bot
 
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                // Set the log level
                 LogLevel = LogSeverity.Debug
             });
         }
 
-        public IServiceProvider ConfigureServices()
-        {
-            return new ServiceCollection()
-                // Add database
-                .AddDbContext<IAldertoDbContext, SqliteDbContext>()
+        public IServiceProvider ConfigureServices() => new ServiceCollection()
+            // Add database
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>()
 
-                // Add discord socket client
-                .AddSingleton(_client)
+            // Add discord socket client
+            .AddSingleton(_client)
 
-                // Add command handling services
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
+            // Add command handling services
+            .AddSingleton<CommandService>()
+            .AddSingleton<CommandHandlingService>()
 
-                // Add logger service
-                .AddLogging(lb => { lb.AddConsole(); })
-                .AddSingleton<LoggingService>()
+            // Add Lua command handler
+            .AddSingleton<CustomCommandsProviderService>()
 
-                // Add configuration
-                .AddSingleton(_config)
+            // Add logger service
+            .AddLogging(lb => { lb.AddConsole(); })
+            .AddSingleton<LoggingService>()
 
-                // Build
-                .BuildServiceProvider();
-        }
+            // Add configuration
+            .AddSingleton(_config)
+
+            // Build
+            .BuildServiceProvider();
 
         public async Task RunAsync()
         {
@@ -62,7 +62,7 @@ namespace Alderto.Bot
             // Start bot
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
-            
+
             // Install Command handler
             await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
 
@@ -79,6 +79,7 @@ namespace Alderto.Bot
 #else
                 .AddJsonFile("config.json")
 #endif
+                .AddJsonFile("commands.json")
                 .Build();
         }
     }
