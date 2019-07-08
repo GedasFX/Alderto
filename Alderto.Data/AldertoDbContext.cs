@@ -3,26 +3,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data
 {
-    public class SqliteDbContext : DbContext, IAldertoDbContext
+    public class AldertoDbContext : DbContext, IAldertoDbContext
     {
         public DbSet<Member> Members { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=store.db");
-
-            base.OnConfiguring(optionsBuilder);
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Member>()
-                .HasMany(m => m.MembersRecruited)
-                .WithOne(m => m.RecruitedByMember)
-                .OnDelete(DeleteBehavior.SetNull);
-
             modelBuilder.Entity<Member>()
                 .HasIndex(m => new { m.MemberId, m.GuildId })
                 .IsUnique();
@@ -42,6 +30,14 @@ namespace Alderto.Data
                 .IsUnique();
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
+
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

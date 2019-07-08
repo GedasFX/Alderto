@@ -35,7 +35,6 @@ namespace Alderto.Tests
             
             ServiceProvider = new ServiceCollection()
                 .AddDbContext<IAldertoDbContext, MockDbContext>()
-                .AddDbContext<SqliteDbContext>()
                 .BuildServiceProvider();
         }
     }

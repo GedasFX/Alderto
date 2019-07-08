@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Alderto.Data.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,8 +11,9 @@ namespace Alderto.Data.Migrations
                 name: "Guilds",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(nullable: false),
-                    Prefix = table.Column<char>(nullable: true)
+                    Id = table.Column<decimal>(nullable: false),
+                    Prefix = table.Column<string>(nullable: true),
+                    PremiumUntil = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -20,12 +21,32 @@ namespace Alderto.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomCommands",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    GuildId = table.Column<decimal>(nullable: false),
+                    TriggerKeyword = table.Column<string>(nullable: true),
+                    LuaCode = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomCommands", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomCommands_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Members",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    MemberId = table.Column<ulong>(nullable: false),
-                    GuildId = table.Column<ulong>(nullable: false),
+                    MemberId = table.Column<decimal>(nullable: false),
+                    GuildId = table.Column<decimal>(nullable: false),
                     CurrencyLastClaimed = table.Column<DateTime>(nullable: true),
                     CurrencyCount = table.Column<int>(nullable: false),
                     RecruitedByMemberId = table.Column<Guid>(nullable: true)
@@ -44,8 +65,15 @@ namespace Alderto.Data.Migrations
                         column: x => x.RecruitedByMemberId,
                         principalTable: "Members",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomCommands_GuildId_TriggerKeyword",
+                table: "CustomCommands",
+                columns: new[] { "GuildId", "TriggerKeyword" },
+                unique: true,
+                filter: "[TriggerKeyword] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Members_GuildId",
@@ -66,6 +94,9 @@ namespace Alderto.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CustomCommands");
+
             migrationBuilder.DropTable(
                 name: "Members");
 

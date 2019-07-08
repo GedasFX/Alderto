@@ -6,6 +6,7 @@ using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,32 +28,29 @@ namespace Alderto.Bot
             });
         }
 
-        public IServiceProvider ConfigureServices()
-        {
-            return new ServiceCollection()
-                // Add database
-                .AddDbContext<IAldertoDbContext, SqliteDbContext>()
+        public IServiceProvider ConfigureServices() => new ServiceCollection()
+            // Add database
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>()
 
-                // Add discord socket client
-                .AddSingleton(_client)
+            // Add discord socket client
+            .AddSingleton(_client)
 
-                // Add command handling services
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
+            // Add command handling services
+            .AddSingleton<CommandService>()
+            .AddSingleton<CommandHandlingService>()
 
-                // Add Lua command handler
-                .AddSingleton<CustomCommandsProviderService>()
+            // Add Lua command handler
+            .AddSingleton<CustomCommandsProviderService>()
 
-                // Add logger service
-                .AddLogging(lb => { lb.AddConsole(); })
-                .AddSingleton<LoggingService>()
+            // Add logger service
+            .AddLogging(lb => { lb.AddConsole(); })
+            .AddSingleton<LoggingService>()
 
-                // Add configuration
-                .AddSingleton(_config)
+            // Add configuration
+            .AddSingleton(_config)
 
-                // Build
-                .BuildServiceProvider();
-        }
+            // Build
+            .BuildServiceProvider();
 
         public async Task RunAsync()
         {

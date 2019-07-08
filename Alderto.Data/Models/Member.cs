@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -49,11 +48,6 @@ namespace Alderto.Data.Models
         /// </summary>
         [ForeignKey(nameof(GuildId))]
         public virtual Guild Guild { get; set; }
-
-        /// <summary>
-        /// A collection of members the current member has recruited.
-        /// </summary>
-        public virtual IEnumerable<Member> MembersRecruited { get; set; }
 
         /// <summary>
         /// Creates a new member object with the given Guild id and Member id

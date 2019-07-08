@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Extentions;
 using Alderto.Tests.MockedEntities;
-using Microsoft.EntityFrameworkCore.InMemory.Storage.Internal;
 using Xunit;
 
 namespace Alderto.Tests

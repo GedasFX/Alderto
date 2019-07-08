@@ -1,10 +1,8 @@
 using System.Threading.Tasks;
-using Alderto.Bot.Modules;
 using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Alderto.Tests.ServicesTests
@@ -28,10 +26,15 @@ namespace Alderto.Tests.ServicesTests
                 GuildId = 1,
                 TriggerKeyword = "test",
                 LuaCode = @"
-if (num1 > num2) then
-  result = num1;
-else
-  result = num2;
+if (args[0] == '_1_test') then
+    arg1 = tonumber(args[1])
+    if (arg1 > tonumber(args[2])) then
+      return arg1
+    else
+      return args[2]
+    end
+else 
+    return 3
 end
 "
             });
@@ -40,7 +43,8 @@ end
 
             await _service.ReloadCommands(1);
 
-            Assert.Equal(4, (int)(await _service.RunCommandAsync(1, "test", "4, 2"))[0]);
+            var cmd = await _service.RunCommandAsync(1, "test", null, "4", "2");
+            Assert.Equal(4, (long)cmd[0]);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Alderto.Bot.TypeReaders;
 using Alderto.Data;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -32,6 +33,8 @@ namespace Alderto.Bot.Services
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;
+
+            _commands.AddTypeReader(typeof(object), new ObjectTypeReader());
 
             // Here we discover all of the command modules in the entry 
             // assembly and load them. Starting from Discord.NET 2.0, a

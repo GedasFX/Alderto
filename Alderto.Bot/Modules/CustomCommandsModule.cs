@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Discord.Commands;
 
@@ -15,9 +16,9 @@ namespace Alderto.Bot.Modules
         }
 
         [Command]
-        public async Task ExecuteAsync([Remainder] string args)
+        public async Task ExecuteAsync(params object[] args)
         {
-            await _cmdProvider.RunCommandAsync(Context.Guild.Id, args.Split(' ')[0], args);
+            await _cmdProvider.RunCommandAsync(Context.Guild.Id, (string)args[0], args);
         }
 
         [Command("Reload")]
