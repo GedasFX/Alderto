@@ -1,7 +1,8 @@
+using Alderto.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,6 +33,12 @@ namespace Alderto.Web
                 options.ClientId = Configuration["DiscordAuth:ClientId"];
                 options.ClientSecret = Configuration["DiscordAuth:ClientSecret"];
             });
+
+            services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
+            services.AddDbContext<AldertoDbContext>(); // For Identity.
+
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddEntityFrameworkStores<AldertoDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

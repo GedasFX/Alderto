@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 
 namespace Alderto.Web.Areas.Identity.Pages
 {
@@ -17,7 +12,9 @@ namespace Alderto.Web.Areas.Identity.Pages
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
+#pragma warning disable MVC1001 // Filters cannot be applied to page handler methods.
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+#pragma warning restore MVC1001 // Filters cannot be applied to page handler methods.
         public void OnGet()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
