@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Alderto.Web.Controllers
@@ -25,38 +26,47 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("signin"), ActionName("SignIn")]
-        public IActionResult SignIn(string returnUrl = null)
+        [Route("some"), ActionName("Some"), Authorize]
+        public IActionResult Some()
+        {
+            return Ok();
+        }
+
+        [Route("logout"), ActionName("LogOut")]
+        public async Task<IActionResult> LogOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        [Route("login"), ActionName("LogIn")]
+        public IActionResult LogIn(string returnUrl = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(action: "SignInCallback", controller: "Account", new { returnUrl });
+            var redirectUrl = Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl);
             return new ChallengeResult(authenticationScheme: "Discord", properties);
         }
 
-        [Route("signin-callback"), ActionName("SignInCallback")]
-        public async Task<string> SignInCallbackAsync(string remoteError = null)
+        [Route("login-callback"), ActionName("LogInCallback")]
+        public async Task<IActionResult> SignInCallbackAsync(string remoteError = null)
         {
             if (remoteError != null)
             {
-                return $"Error from external provider: {remoteError}";
+                return StatusCode(statusCode: 500, $"Error from external provider: {remoteError}");
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                return "Error loading external login information.";
-            }
 
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
             if (result.Succeeded)
             {
                 _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return "success";
+                return Ok();
             }
             if (result.IsLockedOut)
             {
-                return "locked out";
+                return Forbid();
             }
             else
             {
@@ -76,7 +86,7 @@ namespace Alderto.Web.Controllers
                 //});
             }
 
-            return "";
+            return Ok();
         }
     }
 }
