@@ -73,7 +73,7 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("$")]
-        [Summary("Ghecks the amount of points a given user has.")]
+        [Summary("Checks the amount of points a given user has.")]
         public async Task CheckAsync([Summary("Person to check. If none provided, checks personal points.")] IGuildUser user = null)
         {
             if (user == null)
