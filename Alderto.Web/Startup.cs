@@ -68,10 +68,9 @@ namespace Alderto.Web
                 routes.MapRoute(
                     name: "api",
                     template: "api/[controller]/[action]");
-
                 routes.MapRoute(
-                    name: "client",
-                    template: "{*catchall}");
+                    name: "default",
+                    template: "{*url}");
             });
 
             app.UseSpa(spa =>

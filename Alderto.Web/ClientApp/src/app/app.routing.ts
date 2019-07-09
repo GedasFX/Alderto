@@ -7,11 +7,12 @@ import { LayoutComponent } from './containers';
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
 
+import { HomeComponent } from './views/home/home.component';
+
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
+        component: HomeComponent
     },
     {
         path: '404',
