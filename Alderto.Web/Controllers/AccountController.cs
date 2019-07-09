@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Alderto.Data.Models;
+﻿using Alderto.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 
 namespace Alderto.Web.Controllers
 {
@@ -49,12 +45,20 @@ namespace Alderto.Web.Controllers
         }
 
         [Route("login-callback"), ActionName("LogInCallback")]
-        public async Task<IActionResult> SignInCallbackAsync(string remoteError = null)
+        public async Task<IActionResult> LogInCallbackAsync(string remoteError = null, string returnUrl = null)
         {
+            // Return URL cannot be null or empty. If it is, redirect to root.
+            if (string.IsNullOrEmpty(returnUrl))
+                returnUrl = "/";
+
+            // Should never trigger.
             if (remoteError != null)
             {
+                // Todo: better solution
                 return StatusCode(statusCode: 500, $"Error from external provider: {remoteError}");
             }
+
+            // Collect information from the external login provider.
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             // Sign in the user with this external login provider if the user already has a login.
@@ -62,31 +66,32 @@ namespace Alderto.Web.Controllers
             if (result.Succeeded)
             {
                 _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return Ok();
+                return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
             {
+                // Todo: better solution
                 return Forbid();
             }
-            else
-            {
-                // User is not registered. Register him.
-                var user = new ApplicationUser(info.Principal.Identity.Name)
-                {
-                    Id = ulong.Parse(info.ProviderKey)
-                };
-                await _userManager.CreateAsync(user);
-                await _userManager.AddLoginAsync(user, info);
 
-                // Unsure if needed yet
-                //await _userManager.AddClaimsAsync(user, new[]
-                //{
-                //    new Claim(ClaimTypes.Name, user.UserName),
-                //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                //});
+            // User is not registered. Register him.
+            var user = new ApplicationUser(info.Principal.Identity.Name)
+            {
+                Id = ulong.Parse(info.ProviderKey)
+            };
+            await _userManager.CreateAsync(user);
+            await _userManager.AddLoginAsync(user, info);
+
+            // Retry sign in after user was registered.
+            result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
+                return LocalRedirect(returnUrl);
             }
 
-            return Ok();
+            // User failed to register. Internal error.
+            return StatusCode(500);
         }
     }
 }
