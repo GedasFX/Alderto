@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Alderto.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Alderto.Web.Controllers
@@ -9,11 +12,11 @@ namespace Alderto.Web.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<AccountController> logger)
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -56,7 +59,10 @@ namespace Alderto.Web.Controllers
             else
             {
                 // User is not registered. Register him.
-                //await _userManager.CreateAsync(new IdentityUser(info.Principal.Identity.Name) { });
+                await _userManager.CreateAsync(new ApplicationUser(info.Principal.Identity.Name)
+                {
+                    Id = ulong.Parse(info.ProviderKey)
+                });
             }
 
             return "";

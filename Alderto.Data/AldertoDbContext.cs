@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Alderto.Data
 {
-    public class AldertoDbContext : IdentityDbContext<IdentityUser>, IAldertoDbContext
+    public class AldertoDbContext : IdentityDbContext<ApplicationUser, IdentityRole<ulong>, ulong>, IAldertoDbContext
     {
         public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }

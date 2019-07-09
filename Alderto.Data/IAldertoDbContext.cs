@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Interface extracted from Microsoft.EntityFrameworkCore.DbContext
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
