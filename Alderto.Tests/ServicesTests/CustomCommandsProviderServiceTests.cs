@@ -43,8 +43,8 @@ end
 
             await _service.ReloadCommands(1);
 
-            var cmd = await _service.RunCommandAsync(1, "test", null, "4", "2");
-            Assert.Equal(4, (long)cmd[0]);
+            var cmd = await _service.RunCommandAsync(guildId: 1, cmdName: "test", null, "4", "2");
+            Assert.Equal(expected: 4, (long)cmd[0]);
         }
     }
 }

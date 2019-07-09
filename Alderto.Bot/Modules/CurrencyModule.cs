@@ -57,13 +57,13 @@ namespace Alderto.Bot.Modules
             foreach (var user in guildUsers)
             {
                 // Get the user
-                var dbUser = await _context.GetMemberAsync(guildId: user.GuildId, memberId: user.Id, addIfNonExistant: true);
+                var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id, addIfNonExistant: true);
 
                 // Add currency to the user
                 dbUser.CurrencyCount += qty;
 
                 // Format a nice output
-                reply.AddField($"{user.Mention} [{user.Username}#{user.Discriminator}]",    
+                reply.AddField($"{user.Mention} [{user.Username}#{user.Discriminator}]",
                     $"{dbUser.CurrencyCount - qty} -> {dbUser.CurrencyCount} :gp:");
             }
 
@@ -79,7 +79,7 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var dbUser = await _context.GetMemberAsync(guildId: user.GuildId, memberId: user.Id);
+            var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id);
 
             await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
         }

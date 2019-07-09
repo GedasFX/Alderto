@@ -28,7 +28,7 @@ namespace Alderto.Web
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            // Use discord as authentification service.
+            // Use discord as authentication service.
             services.AddAuthentication().AddDiscord(options =>
             {
                 options.ClientId = Configuration["DiscordAuth:ClientId"];

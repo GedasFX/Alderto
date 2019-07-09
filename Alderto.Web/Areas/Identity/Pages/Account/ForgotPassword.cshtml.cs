@@ -48,14 +48,14 @@ namespace Alderto.Web.Areas.Identity.Pages.Account
                 // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
+                    pageName: "/Account/ResetPassword",
                     pageHandler: null,
-                    values: new { code },
-                    protocol: Request.Scheme);
+                    new { code },
+                    Request.Scheme);
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
+                    subject: "Reset Password",
                     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");

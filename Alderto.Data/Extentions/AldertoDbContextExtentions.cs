@@ -52,8 +52,8 @@ namespace Alderto.Data.Extentions
             if (!addIfNonExistant)
                 return null;
 
-            // Member does not exist and addIfNotExistant flag was set. Add to database and return.
-            return await AddMemberAsync(context, new GuildMember(guildId: guildId, memberId: memberId));
+            // Member does not exist and addIfNotExistent flag was set. Add to database and return.
+            return await AddMemberAsync(context, new GuildMember(guildId, memberId));
         }
     }
 }

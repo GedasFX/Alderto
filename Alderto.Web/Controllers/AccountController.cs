@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Alderto.Web.Controllers
@@ -27,9 +25,9 @@ namespace Alderto.Web.Controllers
         public IActionResult SignIn(string returnUrl = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action("LogInCallback", "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl: redirectUrl);
-            return new ChallengeResult("Discord", properties);
+            var redirectUrl = Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl);
+            return new ChallengeResult(authenticationScheme: "Discord", properties);
         }
 
         [Route("[action]"), ActionName("LoginCallback")]
@@ -54,7 +52,7 @@ namespace Alderto.Web.Controllers
             }
             if (result.IsLockedOut)
             {
-                return "lockedout";
+                return "locked out";
             }
             else
             {

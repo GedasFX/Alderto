@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+// ReSharper disable InconsistentNaming
 
 namespace Alderto.Data.Migrations
 {
