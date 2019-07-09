@@ -44,7 +44,7 @@ namespace Alderto.Bot.Services
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _services);
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -84,7 +84,7 @@ namespace Alderto.Bot.Services
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(context: context, argPos: argPos, services: _services);
+            var result = await _commands.ExecuteAsync(context, argPos, _services);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,

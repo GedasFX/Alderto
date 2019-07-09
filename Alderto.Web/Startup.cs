@@ -1,7 +1,7 @@
+using Alderto.Data;
+using Alderto.Data.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +19,29 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            // Add Mvc
+            services.AddMvc();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            // Use discord as authentication service.
+            services.AddAuthentication().AddDiscord(options =>
+            {
+                options.ClientId = Configuration["DiscordAuth:ClientId"];
+                options.ClientSecret = Configuration["DiscordAuth:ClientSecret"];
+            });
+
+            // Add database
+            services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
+            services.AddDbContext<AldertoDbContext>(); // For Identity. Does not affect performance.
+
+            // Identity management. 
+            services.AddDefaultIdentity<ApplicationUser>()
+                .AddEntityFrameworkStores<AldertoDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,11 +61,17 @@ namespace Alderto.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    name: "api",
+                    template: "api/[controller]/[action]");
+
+                routes.MapRoute(
+                    name: "client",
+                    template: "{*catchall}");
             });
 
             app.UseSpa(spa =>

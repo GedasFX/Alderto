@@ -1,17 +1,20 @@
 ﻿using Alderto.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Alderto.Data
 {
-    public class AldertoDbContext : DbContext, IAldertoDbContext
+    public class AldertoDbContext : IdentityDbContext<ApplicationUser, IdentityRole<ulong>, ulong>, IAldertoDbContext
     {
-        public DbSet<Member> Members { get; set; }
+        public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Member>()
+            modelBuilder.Entity<GuildMember>()
                 .HasIndex(m => new { m.MemberId, m.GuildId })
                 .IsUnique();
 

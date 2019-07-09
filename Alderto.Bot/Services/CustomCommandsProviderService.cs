@@ -93,7 +93,7 @@ namespace Alderto.Bot.Services
             {
                 foreach (var cmd in guild.CustomCommands)
                 {
-                    await RegisterCommand(functionName: $"_{guildId}_{cmd.TriggerKeyword}", code: cmd.LuaCode);
+                    await RegisterCommand($"_{guildId}_{cmd.TriggerKeyword}", cmd.LuaCode);
                 }
             }
         }
@@ -109,11 +109,11 @@ namespace Alderto.Bot.Services
             using (var c = new CancellationTokenSource())
             {
                 c.CancelAfter(CustomCommandExecTimeout);
-                await Task.Run(action: () =>
+                await Task.Run(() =>
                 {
                     _luaState.DoString($"function {functionName} (args) {code} end");
                     _commands[functionName] = _luaState.GetFunction(functionName);
-                }, cancellationToken: c.Token);
+                }, c.Token);
             }
         }
     }

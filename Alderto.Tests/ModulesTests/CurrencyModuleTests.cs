@@ -22,9 +22,9 @@ namespace Alderto.Tests.ModulesTests
         public async Task Give()
         {
             var user = Dummies.Alice;
-            await _module.ModifyAsyncExec(20, new[] { Dummies.Alice, Dummies.Alice });
-            var dbUser = await _context.Members.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
-            Assert.Equal(40, dbUser.CurrencyCount);
+            await _module.ModifyAsyncExec(qty: 20, new[] { Dummies.Alice, Dummies.Alice });
+            var dbUser = await _context.GuildMembers.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
+            Assert.Equal(expected: 40, dbUser.CurrencyCount);
         }
 
         [Fact]

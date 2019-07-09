@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Interface extracted from Microsoft.EntityFrameworkCore.DbContext
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -13,7 +14,7 @@ namespace Alderto.Data
 {
     public interface IAldertoDbContext
     {
-        DbSet<Member> Members { get; }
+        DbSet<GuildMember> GuildMembers { get; }
         DbSet<Guild> Guilds { get; }
         DbSet<CustomCommand> CustomCommands { get; }
 

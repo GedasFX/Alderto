@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Alderto.Data.Models
 {
-    public class Member
+    public class GuildMember
     {
         /// <summary>
         /// Unique member identifier within the bot. Differs between guilds.
@@ -41,7 +41,7 @@ namespace Alderto.Data.Models
         /// Member, referenced by <see cref="RecruitedByMemberId"/>.
         /// </summary>
         [ForeignKey(nameof(RecruitedByMemberId))]
-        public virtual Member RecruitedByMember { get; set; }
+        public virtual GuildMember RecruitedByGuildMember { get; set; }
 
         /// <summary>
         /// Guild, referenced by <see cref="GuildId"/>
@@ -54,7 +54,7 @@ namespace Alderto.Data.Models
         /// </summary>
         /// <param name="guildId">Id og the guild user is in.</param>
         /// <param name="memberId">Id of the user.</param>
-        public Member(ulong guildId, ulong memberId)
+        public GuildMember(ulong guildId, ulong memberId)
         {
             GuildId = guildId;
             MemberId = memberId;

@@ -34,7 +34,7 @@ namespace Alderto.Bot.Services
         {
             _discordLogger.Log(
                 LogLevelFromSeverity(message.Severity),
-                0,
+                eventId: 0,
                 message,
                 message.Exception,
                 delegate { return message.ToString(prependTimestamp: true); });
@@ -46,13 +46,13 @@ namespace Alderto.Bot.Services
             // Return an error message for async commands
             if (message.Exception is CommandException command)
             {
-                // Don't risk blocking the logging task by awaiting a message send; ratelimits!?
+                // Don't risk blocking the logging task by awaiting a message send; rate limits!?
                 command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
             }
 
             _commandsLogger.Log(
                 LogLevelFromSeverity(message.Severity),
-                0,
+                eventId: 0,
                 message,
                 message.Exception,
                 delegate { return message.ToString(prependTimestamp: true); });
