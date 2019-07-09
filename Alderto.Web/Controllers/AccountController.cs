@@ -1,12 +1,16 @@
-﻿using Alderto.Data.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Alderto.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -21,17 +25,17 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("[action]"), ActionName("SignIn")]
+        [Route("signin"), ActionName("SignIn")]
         public IActionResult SignIn(string returnUrl = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl });
+            var redirectUrl = Url.Action(action: "SignInCallback", controller: "Account", new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl);
             return new ChallengeResult(authenticationScheme: "Discord", properties);
         }
 
-        [Route("[action]"), ActionName("LoginCallback")]
-        public async Task<string> LogInCallbackAsync(string remoteError = null)
+        [Route("signin-callback"), ActionName("SignInCallback")]
+        public async Task<string> SignInCallbackAsync(string remoteError = null)
         {
             if (remoteError != null)
             {
@@ -44,7 +48,7 @@ namespace Alderto.Web.Controllers
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
             if (result.Succeeded)
             {
                 _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
@@ -57,10 +61,19 @@ namespace Alderto.Web.Controllers
             else
             {
                 // User is not registered. Register him.
-                await _userManager.CreateAsync(new ApplicationUser(info.Principal.Identity.Name)
+                var user = new ApplicationUser(info.Principal.Identity.Name)
                 {
                     Id = ulong.Parse(info.ProviderKey)
-                });
+                };
+                await _userManager.CreateAsync(user);
+                await _userManager.AddLoginAsync(user, info);
+
+                // Unsure if needed yet
+                //await _userManager.AddClaimsAsync(user, new[]
+                //{
+                //    new Claim(ClaimTypes.Name, user.UserName),
+                //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                //});
             }
 
             return "";
