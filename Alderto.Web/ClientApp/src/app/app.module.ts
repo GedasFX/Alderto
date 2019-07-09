@@ -5,24 +5,14 @@ import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
-
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-    suppressScrollX: true
-};
 
 import { AppComponent } from './app.component';
 
 // Import containers
-import { DefaultLayoutComponent } from './containers';
+import { LayoutComponent } from './containers';
 
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
-
-const appContainers = [
-    DefaultLayoutComponent
-];
 
 import {
     AppBreadcrumbModule,
@@ -38,7 +28,7 @@ import { AppRoutingModule } from './app.routing';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ChartsModule } from 'ng2-charts';
-import { AppAccountComponent } from './components/app-account/app-account.component';
+import { AccountComponent } from './views/account/account.component';
 
 @NgModule({
     imports: [
@@ -56,11 +46,11 @@ import { AppAccountComponent } from './components/app-account/app-account.compon
         HttpClientModule
     ],
     declarations: [
-        appContainers,
+        LayoutComponent,
+        AccountComponent,
         AppComponent,
         P404Component,
-        P500Component,
-        AppAccountComponent
+        P500Component
     ],
     providers: [{
         provide: LocationStrategy,
