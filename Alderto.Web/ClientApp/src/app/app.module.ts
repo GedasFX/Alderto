@@ -22,12 +22,11 @@ import { P500Component } from './views/error/500.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
 
-const APP_CONTAINERS = [
+const appContainers = [
     DefaultLayoutComponent
 ];
 
 import {
-    AppAsideModule,
     AppBreadcrumbModule,
     AppHeaderModule,
     AppFooterModule,
@@ -47,7 +46,6 @@ import { ChartsModule } from 'ng2-charts';
         BrowserModule,
         BrowserAnimationsModule,
         AppRoutingModule,
-        AppAsideModule,
         AppBreadcrumbModule.forRoot(),
         AppFooterModule,
         AppHeaderModule,
@@ -60,7 +58,7 @@ import { ChartsModule } from 'ng2-charts';
     ],
     declarations: [
         AppComponent,
-        ...APP_CONTAINERS,
+        ...appContainers,
         P404Component,
         P500Component,
         LoginComponent,
