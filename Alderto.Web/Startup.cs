@@ -1,6 +1,6 @@
 using Alderto.Data;
 using Alderto.Data.Models;
-using Microsoft.AspNetCore.Authorization;
+using AspNet.Security.OAuth.Discord;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -23,23 +23,20 @@ namespace Alderto.Web
         {
             // Add database
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
-            services.AddDbContext<AldertoDbContext>(); // For Identity. Does not affect performance.
 
             // Identity management. 
-            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>()
-                .AddEntityFrameworkStores<AldertoDbContext>();
-
-            services.ConfigureApplicationCookie(options => {
-                options.LoginPath = "/api/account/login";
-                options.LogoutPath = "/api/account/logout";
-            });
+            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>();
 
             // Use discord as authentication service.
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+                })
                 .AddDiscord(options =>
                 {
-                    options.ClientId = Configuration["DiscordAuth:ClientId"];
-                    options.ClientSecret = Configuration["DiscordAuth:ClientSecret"];
+                    options.ClientId = Configuration["DiscordApp:ClientId"];
+                    options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
                 });
 
             // Add Mvc

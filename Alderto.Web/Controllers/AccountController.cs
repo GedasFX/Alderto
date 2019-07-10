@@ -9,6 +9,7 @@ namespace Alderto.Web.Controllers
 {
     [Route("api/account")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -22,13 +23,13 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("some"), ActionName("Some"), Authorize]
+        [Route("some"), ActionName("Some")]
         public IActionResult Some()
         {
             return Ok();
         }
 
-        [Route("logout"), ActionName("LogOut")]
+        [Route("logout"), ActionName("LogOut"), AllowAnonymous]
         public async Task<IActionResult> LogOutAsync()
         {
             await _signInManager.SignOutAsync();
@@ -36,12 +37,12 @@ namespace Alderto.Web.Controllers
         }
 
         [Route("login"), ActionName("LogIn")]
-        public IActionResult LogIn(string returnUrl = null)
+        public IActionResult LogIn()
         {
-            // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl);
-            return new ChallengeResult(authenticationScheme: "Discord", properties);
+            var user = User;
+            // AuthorizeAttribute ensures login procedure.
+            // If code inside this method was reached, the person is logged in.
+            return Ok();
         }
 
         [Route("login-callback"), ActionName("LogInCallback")]
