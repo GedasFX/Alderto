@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using Alderto.Data.Models;
+﻿using Alderto.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using AspNet.Security.OAuth.Discord;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Alderto.Web.Controllers
@@ -39,23 +36,20 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-        [Route("login"), ActionName("LogIn"), Authorize]
-        public async Task<IActionResult> LogInAsync(string returnUrl = null)
+        [Route("login"), ActionName("LogIn")]
+        public IActionResult LogIn(string returnUrl = null)
         {
-            var a = HttpContext.Request.Headers["login"];
-            return Ok();
             var properties = _signInManager
                 .ConfigureExternalAuthenticationProperties(
-                    provider: "Discord", 
-                    redirectUrl: Url.Action(action: "LogIn", controller: "Account", new { returnUrl }));
-            return new ChallengeResult(DiscordAuthenticationDefaults.AuthenticationScheme, properties);
-            if (User.Identity.IsAuthenticated)
-                return Ok();
+                    provider: "Discord",
+                    redirectUrl: Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl }));
 
-            return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "."
-            }, DiscordAuthenticationDefaults.AuthenticationScheme);
+            return new ChallengeResult(DiscordAuthenticationDefaults.AuthenticationScheme, properties);
+        }
+
+        [Route("login-callback"), ActionName("LogInCallback")]
+        public async Task<IActionResult> LogInCallbackAsync(string returnUrl = null)
+        {
             // AuthorizeAttribute ensures login procedure.
             // If code inside this method was reached, the person is logged in.
 

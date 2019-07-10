@@ -56,21 +56,6 @@ namespace Alderto.Web
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
-
-                    var oldAuth = options.Events.OnRedirectToAuthorizationEndpoint;
-                    options.Events.OnRedirectToAuthorizationEndpoint = context =>
-                    {
-                        // TODO: Find a more elegant solution.
-                        // Check if request header contains login.
-                        // Design is that only those requests are intended to be logged in.
-                        if (context.HttpContext.Request.Headers["login"].Count != 0)
-                            return oldAuth(context);
-
-                        // Return to SPA that client is unauthorized.
-                        context.HttpContext.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-
-                    };
                 });
 
             // Add Mvc
