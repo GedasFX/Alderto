@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Alderto.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ namespace Alderto.Web.Controllers
         [Route("login"), ActionName("LogIn"), Authorize]
         public async Task<IActionResult> LogInAsync(string returnUrl = null)
         {
+            var a = HttpContext.Request.Headers["login"];
             return Ok();
             var properties = _signInManager
                 .ConfigureExternalAuthenticationProperties(
