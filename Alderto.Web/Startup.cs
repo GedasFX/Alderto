@@ -1,6 +1,8 @@
+using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using AspNet.Security.OAuth.Discord;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -23,20 +25,39 @@ namespace Alderto.Web
         {
             // Add database
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
+            services.AddDbContext<AldertoDbContext>(); // For identity.
 
             // Identity management. 
-            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>();
+            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>()
+                .AddEntityFrameworkStores<AldertoDbContext>();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.HttpContext.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.HttpContext.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+            });
 
             // Use discord as authentication service.
-            services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
-                })
+            services
+                .AddAuthentication(
+                    options => options.DefaultScheme = DiscordAuthenticationDefaults.AuthenticationScheme)
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+                    {
+                        context.HttpContext.Response.StatusCode = 403;
+                        return Task.CompletedTask;
+                    };
                 });
 
             // Add Mvc

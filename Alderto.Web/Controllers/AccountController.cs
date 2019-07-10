@@ -1,15 +1,17 @@
-﻿using Alderto.Data.Models;
+﻿using System;
+using Alderto.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using AspNet.Security.OAuth.Discord;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Alderto.Web.Controllers
 {
     [Route("api/account")]
     [ApiController]
-    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -23,41 +25,40 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("some"), ActionName("Some")]
+        [Route("some"), ActionName("Some"), Authorize]
         public IActionResult Some()
         {
             return Ok();
         }
 
-        [Route("logout"), ActionName("LogOut"), AllowAnonymous]
+        [Route("logout"), ActionName("LogOut"), Authorize]
         public async Task<IActionResult> LogOutAsync()
         {
             await _signInManager.SignOutAsync();
             return Ok();
         }
 
-        [Route("login"), ActionName("LogIn")]
-        public IActionResult LogIn()
+        [Route("login"), ActionName("LogIn"), Authorize]
+        public async Task<IActionResult> LogInAsync(string returnUrl = null)
         {
-            var user = User;
+            return Ok();
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    provider: "Discord", 
+                    redirectUrl: Url.Action(action: "LogIn", controller: "Account", new { returnUrl }));
+            return new ChallengeResult(DiscordAuthenticationDefaults.AuthenticationScheme, properties);
+            if (User.Identity.IsAuthenticated)
+                return Ok();
+
+            return Challenge(new AuthenticationProperties()
+            {
+                RedirectUri = "."
+            }, DiscordAuthenticationDefaults.AuthenticationScheme);
             // AuthorizeAttribute ensures login procedure.
             // If code inside this method was reached, the person is logged in.
-            return Ok();
-        }
 
-        [Route("login-callback"), ActionName("LogInCallback")]
-        public async Task<IActionResult> LogInCallbackAsync(string remoteError = null, string returnUrl = null)
-        {
-            // Return URL cannot be null or empty. If it is, redirect to root.
-            if (string.IsNullOrEmpty(returnUrl))
-                returnUrl = "/";
-
-            // Should never trigger.
-            if (remoteError != null)
-            {
-                // Todo: better solution
-                return StatusCode(statusCode: 500, $"Error from external provider: {remoteError}");
-            }
+            // If return url was not specified, just return 200.
+            var onSuccess = returnUrl == null ? (IActionResult)Ok() : LocalRedirect(returnUrl);
 
             // Collect information from the external login provider.
             var info = await _signInManager.GetExternalLoginInfoAsync();
@@ -67,12 +68,7 @@ namespace Alderto.Web.Controllers
             if (result.Succeeded)
             {
                 _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return LocalRedirect(returnUrl);
-            }
-            if (result.IsLockedOut)
-            {
-                // Todo: better solution
-                return Forbid();
+                return onSuccess;
             }
 
             // User is not registered. Register him.
@@ -87,8 +83,8 @@ namespace Alderto.Web.Controllers
             result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return LocalRedirect(returnUrl);
+                _logger.LogInformation($"{info.Principal.Identity.Name} was registered and logged in with {info.LoginProvider} provider.");
+                return onSuccess;
             }
 
             // User failed to register. Internal error.
