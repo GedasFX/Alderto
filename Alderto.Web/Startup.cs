@@ -47,11 +47,10 @@ namespace Alderto.Web
 
             // Use discord as authentication service.
             services
-                .AddAuthentication(
-                    options =>
-                    {
-                        options.DefaultScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
-                    })
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+                })
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
