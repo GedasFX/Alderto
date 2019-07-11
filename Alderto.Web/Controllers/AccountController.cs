@@ -23,36 +23,34 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("some"), ActionName("Some"), Authorize]
+        [Route("some"), Authorize]
         public IActionResult Some()
         {
             return Ok();
         }
 
-        [Route("logout"), ActionName("LogOut"), Authorize]
-        public async Task<IActionResult> LogOutAsync()
+        [Route("logout"), Authorize]
+        public async Task<IActionResult> LogOut()
         {
             await _signInManager.SignOutAsync();
             return Ok();
         }
 
-        [Route("login"), ActionName("LogIn")]
+        [HttpPost]
+        [Route("login")]
         public IActionResult LogIn(string returnUrl = null)
         {
             var properties = _signInManager
                 .ConfigureExternalAuthenticationProperties(
                     provider: "Discord",
-                    redirectUrl: Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl }));
+                    redirectUrl: Url.Action(action: nameof(LogInCallback), new { returnUrl }));
 
-            return new ChallengeResult(DiscordAuthenticationDefaults.AuthenticationScheme, properties);
+            return Challenge(properties, DiscordAuthenticationDefaults.AuthenticationScheme);
         }
 
-        [Route("login-callback"), ActionName("LogInCallback")]
-        public async Task<IActionResult> LogInCallbackAsync(string returnUrl = null)
+        [Route("login-callback")]
+        public async Task<IActionResult> LogInCallback(string returnUrl = null)
         {
-            // AuthorizeAttribute ensures login procedure.
-            // If code inside this method was reached, the person is logged in.
-
             // If return url was not specified, just return 200.
             var onSuccess = returnUrl == null ? (IActionResult)Ok() : LocalRedirect(returnUrl);
 

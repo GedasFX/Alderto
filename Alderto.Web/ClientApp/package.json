@@ -1,21 +1,14 @@
 {
-  "name": "@coreui/coreui-free-angular-admin-template",
-  "version": "2.5.2",
-  "description": "CoreUI Free Angular 2+ Admin Template",
+  "name": "aldertobot-web",
+  "version": "0.0.1",
+  "description": "WebUI for the Alderto Discord bot",
   "author": {
-    "name": "Łukasz Holeczek",
-    "url": "http://holeczek.pl",
-    "github": "https://github.com/mrholek",
-    "twitter": "https://twitter.com/lukaszholeczek"
+    "name": "GedasFX",
+    "url": "https://gediminasm.lt",
+    "github": "https://github.com/gedasfx"
   },
-  "contributors": [
-    {
-      "name": "Andrzej Kopański",
-      "url": "https://github.com/xidedix"
-    }
-  ],
-  "homepage": "https://coreui.io/angular",
-  "copyright": "Copyright 2019 creativeLabs Łukasz Holeczek",
+  "homepage": "https://aldertobot.io",
+  "copyright": "Copyright 2019 GedasFX",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

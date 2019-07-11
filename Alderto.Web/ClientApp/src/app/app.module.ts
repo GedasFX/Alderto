@@ -9,7 +9,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AppComponent } from './app.component';
 
 // Import containers
-import { LayoutComponent } from './containers';
+import { LayoutComponent } from './containers/layout';
 
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
