@@ -6,11 +6,11 @@ using Xunit;
 
 namespace Alderto.Tests
 {
-    public class DatabaseExtentionsTests
+    public class DatabaseExtensionsTests
     {
         private readonly IAldertoDbContext _context;
 
-        public DatabaseExtentionsTests()
+        public DatabaseExtensionsTests()
         {
             _context = new MockDbContext();
         }
@@ -18,7 +18,7 @@ namespace Alderto.Tests
         [Fact]
         public async Task GetMember()
         {
-            // Fail to get the entity when he doesnt exist.
+            // Fail to get the entity when he doesn't exist.
             var member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1);
             Assert.Null(member);
 
@@ -26,7 +26,7 @@ namespace Alderto.Tests
             member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1, addIfNonExistent: true);
             Assert.NotNull(member);
       
-            // Check if internal extention .SingleOrDefaultAsync() does not crash
+            // Check if internal extenstion .SingleOrDefaultAsync() does not crash
             member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1, addIfNonExistent: true);
             Assert.NotNull(member);
 
