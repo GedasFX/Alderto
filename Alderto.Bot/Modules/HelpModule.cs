@@ -18,14 +18,13 @@ namespace Alderto.Bot.Modules
         [Summary("Shows help menu")]
         public async Task Help()
         {
-            await this.ReplyEmbedAsync(
-                extra: builder =>
+            await this.ReplyEmbedAsync(extra: builder =>
+            {
+                foreach (var command in _commands.Commands)
                 {
-                    foreach (var command in _commands.Commands)
-                    {
-                        builder.AddField(command.Name, command.Summary);
-                    }
-                });
+                    builder.AddField(command.Name, command.Summary);
+                }
+            });
         }
 
         [Group("Currency")]
