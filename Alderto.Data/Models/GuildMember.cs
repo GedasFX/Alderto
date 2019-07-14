@@ -19,6 +19,11 @@ namespace Alderto.Data.Models
         public ulong GuildId { get; set; }
 
         /// <summary>
+        /// Last known nickname of the user.
+        /// </summary>
+        public string Nickname { get; set; }
+
+        /// <summary>
         /// Time of last currency claim. Value is null if never claimed timely reward.
         /// </summary>
         public DateTimeOffset? CurrencyLastClaimed { get; set; }

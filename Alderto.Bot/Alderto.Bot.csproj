@@ -12,10 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modules\RecruitmentModule.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="commands.json" />
     <None Remove="config.json" />
     <None Remove="config.json.debug" />
@@ -31,10 +27,6 @@
     <Content Include="config.json.debug">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Modules\RecruitmentModule.cs" />
   </ItemGroup>
 
   <ItemGroup>

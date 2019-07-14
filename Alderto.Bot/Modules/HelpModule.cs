@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Bot.Extentions;
+using Alderto.Bot.Extensions;
 using Discord;
 using Discord.Commands;
 

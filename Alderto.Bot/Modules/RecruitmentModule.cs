@@ -1,11 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Bot.Extentions;
+using Alderto.Bot.Extensions;
 using Alderto.Data;
 using Alderto.Data.Extensions;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
@@ -20,7 +19,7 @@ namespace Alderto.Bot.Modules
             _context = context;
         }
 
-        [Command("Recruited")]
+        [Command("Recruited"), Alias("Add")]
         public async Task Recruited(IGuildUser recruiter, params IGuildUser[] recruited)
         {
             var recruiterId = recruiter.Id;
@@ -28,13 +27,18 @@ namespace Alderto.Bot.Modules
             {
                 var dbUser = await _context.GetGuildMemberAsync(recruiter.GuildId, member.Id, addIfNonExistent: true);
                 dbUser.RecruiterMemberId = recruiterId;
+
+                // Ensure that joinedAt is registered. Is used for listing user recruits.
+                dbUser.JoinedAt = member.JoinedAt;
             }
 
             await _context.SaveChangesAsync();
+
+            await ReplyAsync(embed: new EmbedBuilder().WithDefault().WithDescription($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.GetFullName()}").Build());
         }
 
         [Command("List")]
-        public void List(IGuildUser member)
+        public async Task ListAsync(IGuildUser member)
         {
             var recruits = _context.GuildMembers
                 .Include(g => g.Member)
@@ -42,20 +46,31 @@ namespace Alderto.Bot.Modules
 
             var res = new EmbedBuilder()
                 .WithDefault()
-                .WithAuthor(member);
+                .WithAuthor(member)
+                .WithDescription("Recruits list");
 
             foreach (var recruit in recruits)
             {
-                res.AddField($"{recruit.Member.Username}#{recruit.Member.Discriminator}", value: null);
+                res.AddField($"{recruit.Member.Username}#{recruit.Member.Discriminator}", value: recruit.JoinedAt);
             }
 
+            await ReplyAsync(embed: res.Build());
         }
 
         [Command("By")]
-        public async Task ByAsync(IGuildUser member)
+        public async Task ByAsync(IGuildUser member = null)
         {
+            if (member == null)
+                member = (IGuildUser)Context.User;
+
             var dbUser = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
-            //dbUser.RecruitedByGuildMember;
+            var recruiter = await _context.GuildMembers.Include(g => g.Member).SingleOrDefaultAsync(g => g.GuildId == member.GuildId && dbUser.RecruiterMemberId == g.MemberId);
+
+            var embed = new EmbedBuilder().WithDefault();
+            if (recruiter == null)
+                await ReplyAsync(embed: embed.WithDescription($"User {member.GetFullName()} was not recruited by anyone").Build());
+            else
+                await ReplyAsync(embed: embed.WithDescription($"User {member.GetFullName()} was recruited by {recruiter.GetFullName()}").Build());
         }
     }
 }

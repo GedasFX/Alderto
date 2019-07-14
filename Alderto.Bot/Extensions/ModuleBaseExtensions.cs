@@ -2,9 +2,9 @@
 using Discord;
 using Discord.Commands;
 
-namespace Alderto.Bot.Extentions
+namespace Alderto.Bot.Extensions
 {
-    public static class ModuleBaseExtentions
+    public static class ModuleBaseExtensions
     {
         public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module, string description) where T : class, ICommandContext
         {

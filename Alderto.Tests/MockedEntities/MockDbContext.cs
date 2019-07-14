@@ -9,6 +9,7 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
+        public DbSet<Member> Members { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Alderto.Bot.Extentions;
+using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Extensions;
