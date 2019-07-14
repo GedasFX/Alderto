@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
@@ -6,14 +7,13 @@ namespace Alderto.Bot.Extensions
 {
     public static class ModuleBaseExtensions
     {
-        public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module, string description) where T : class, ICommandContext
+        public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module,
+            string description = null,
+            Action<EmbedBuilder> extra = null,
+            EmbedColor color = EmbedColor.Info) where T : class, ICommandContext
         {
-            var builder = new EmbedBuilder()
-                .WithDefault()
-                .WithDescription(description);
-            var embed = builder.Build();
-            await module.Context.Channel.SendMessageAsync(text: null, embed: embed)
-                .ConfigureAwait(false);
+            var embed = new EmbedBuilder().WithDefault(description, extra, color).Build();
+            await module.Context.Channel.SendMessageAsync(embed: embed);
         }
     }
 }

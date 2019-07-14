@@ -12,21 +12,16 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const string currencySymbol = ":Bucketpin:";
-        private const int timelyAmount = 3;
-        private const int minTimeElapsedMS = 1000 * 60 * 60 * 6;
-        private const bool allowNegativePoints = true;
+        private const string CurrencySymbol = ":Bucketpin:";
+        private const int TimelyAmount = 3;
+        private const int MinTimeElapsedMs = 1000 * 60 * 60 * 6;
+        private const bool AllowNegativePoints = true;
 
         private readonly IAldertoDbContext _context;
 
         public CurrencyModule(IAldertoDbContext context)
         {
             _context = context;
-        }
-
-        private Task<IUserMessage> ReplyAsyncSimpleEmbed(string message)
-        {
-            return ReplyAsync(embed: new EmbedBuilder().WithDefault(message).Build());
         }
 
         [Command("Give")]
@@ -38,13 +33,13 @@ namespace Alderto.Bot.Modules
             // This is for giving, not taking
             if (qty <= 0)
             {
-                await ReplyAsyncSimpleEmbed("No changes made: Given quantity must by > 0");
+                await this.ReplyEmbedAsync(description: "No changes made: Given quantity must be > 0.", color: EmbedColor.Error);
                 return;
             }
 
             if (users.Length == 0)
             {
-                await ReplyAsyncSimpleEmbed("No changes made: At least one user must be specified.");
+                await this.ReplyEmbedAsync(description: "No changes made: At least one user must be specified.", color: EmbedColor.Error);
                 return;
             }
 
@@ -62,13 +57,13 @@ namespace Alderto.Bot.Modules
             // This is for taking, not giving
             if (qty <= 0)
             {
-                await ReplyAsyncSimpleEmbed("No changes made: Given quantity must by > 0");
+                await this.ReplyEmbedAsync(description: "No changes made: Given quantity must be > 0.", color: EmbedColor.Error);
                 return;
             }
 
             if (users.Length == 0)
             {
-                await ReplyAsyncSimpleEmbed("No changes made: At least one user must be specified.");
+                await this.ReplyEmbedAsync(description: "No changes made: At least one user must be specified.", color: EmbedColor.Error);
                 return;
             }
 
@@ -79,8 +74,7 @@ namespace Alderto.Bot.Modules
         public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
             var reply = new EmbedBuilder()
-                .WithDefault()
-                .WithDescription("**The following changes have been made:**");
+                .WithDefault("**The following changes have been made:**");
 
             foreach (var user in guildUsers)
             {
@@ -91,12 +85,12 @@ namespace Alderto.Bot.Modules
                 if (qty > 0 && oldCurrencyCount > 0 && oldCurrencyCount + qty < 0)
                 {
                     // overflow, set to max value instead.
-                    dbUser.CurrencyCount = Int32.MaxValue;
+                    dbUser.CurrencyCount = int.MaxValue;
                 }
                 else if (qty < 0 && oldCurrencyCount < 0 && oldCurrencyCount + qty > 0)
                 {
                     //underflow, set to min value instead
-                    dbUser.CurrencyCount = Int32.MinValue;
+                    dbUser.CurrencyCount = int.MinValue;
                 }
                 else
                 {
@@ -104,14 +98,14 @@ namespace Alderto.Bot.Modules
                     dbUser.CurrencyCount += qty;
                 }
 
-                if (!allowNegativePoints && dbUser.CurrencyCount < 0)
+                if (!AllowNegativePoints && dbUser.CurrencyCount < 0)
                 {
                     dbUser.CurrencyCount = 0;
                 }
 
-                // Format a nice output
-                reply.AddField($"{user.Mention} [{user.Username}#{user.Discriminator}]",
-                    $"{oldCurrencyCount} -> {dbUser.CurrencyCount} {currencySymbol}");
+                // Format a nice output.
+                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {CurrencySymbol}",
+                    $"{user.Mention} [{user.Username}#{user.Discriminator}]");
             }
 
             await _context.SaveChangesAsync();
@@ -128,8 +122,8 @@ namespace Alderto.Bot.Modules
 
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            await ReplyAsyncSimpleEmbed($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has " +
-                $"{dbUser.CurrencyCount} {currencySymbol}{(dbUser.CurrencyCount == 1 || dbUser.CurrencyCount == -1 ? "" : "s")}.```");
+            await this.ReplyEmbedAsync($"{user.Mention} has " +
+                $"{dbUser.CurrencyCount} {CurrencySymbol}{(dbUser.CurrencyCount == 1 || dbUser.CurrencyCount == -1 ? "" : "s")}.");
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
@@ -138,22 +132,22 @@ namespace Alderto.Bot.Modules
             var user = (IGuildUser)Context.User;
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
 
-            var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(minTimeElapsedMS) - DateTimeOffset.Now;
+            var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(MinTimeElapsedMs) - DateTimeOffset.Now;
 
 
             if (timeRemaining.Ticks > 0)
             {
                 // Deny points as time delay hasn't ran out.
-                await ReplyAsyncSimpleEmbed($"You will be able to claim more {currencySymbol}s in **{timeRemaining}**.");
+                await this.ReplyEmbedAsync($"You will be able to claim more {CurrencySymbol}s in **{timeRemaining}**.");
                 return;
             }
 
             // Give out points.
             dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
-            dbUser.CurrencyCount += timelyAmount;
+            dbUser.CurrencyCount += TimelyAmount;
             await _context.SaveChangesAsync();
 
-            await ReplyAsyncSimpleEmbed($"{user.Mention} was given {currencySymbol}{(timelyAmount == 1 || timelyAmount == -1 ? "" : "s")} {currencySymbol}. " +
+            await this.ReplyEmbedAsync($"{user.Mention} was given {CurrencySymbol}{(TimelyAmount == 1 || TimelyAmount == -1 ? "" : "s")} {CurrencySymbol}. " +
                     $"New total: **{dbUser.CurrencyCount}**.");
         }
     }

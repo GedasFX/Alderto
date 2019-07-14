@@ -36,7 +36,7 @@ namespace Alderto.Bot.Modules
 
             await _context.SaveChangesAsync();
 
-            await ReplyAsync(embed: new EmbedBuilder().WithDefault().WithDescription($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.GetFullName()}").Build());
+            await this.ReplyEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}");
         }
 
         [Command("List")]
