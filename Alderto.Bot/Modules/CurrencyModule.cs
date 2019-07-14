@@ -98,7 +98,7 @@ namespace Alderto.Bot.Modules
             {
                 // Deny points as time delay hasn't ran out.
                 await ReplyAsync(embed: new EmbedBuilder()
-                    .WithDefault($"You will be able to claim more points in {timeRemaining}.").Build());
+                    .WithDefault($"You will be able to claim more points in **{timeRemaining}**.").Build());
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace Alderto.Bot.Modules
 
             await ReplyAsync(
                 embed: new EmbedBuilder().WithDefault(
-                    $"{user.Mention} was given 3 points. New total: {dbUser.CurrencyCount}.").Build());
+                    $"{user.Mention} was given 3 points. New total: **{dbUser.CurrencyCount}**.").Build());
         }
     }
 }
