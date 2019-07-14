@@ -38,20 +38,21 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("List")]
-        public async Task ListAsync(IGuildUser member)
+        public async Task ListAsync(IGuildUser member = null)
         {
+            if (member == null)
+                member = (IGuildUser)Context.User;
             var recruits = _context.GuildMembers
                 .Include(g => g.Member)
                 .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.Id);
 
             var res = new EmbedBuilder()
                 .WithDefault()
-                .WithAuthor(member)
-                .WithDescription("Recruits list");
+                .WithAuthor(member);
 
             foreach (var recruit in recruits)
             {
-                res.AddField($"{recruit.Member.Username}#{recruit.Member.Discriminator}", value: recruit.JoinedAt);
+                res.AddField(recruit.JoinedAt.ToString(), value: $"<@{recruit.MemberId}>");
             }
 
             await ReplyAsync(embed: res.Build());
@@ -63,14 +64,14 @@ namespace Alderto.Bot.Modules
             if (member == null)
                 member = (IGuildUser)Context.User;
 
-            var dbUser = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
+            var dbUser = await _context.GetGuildMemberAsync(member.GuildId, member.Id, addIfNonExistent: true);
             var recruiter = await _context.GuildMembers.Include(g => g.Member).SingleOrDefaultAsync(g => g.GuildId == member.GuildId && dbUser.RecruiterMemberId == g.MemberId);
 
             var embed = new EmbedBuilder().WithDefault();
             if (recruiter == null)
-                await ReplyAsync(embed: embed.WithDescription($"User {member.GetFullName()} was not recruited by anyone").Build());
+                await ReplyAsync(embed: embed.WithDescription($"{member.GetFullName()} was not recruited by anyone.").Build());
             else
-                await ReplyAsync(embed: embed.WithDescription($"User {member.GetFullName()} was recruited by {recruiter.GetFullName()}").Build());
+                await ReplyAsync(embed: embed.WithDescription($"{member.Mention} was recruited by <@{recruiter.MemberId}>.").Build());
         }
     }
 }

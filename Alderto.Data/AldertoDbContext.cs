@@ -47,6 +47,9 @@ namespace Alderto.Data
         {
             optionsBuilder.UseSqlServer(
                 "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
+#if DEBUG
+            optionsBuilder.EnableSensitiveDataLogging();
+#endif
 
             base.OnConfiguring(optionsBuilder);
         }

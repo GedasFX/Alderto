@@ -50,7 +50,7 @@ namespace Alderto.Data.Extensions
         /// <returns>DbContext tracked <see cref="GuildMember"/>, or null if <see cref="addIfNonExistent"/> was not set to true.</returns>
         public static async Task<GuildMember> GetGuildMemberAsync(this IAldertoDbContext context, ulong guildId, ulong memberId, bool addIfNonExistent = false)
         {
-            var member = await context.GuildMembers.FindAsync(guildId, memberId);
+            var member = await context.GuildMembers.FindAsync(memberId, guildId);
 
             // Check if member exists. If yes - return it
             if (member != null)
