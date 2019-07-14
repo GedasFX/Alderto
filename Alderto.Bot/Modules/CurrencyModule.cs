@@ -12,11 +12,21 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
+        private const string currencySymbol = ":Bucketpin:";
+        private const int timelyAmount = 3;
+        private const int minTimeElapsedMS = 1000 * 60 * 60 * 6;
+        private const bool allowNegativePoints = true;
+
         private readonly IAldertoDbContext _context;
 
         public CurrencyModule(IAldertoDbContext context)
         {
             _context = context;
+        }
+
+        private Task<IUserMessage> ReplyAsyncSimpleEmbed(string message)
+        {
+            return ReplyAsync(embed: new EmbedBuilder().WithDefault(message).Build());
         }
 
         [Command("Give")]
@@ -27,7 +37,16 @@ namespace Alderto.Bot.Modules
         {
             // This is for giving, not taking
             if (qty <= 0)
+            {
+                await ReplyAsyncSimpleEmbed("No changes made: Given quantity must by > 0");
                 return;
+            }
+
+            if (users.Length == 0)
+            {
+                await ReplyAsyncSimpleEmbed("No changes made: At least one user must be specified.");
+                return;
+            }
 
             var reply = await ModifyAsyncExec(qty, users);
 
@@ -42,10 +61,18 @@ namespace Alderto.Bot.Modules
         {
             // This is for taking, not giving
             if (qty <= 0)
+            {
+                await ReplyAsyncSimpleEmbed("No changes made: Given quantity must by > 0");
                 return;
+            }
+
+            if (users.Length == 0)
+            {
+                await ReplyAsyncSimpleEmbed("No changes made: At least one user must be specified.");
+                return;
+            }
 
             var reply = await ModifyAsyncExec(-qty, users);
-
             await ReplyAsync(embed: reply);
         }
 
@@ -59,13 +86,32 @@ namespace Alderto.Bot.Modules
             {
                 // Get the user
                 var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
+                var oldCurrencyCount = dbUser.CurrencyCount;
 
-                // Add currency to the user
-                dbUser.CurrencyCount += qty;
+                if (qty > 0 && oldCurrencyCount > 0 && oldCurrencyCount + qty < 0)
+                {
+                    // overflow, set to max value instead.
+                    dbUser.CurrencyCount = Int32.MaxValue;
+                }
+                else if (qty < 0 && oldCurrencyCount < 0 && oldCurrencyCount + qty > 0)
+                {
+                    //underflow, set to min value instead
+                    dbUser.CurrencyCount = Int32.MinValue;
+                }
+                else
+                {
+                    // Add currency to the user
+                    dbUser.CurrencyCount += qty;
+                }
+
+                if (!allowNegativePoints && dbUser.CurrencyCount < 0)
+                {
+                    dbUser.CurrencyCount = 0;
+                }
 
                 // Format a nice output
                 reply.AddField($"{user.Mention} [{user.Username}#{user.Discriminator}]",
-                    $"{dbUser.CurrencyCount - qty} -> {dbUser.CurrencyCount} :gp:");
+                    $"{oldCurrencyCount} -> {dbUser.CurrencyCount} {currencySymbol}");
             }
 
             await _context.SaveChangesAsync();
@@ -82,7 +128,8 @@ namespace Alderto.Bot.Modules
 
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
+            await ReplyAsyncSimpleEmbed($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has " +
+                $"{dbUser.CurrencyCount} {currencySymbol}{(dbUser.CurrencyCount == 1 || dbUser.CurrencyCount == -1 ? "" : "s")}.```");
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
@@ -91,25 +138,23 @@ namespace Alderto.Bot.Modules
             var user = (IGuildUser)Context.User;
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
 
-            var timeRemaining = dbUser.CurrencyLastClaimed.AddHours(6) - DateTimeOffset.Now;
+            var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(minTimeElapsedMS) - DateTimeOffset.Now;
 
 
             if (timeRemaining.Ticks > 0)
             {
                 // Deny points as time delay hasn't ran out.
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithDefault($"You will be able to claim more points in **{timeRemaining}**.").Build());
+                await ReplyAsyncSimpleEmbed($"You will be able to claim more {currencySymbol}s in **{timeRemaining}**.");
                 return;
             }
 
             // Give out points.
             dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
-            dbUser.CurrencyCount += 3;
+            dbUser.CurrencyCount += timelyAmount;
             await _context.SaveChangesAsync();
 
-            await ReplyAsync(
-                embed: new EmbedBuilder().WithDefault(
-                    $"{user.Mention} was given 3 points. New total: **{dbUser.CurrencyCount}**.").Build());
+            await ReplyAsyncSimpleEmbed($"{user.Mention} was given {currencySymbol}{(timelyAmount == 1 || timelyAmount == -1 ? "" : "s")} {currencySymbol}. " +
+                    $"New total: **{dbUser.CurrencyCount}**.");
         }
     }
 }
