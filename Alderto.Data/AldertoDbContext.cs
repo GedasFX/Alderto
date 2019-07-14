@@ -12,6 +12,14 @@ namespace Alderto.Data
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
 
+        public AldertoDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        public AldertoDbContext()
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Guild Members
@@ -45,12 +53,9 @@ namespace Alderto.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
 #if DEBUG
             optionsBuilder.EnableSensitiveDataLogging();
 #endif
-
             base.OnConfiguring(optionsBuilder);
         }
     }
