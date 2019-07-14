@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Bot.Extentions;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
-using Alderto.Data.Extentions;
+using Alderto.Data.Extensions;
 using Discord;
 using Discord.Commands;
 
@@ -57,7 +57,7 @@ namespace Alderto.Bot.Modules
             foreach (var user in guildUsers)
             {
                 // Get the user
-                var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id, addIfNonExistant: true);
+                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
 
                 // Add currency to the user
                 dbUser.CurrencyCount += qty;
@@ -79,7 +79,7 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id);
+            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
         }

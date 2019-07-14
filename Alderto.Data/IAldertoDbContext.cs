@@ -17,6 +17,7 @@ namespace Alderto.Data
         DbSet<GuildMember> GuildMembers { get; }
         DbSet<Guild> Guilds { get; }
         DbSet<CustomCommand> CustomCommands { get; }
+        DbSet<Member> Members { get; }
 
         /// <summary>
         ///     Provides access to database related information and operations for this context.

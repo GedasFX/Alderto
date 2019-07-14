@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Alderto.Data;
-using Alderto.Data.Extentions;
+using Alderto.Data.Extensions;
 using Alderto.Tests.MockedEntities;
 using Xunit;
 
@@ -19,19 +19,19 @@ namespace Alderto.Tests
         public async Task GetMember()
         {
             // Fail to get the entity when he doesnt exist.
-            var member = await _context.GetMemberAsync(guildId: 1, memberId: 1);
+            var member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1);
             Assert.Null(member);
 
             // This time make sure to add the member.
-            member = await _context.GetMemberAsync(guildId: 1, memberId: 1, addIfNonExistant: true);
+            member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1, addIfNonExistent: true);
             Assert.NotNull(member);
       
             // Check if internal extention .SingleOrDefaultAsync() does not crash
-            member = await _context.GetMemberAsync(guildId: 1, memberId: 1, addIfNonExistant: true);
+            member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1, addIfNonExistent: true);
             Assert.NotNull(member);
 
             // Once more to see if it wasn't added a second time.
-            member = await _context.GetMemberAsync(guildId: 1, memberId: 1, addIfNonExistant: true);
+            member = await _context.GetGuildMemberAsync(guildId: 1, memberId: 1, addIfNonExistent: true);
             Assert.NotNull(member);
         }
     }

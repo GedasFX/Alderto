@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Bot.Extentions;
-using Alderto.Bot.Preconditions;
-using Alderto.Data;
-using Alderto.Data.Extentions;
 using Discord;
 using Discord.Commands;
 

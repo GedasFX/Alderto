@@ -21,12 +21,12 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Time when guild premium status runs out. Returns null if is not premium.
         /// </summary>
-        public DateTime? PremiumUntil { get; set; }
+        public DateTimeOffset? PremiumUntil { get; set; }
 
         /// <summary>
         /// A collection of members the guild contains.
         /// </summary>
-        public virtual IEnumerable<GuildMember> Members { get; set; }
+        public virtual IEnumerable<GuildMember> GuildMembers { get; set; }
 
         /// <summary>
         /// A collection of all custom commands registered to the guild.
