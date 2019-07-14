@@ -79,7 +79,7 @@ namespace Alderto.Bot.Modules
             foreach (var user in guildUsers)
             {
                 // Get the user
-                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
+                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
                 var oldCurrencyCount = dbUser.CurrencyCount;
 
                 if (qty > 0 && oldCurrencyCount > 0 && oldCurrencyCount + qty < 0)
@@ -129,7 +129,7 @@ namespace Alderto.Bot.Modules
         public async Task Timely()
         {
             var user = (IGuildUser)Context.User;
-            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
+            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(MinTimeElapsedMs) - DateTimeOffset.Now;
 

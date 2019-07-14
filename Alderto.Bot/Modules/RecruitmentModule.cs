@@ -27,7 +27,7 @@ namespace Alderto.Bot.Modules
             var recruiterId = recruiter.Id;
             foreach (var member in recruited)
             {
-                var dbUser = await _context.GetGuildMemberAsync(recruiter.GuildId, member.Id, addIfNonExistent: true);
+                var dbUser = await _context.GetGuildMemberAsync(recruiter.GuildId, member.Id);
                 dbUser.RecruiterMemberId = recruiterId;
 
                 // Ensure that joinedAt is registered. Is used for listing user recruits.
@@ -65,10 +65,8 @@ namespace Alderto.Bot.Modules
             if (member == null)
                 member = (IGuildUser)Context.User;
 
-            var dbUser = await _context.GetGuildMemberAsync(member.GuildId, member.Id, addIfNonExistent: true);
-            var recruiter = await _context.GuildMembers.Include(g => g.Member).SingleOrDefaultAsync(g => g.GuildId == member.GuildId && dbUser.RecruiterMemberId == g.MemberId);
+            var recruiter = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
 
-            var embed = new EmbedBuilder().WithDefault();
             if (recruiter == null)
                 await this.ReplyEmbedAsync($"{member.Mention} was not recruited by anyone.");
             else
