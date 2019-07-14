@@ -1,3 +1,3 @@
 {
-  "Token": ""
+  "DbConnectionString": "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true"
 }
