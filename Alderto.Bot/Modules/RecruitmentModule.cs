@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
+using Alderto.Bot.Preconditions;
 using Alderto.Data;
 using Alderto.Data.Extensions;
 using Discord;
@@ -20,6 +21,7 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Recruited"), Alias("Add")]
+        [RequireRole("Admin")]
         public async Task Recruited(IGuildUser recruiter, params IGuildUser[] recruited)
         {
             var recruiterId = recruiter.Id;
