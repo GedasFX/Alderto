@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Discord;
 using Discord.Commands;
 
 namespace Alderto.Bot.Modules
@@ -19,13 +18,14 @@ namespace Alderto.Bot.Modules
         [Summary("Shows help menu")]
         public async Task Help()
         {
-            var embed = new EmbedBuilder()
-                .WithDefault();
-            foreach (var command in _commands.Commands)
-            {
-                embed.AddField(command.Name, command.Summary);
-            }
-            await ReplyAsync(embed: embed.Build());
+            await this.ReplyEmbedAsync(
+                extra: builder =>
+                {
+                    foreach (var command in _commands.Commands)
+                    {
+                        builder.AddField(command.Name, command.Summary);
+                    }
+                });
         }
 
         [Group("Currency")]

@@ -20,7 +20,8 @@ namespace Alderto.Bot.Modules
         {
             await user.ModifyAsync(u => u.Nickname = username);
             await user.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(r => r.Name == "Member"));
-            await ReplyAsync(embed: new EmbedBuilder().WithDefault().WithDescription($"{user.Mention} has been accepted.").Build());
+
+            await this.ReplyEmbedAsync($"{Context.Message.Author.Mention} has accepted {user.Mention}.", color: EmbedColor.Success);
         }
     }
 }
