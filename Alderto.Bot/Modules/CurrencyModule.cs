@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
@@ -82,6 +83,33 @@ namespace Alderto.Bot.Modules
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
+        }
+
+        [Command("Timely"), Alias("Tub", "ClaimTub")]
+        public async Task Timely()
+        {
+            var user = (IGuildUser)Context.User;
+            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
+
+            var timeRemaining = dbUser.CurrencyLastClaimed.AddHours(6) - DateTimeOffset.Now;
+
+
+            if (timeRemaining.Ticks > 0)
+            {
+                // Deny points as time delay hasn't ran out.
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .WithDefault($"You will be able to claim more points in {timeRemaining}.").Build());
+                return;
+            }
+
+            // Give out points.
+            dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
+            dbUser.CurrencyCount += 3;
+            await _context.SaveChangesAsync();
+
+            await ReplyAsync(
+                embed: new EmbedBuilder().WithDefault(
+                    $"{user.Mention} was given 3 points. New total: {dbUser.CurrencyCount}.").Build());
         }
     }
 }

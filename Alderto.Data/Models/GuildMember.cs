@@ -26,7 +26,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Time of last currency claim. Value is null if never claimed timely reward.
         /// </summary>
-        public DateTimeOffset? CurrencyLastClaimed { get; set; }
+        public DateTimeOffset CurrencyLastClaimed { get; set; }
 
         /// <summary>
         /// Time the user joined the guild.

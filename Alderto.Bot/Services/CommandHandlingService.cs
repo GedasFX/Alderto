@@ -94,6 +94,10 @@ namespace Alderto.Bot.Services
             // rather an object stating if the command executed successfully.
             var result = await _commands.ExecuteAsync(context, argPos, _services);
 
+            // Delete successful triggers.
+            if (result.IsSuccess)
+                await message.DeleteAsync();
+
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
