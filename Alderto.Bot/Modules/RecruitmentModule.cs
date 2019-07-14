@@ -36,7 +36,7 @@ namespace Alderto.Bot.Modules
 
             await _context.SaveChangesAsync();
 
-            await this.ReplyEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}");
+            await this.ReplyEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.", color: EmbedColor.Success);
         }
 
         [Command("List")]
@@ -48,16 +48,15 @@ namespace Alderto.Bot.Modules
                 .Include(g => g.Member)
                 .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.Id);
 
-            var res = new EmbedBuilder()
-                .WithDefault()
-                .WithAuthor(member);
-
-            foreach (var recruit in recruits)
+            await this.ReplyEmbedAsync(extra: builder =>
             {
-                res.AddField(recruit.JoinedAt.ToString(), value: $"<@{recruit.MemberId}>");
-            }
+                foreach (var recruit in recruits)
+                {
+                    builder.AddField(recruit.JoinedAt.ToString(), value: $"<@{recruit.MemberId}>");
+                }
 
-            await ReplyAsync(embed: res.Build());
+                builder.WithAuthor(member);
+            });
         }
 
         [Command("By")]
@@ -71,9 +70,9 @@ namespace Alderto.Bot.Modules
 
             var embed = new EmbedBuilder().WithDefault();
             if (recruiter == null)
-                await ReplyAsync(embed: embed.WithDescription($"{member.GetFullName()} was not recruited by anyone.").Build());
+                await this.ReplyEmbedAsync($"{member.Mention} was not recruited by anyone.");
             else
-                await ReplyAsync(embed: embed.WithDescription($"{member.Mention} was recruited by <@{recruiter.MemberId}>.").Build());
+                await this.ReplyEmbedAsync($"{member.Mention} was recruited by <@{recruiter.MemberId}>.");
         }
     }
 }

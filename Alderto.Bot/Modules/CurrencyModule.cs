@@ -74,7 +74,7 @@ namespace Alderto.Bot.Modules
         public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
             var reply = new EmbedBuilder()
-                .WithDefault("**The following changes have been made:**");
+                .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success);
 
             foreach (var user in guildUsers)
             {
@@ -104,8 +104,7 @@ namespace Alderto.Bot.Modules
                 }
 
                 // Format a nice output.
-                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {CurrencySymbol}",
-                    $"{user.Mention} [{user.Username}#{user.Discriminator}]");
+                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {CurrencySymbol}", $"{user.Mention}");
             }
 
             await _context.SaveChangesAsync();
@@ -138,7 +137,7 @@ namespace Alderto.Bot.Modules
             if (timeRemaining.Ticks > 0)
             {
                 // Deny points as time delay hasn't ran out.
-                await this.ReplyEmbedAsync($"You will be able to claim more {CurrencySymbol}s in **{timeRemaining}**.");
+                await this.ReplyEmbedAsync($"You will be able to claim more {CurrencySymbol}s in **{timeRemaining}**.", color: EmbedColor.Error);
                 return;
             }
 
@@ -148,7 +147,7 @@ namespace Alderto.Bot.Modules
             await _context.SaveChangesAsync();
 
             await this.ReplyEmbedAsync($"{user.Mention} was given {CurrencySymbol}{(TimelyAmount == 1 || TimelyAmount == -1 ? "" : "s")} {CurrencySymbol}. " +
-                    $"New total: **{dbUser.CurrencyCount}**.");
+                    $"New total: **{dbUser.CurrencyCount}**.", color: EmbedColor.Success);
         }
     }
 }
