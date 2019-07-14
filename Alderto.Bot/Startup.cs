@@ -6,6 +6,7 @@ using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,8 @@ namespace Alderto.Bot
 
         public IServiceProvider ConfigureServices() => new ServiceCollection()
             // Add database
-            .AddDbContext<IAldertoDbContext, AldertoDbContext>()
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder => 
+                builder.UseSqlServer(_config["DbConnectionString"]))
 
             // Add discord socket client
             .AddSingleton(_client)
@@ -59,13 +61,13 @@ namespace Alderto.Bot
             await services.GetService<LoggingService>().InstallLogger();
 
             // Start bot
-            await _client.LoginAsync(TokenType.Bot, _config["token"]);
+            await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
             await _client.StartAsync();
 
             // Install Command handler
             await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
 
-            // Lock main thread to run indefinetly
+            // Lock main thread to run indefinitely
             await Task.Delay(-1);
         }
 
@@ -73,11 +75,8 @@ namespace Alderto.Bot
         {
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-#if DEBUG
-                .AddJsonFile("config.json.debug")
-#else
+                .AddUserSecrets("c53fe5d3-16e9-400d-a588-4859345371e5")
                 .AddJsonFile("config.json")
-#endif
                 .AddJsonFile("commands.json")
                 .Build();
         }

@@ -9,6 +9,15 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
+        public DbSet<Member> Members { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GuildMember>()
+                .HasKey(m => new { m.MemberId, m.GuildId });
+
+            base.OnModelCreating(modelBuilder);
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

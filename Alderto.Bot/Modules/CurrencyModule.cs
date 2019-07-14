@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Alderto.Bot.Extentions;
+using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
 using Alderto.Data;
-using Alderto.Data.Extentions;
+using Alderto.Data.Extensions;
 using Discord;
 using Discord.Commands;
 
@@ -57,7 +58,7 @@ namespace Alderto.Bot.Modules
             foreach (var user in guildUsers)
             {
                 // Get the user
-                var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id, addIfNonExistant: true);
+                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
 
                 // Add currency to the user
                 dbUser.CurrencyCount += qty;
@@ -79,9 +80,36 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var dbUser = await _context.GetMemberAsync(user.GuildId, user.Id);
+            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             await ReplyAsync($"```{user.Nickname ?? user.Username} [{user.Username}#{user.Discriminator}] has {dbUser.CurrencyCount} point(s).```");
+        }
+
+        [Command("Timely"), Alias("Tub", "ClaimTub")]
+        public async Task Timely()
+        {
+            var user = (IGuildUser)Context.User;
+            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent: true);
+
+            var timeRemaining = dbUser.CurrencyLastClaimed.AddHours(6) - DateTimeOffset.Now;
+
+
+            if (timeRemaining.Ticks > 0)
+            {
+                // Deny points as time delay hasn't ran out.
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .WithDefault($"You will be able to claim more points in **{timeRemaining}**.").Build());
+                return;
+            }
+
+            // Give out points.
+            dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
+            dbUser.CurrencyCount += 3;
+            await _context.SaveChangesAsync();
+
+            await ReplyAsync(
+                embed: new EmbedBuilder().WithDefault(
+                    $"{user.Mention} was given 3 points. New total: **{dbUser.CurrencyCount}**.").Build());
         }
     }
 }

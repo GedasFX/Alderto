@@ -33,6 +33,14 @@ namespace Alderto.Bot.Services
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;
+            _client.UserUpdated += (before, after) =>
+            {
+                if (before.Username != after.Username)
+                {
+                    Console.WriteLine($"{before.Username} + {after.Username}");
+                }
+                return Task.CompletedTask;
+            };
 
             _commands.AddTypeReader(typeof(object), new ObjectTypeReader());
 
@@ -85,6 +93,10 @@ namespace Alderto.Bot.Services
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
             var result = await _commands.ExecuteAsync(context, argPos, _services);
+
+            // Delete successful triggers.
+            if (result.IsSuccess)
+                await message.DeleteAsync();
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,

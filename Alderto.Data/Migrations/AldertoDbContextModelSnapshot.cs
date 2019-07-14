@@ -19,117 +19,7 @@ namespace Alderto.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<string>("LuaCode");
-
-                    b.Property<string>("TriggerKeyword");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GuildId", "TriggerKeyword")
-                        .IsUnique()
-                        .HasFilter("[TriggerKeyword] IS NOT NULL");
-
-                    b.ToTable("CustomCommands");
-                });
-
-            modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<string>("Prefix")
-                        .HasConversion(new ValueConverter<string, string>(v => default(string), v => default(string), new ConverterMappingHints(size: 1)));
-
-                    b.Property<DateTime?>("PremiumUntil");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Guilds");
-                });
-
-            modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("CurrencyCount");
-
-                    b.Property<DateTime?>("CurrencyLastClaimed");
-
-                    b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<decimal>("MemberId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<Guid?>("RecruitedByMemberId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GuildId");
-
-                    b.HasIndex("RecruitedByMemberId");
-
-                    b.HasIndex("MemberId", "GuildId")
-                        .IsUnique();
-
-                    b.ToTable("GuildMembers");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<ulong>", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<ulong>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ClaimType");
-
-                    b.Property<string>("ClaimValue");
-
-                    b.Property<decimal>("RoleId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser<ulong>", b =>
+            modelBuilder.Entity("Alderto.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -179,6 +69,127 @@ namespace Alderto.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("GuildId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<string>("LuaCode");
+
+                    b.Property<string>("TriggerKeyword");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId", "TriggerKeyword")
+                        .IsUnique()
+                        .HasFilter("[TriggerKeyword] IS NOT NULL");
+
+                    b.ToTable("CustomCommands");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<string>("Prefix")
+                        .HasConversion(new ValueConverter<string, string>(v => default(string), v => default(string), new ConverterMappingHints(size: 1)));
+
+                    b.Property<DateTimeOffset?>("PremiumUntil");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Guilds");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
+                {
+                    b.Property<decimal>("MemberId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<decimal>("GuildId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<int>("CurrencyCount");
+
+                    b.Property<DateTimeOffset>("CurrencyLastClaimed");
+
+                    b.Property<DateTimeOffset?>("JoinedAt");
+
+                    b.Property<string>("Nickname");
+
+                    b.Property<decimal?>("RecruiterMemberId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.HasKey("MemberId", "GuildId");
+
+                    b.HasAlternateKey("GuildId", "MemberId");
+
+                    b.ToTable("GuildMembers");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.Member", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<string>("Discriminator");
+
+                    b.Property<string>("Username");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<ulong>", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<ulong>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<decimal>("RoleId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<ulong>", b =>
@@ -261,13 +272,14 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
                 {
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
-                        .WithMany("Members")
+                        .WithMany("GuildMembers")
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Alderto.Data.Models.GuildMember", "RecruitedByGuildMember")
-                        .WithMany()
-                        .HasForeignKey("RecruitedByMemberId");
+                    b.HasOne("Alderto.Data.Models.Member", "Member")
+                        .WithMany("GuildMembers")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<ulong>", b =>
@@ -280,7 +292,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<ulong>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<ulong>")
+                    b.HasOne("Alderto.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -288,7 +300,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<ulong>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<ulong>")
+                    b.HasOne("Alderto.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -301,7 +313,7 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<ulong>")
+                    b.HasOne("Alderto.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -309,7 +321,7 @@ namespace Alderto.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<ulong>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<ulong>")
+                    b.HasOne("Alderto.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

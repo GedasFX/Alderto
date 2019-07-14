@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using AspNet.Security.OAuth.Discord;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -21,49 +23,66 @@ namespace Alderto.Web.Controllers
             _logger = logger;
         }
 
-        [Route("[action]"), ActionName("SignIn")]
-        public IActionResult SignIn(string returnUrl = null)
+        [Route("some"), Authorize]
+        public IActionResult Some()
         {
-            // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(action: "LogInCallback", controller: "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider: "Discord", redirectUrl);
-            return new ChallengeResult(authenticationScheme: "Discord", properties);
+            return Ok();
         }
 
-        [Route("[action]"), ActionName("LoginCallback")]
-        public async Task<string> LogInCallbackAsync(string remoteError = null)
+        [Route("logout"), Authorize]
+        public async Task<IActionResult> LogOut()
         {
-            if (remoteError != null)
-            {
-                return $"Error from external provider: {remoteError}";
-            }
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public IActionResult LogIn(string returnUrl = null)
+        {
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    provider: "Discord",
+                    redirectUrl: Url.Action(action: nameof(LogInCallback), new { returnUrl }));
+
+            return Challenge(properties, DiscordAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        [Route("login-callback")]
+        public async Task<IActionResult> LogInCallback(string returnUrl = null)
+        {
+            // If return url was not specified, just return 200.
+            var onSuccess = returnUrl == null ? (IActionResult)Ok() : LocalRedirect(returnUrl);
+
+            // Collect information from the external login provider.
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                return "Error loading external login information.";
-            }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
             if (result.Succeeded)
             {
                 _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return "success";
-            }
-            if (result.IsLockedOut)
-            {
-                return "locked out";
-            }
-            else
-            {
-                // User is not registered. Register him.
-                await _userManager.CreateAsync(new ApplicationUser(info.Principal.Identity.Name)
-                {
-                    Id = ulong.Parse(info.ProviderKey)
-                });
+                return onSuccess;
             }
 
-            return "";
+            // User is not registered. Register him.
+            var user = new ApplicationUser(info.Principal.Identity.Name)
+            {
+                Id = ulong.Parse(info.ProviderKey)
+            };
+            await _userManager.CreateAsync(user);
+            await _userManager.AddLoginAsync(user, info);
+
+            // Retry sign in after user was registered.
+            result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"{info.Principal.Identity.Name} was registered and logged in with {info.LoginProvider} provider.");
+                return onSuccess;
+            }
+
+            // User failed to register. Internal error.
+            return StatusCode(500);
         }
     }
 }

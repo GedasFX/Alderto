@@ -1,7 +1,11 @@
+using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
+using AspNet.Security.OAuth.Discord;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,29 +23,45 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add database
+            services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
+            services.AddDbContext<AldertoDbContext>(); // For identity.
+
+            // Identity management. 
+            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>()
+                .AddEntityFrameworkStores<AldertoDbContext>();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.HttpContext.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.HttpContext.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+            });
+
+            // Use discord as authentication service.
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddDiscord(options =>
+                {
+                    options.ClientId = Configuration["DiscordApp:ClientId"];
+                    options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                });
+
             // Add Mvc
             services.AddMvc();
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
-
-            // Use discord as authentication service.
-            services.AddAuthentication().AddDiscord(options =>
-            {
-                options.ClientId = Configuration["DiscordAuth:ClientId"];
-                options.ClientSecret = Configuration["DiscordAuth:ClientSecret"];
-            });
-
-            // Add database
-            services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
-            services.AddDbContext<AldertoDbContext>(); // For Identity. Does not affect performance.
-
-            // Identity management. 
-            services.AddDefaultIdentity<ApplicationUser>()
-                .AddEntityFrameworkStores<AldertoDbContext>();
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,10 +88,9 @@ namespace Alderto.Web
                 routes.MapRoute(
                     name: "api",
                     template: "api/[controller]/[action]");
-
                 routes.MapRoute(
-                    name: "client",
-                    template: "{*catchall}");
+                    name: "spa",
+                    template: "{*url}");
             });
 
             app.UseSpa(spa =>
