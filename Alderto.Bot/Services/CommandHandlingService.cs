@@ -106,7 +106,7 @@ namespace Alderto.Bot.Services
             // command.
 #if DEBUG
             if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason).Build());
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason, EmbedColor.Error).Build());
 #endif
         }
     }

@@ -6,12 +6,12 @@ namespace Alderto.Bot.Extensions
     public static class EmbedBuilderExtensions
     {
         /// <summary>
-        /// Adds frequently used elements to the embed builder.
+        /// Adds frequently used elements <see cref="EmbedBuilder.WithDescription"/>, <see cref="EmbedBuilder.WithColor"/> to the embed builder.
         /// </summary>
         /// <param name="builder">Builder to configure.</param>
         /// <param name="description"><see cref="EmbedBuilder.WithDescription"/></param>
         /// <param name="embedColor"><see cref="Color"/> to be displayed to the right side of the embed.
-        /// Use <see cref="EmbedColor"/> properties or a custom color. Defaults to <see cref="EmbedColor.Info"/></param>
+        /// Use class <see cref="EmbedColor"/> properties, or a custom color. Defaults to <see cref="EmbedColor.Info"/></param>
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns><see cref="builder"/></returns>
         public static EmbedBuilder WithDefault(this EmbedBuilder builder,

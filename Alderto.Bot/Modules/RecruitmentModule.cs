@@ -36,7 +36,7 @@ namespace Alderto.Bot.Modules
 
             await _context.SaveChangesAsync();
 
-            await this.ReplyEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.", color: EmbedColor.Success);
+            await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");
         }
 
         [Command("List")]
@@ -65,12 +65,15 @@ namespace Alderto.Bot.Modules
             if (member == null)
                 member = (IGuildUser)Context.User;
 
-            var recruiter = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
-
-            if (recruiter == null)
+            var dbMember = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
+            if (dbMember?.RecruiterMemberId == null)
+            {
                 await this.ReplyEmbedAsync($"{member.Mention} was not recruited by anyone.");
-            else
-                await this.ReplyEmbedAsync($"{member.Mention} was recruited by <@{recruiter.MemberId}>.");
+                return;
+            }
+
+            var recruiter = await _context.GetGuildMemberAsync(member.GuildId, (ulong)dbMember.RecruiterMemberId);
+            await this.ReplyEmbedAsync($"{member.Mention} was recruited by <@{recruiter.MemberId}>.");
         }
     }
 }
