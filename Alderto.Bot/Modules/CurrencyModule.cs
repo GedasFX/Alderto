@@ -57,13 +57,13 @@ namespace Alderto.Bot.Modules
             // This is for taking, not giving
             if (qty <= 0)
             {
-                await this.ReplyEmbedAsync(description: "No changes made: Given quantity must be > 0.", color: EmbedColor.Error);
+                await this.ReplyErrorEmbedAsync("No changes made: Given quantity must be > 0.");
                 return;
             }
 
             if (users.Length == 0)
             {
-                await this.ReplyEmbedAsync(description: "No changes made: At least one user must be specified.", color: EmbedColor.Error);
+                await this.ReplyErrorEmbedAsync("No changes made: At least one user must be specified.");
                 return;
             }
 
