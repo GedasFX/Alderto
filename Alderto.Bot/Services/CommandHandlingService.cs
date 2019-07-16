@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Alderto.Bot.Extensions;
 using Alderto.Bot.TypeReaders;
 using Alderto.Data;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -104,7 +106,7 @@ namespace Alderto.Bot.Services
             // command.
 #if DEBUG
             if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(result.ErrorReason);
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason, EmbedColor.Error).Build());
 #endif
         }
     }
