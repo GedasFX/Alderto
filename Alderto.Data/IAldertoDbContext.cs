@@ -18,6 +18,7 @@ namespace Alderto.Data
         DbSet<Guild> Guilds { get; }
         DbSet<CustomCommand> CustomCommands { get; }
         DbSet<Member> Members { get; }
+        DbSet<GuildConfiguration> GuildPreferences { get; }
 
         /// <summary>
         ///     Provides access to database related information and operations for this context.
@@ -121,7 +122,7 @@ namespace Alderto.Data
         ///     A concurrency violation occurs when an unexpected number of rows are affected during save.
         ///     This is usually because the data in the database has been modified since it was loaded into memory.
         /// </exception>
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Asynchronously saves all changes made in this context to the database.
@@ -154,7 +155,7 @@ namespace Alderto.Data
         ///     A concurrency violation occurs when an unexpected number of rows are affected during save.
         ///     This is usually because the data in the database has been modified since it was loaded into memory.
         /// </exception>
-        Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken));
+        Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Releases the allocated resources for this context.
@@ -223,7 +224,7 @@ namespace Alderto.Data
         ///     <see cref="T:Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry`1" /> for the entity. The entry provides access to change tracking
         ///     information and operations for the entity.
         /// </returns>
-        Task<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class;
+        Task<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
 
         /// <summary>
         ///     <para>
@@ -349,7 +350,7 @@ namespace Alderto.Data
         ///     <see cref="T:Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry" /> for the entity. The entry provides access to change tracking
         ///     information and operations for the entity.
         /// </returns>
-        Task<EntityEntry> AddAsync(object entity, CancellationToken cancellationToken = default(CancellationToken));
+        Task<EntityEntry> AddAsync(object entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     <para>
@@ -543,7 +544,7 @@ namespace Alderto.Data
         /// <returns>
         ///     A task that represents the asynchronous operation.
         /// </returns>
-        Task AddRangeAsync(IEnumerable<object> entities, CancellationToken cancellationToken = default(CancellationToken));
+        Task AddRangeAsync(IEnumerable<object> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     <para>

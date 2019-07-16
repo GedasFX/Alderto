@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Alderto.Bot.Services
 {
-    public class LoggingService
+    public class LoggingService : ILoggingService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
@@ -47,7 +47,8 @@ namespace Alderto.Bot.Services
             if (message.Exception is CommandException command)
             {
                 // Don't risk blocking the logging task by awaiting a message send; rate limits!?
-                command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
+                // TODO: Code from API. Maybe bad solution.
+                _ = command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
             }
 
             _commandsLogger.Log(

@@ -1,34 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.TypeReaders;
-using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Bot.Services
 {
-    public class CommandHandlingService
+    public class CommandHandlingService : ICommandHandlingService
     {
         private const char DefaultCommandPrefix = '.';
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly IAldertoDbContext _context;
+        private readonly IGuildPreferencesProviderService _guildPreferences;
 
-        private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
-
-        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services)
+        public CommandHandlingService(
+            DiscordSocketClient client,
+            CommandService commands,
+            IServiceProvider services,
+            IGuildPreferencesProviderService guildPreferences)
         {
             _client = client;
             _commands = commands;
             _services = services;
-            _context = _services.GetService<IAldertoDbContext>();
+            _guildPreferences = guildPreferences;
         }
 
         public async Task InstallCommandsAsync()
@@ -60,7 +59,8 @@ namespace Alderto.Bot.Services
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
-            if (!(messageParam is SocketUserMessage message)) return;
+            if (!(messageParam is SocketUserMessage message))
+                return;
 
             // Create a number to track where the prefix ends and the command begins
             var argPos = 0;
@@ -68,17 +68,8 @@ namespace Alderto.Bot.Services
             // Get the prefix preference of a guild (if applicable)
             var prefix = DefaultCommandPrefix;
             if (message.Author is SocketGuildUser guildUser)
-            {
-                var guildId = guildUser.Guild.Id;
-                if (!_guildPrefixes.TryGetValue(guildId, out prefix))
-                {
-                    var guild = await _context.Guilds.FindAsync(guildId);
+                prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id))?.Prefix ?? DefaultCommandPrefix;
 
-                    // If guild is null or its prefix is null, use default prefix, otherwise, use whatever the guild has set.
-                    prefix = guild?.Prefix ?? DefaultCommandPrefix;
-                    _guildPrefixes[guildId] = prefix;
-                }
-            }
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (!(message.HasCharPrefix(prefix, ref argPos) ||

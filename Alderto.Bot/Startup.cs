@@ -38,14 +38,14 @@ namespace Alderto.Bot
 
             // Add command handling services
             .AddSingleton<CommandService>()
-            .AddSingleton<CommandHandlingService>()
+            .AddSingleton<ICommandHandlingService, CommandHandlingService>()
 
             // Add Lua command handler
-            .AddSingleton<CustomCommandsProviderService>()
+            .AddSingleton<ICustomCommandProviderService, CustomCommandProviderService>()
 
             // Add logger service
             .AddLogging(lb => { lb.AddConsole(); })
-            .AddSingleton<LoggingService>()
+            .AddSingleton<ILoggingService, LoggingService>()
 
             // Add configuration
             .AddSingleton(_config)

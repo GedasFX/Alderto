@@ -7,9 +7,9 @@ namespace Alderto.Bot.Modules
     [Group("Cc")]
     public class CustomCommandsModule : ModuleBase<SocketCommandContext>
     {
-        private readonly CustomCommandsProviderService _cmdProvider;
+        private readonly ICustomCommandProviderService _cmdProvider;
 
-        public CustomCommandsModule(CustomCommandsProviderService cmdProvider)
+        public CustomCommandsModule(ICustomCommandProviderService cmdProvider)
         {
             _cmdProvider = cmdProvider;
         }

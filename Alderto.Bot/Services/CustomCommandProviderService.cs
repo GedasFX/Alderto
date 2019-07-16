@@ -8,7 +8,7 @@ using NLua;
 
 namespace Alderto.Bot.Services
 {
-    public class CustomCommandsProviderService
+    public class CustomCommandProviderService : ICustomCommandProviderService
     {
         /// <summary>
         /// Maximum amount of time allowed for a Lua Kernel to handle a command.
@@ -20,7 +20,7 @@ namespace Alderto.Bot.Services
         private readonly Lua _luaState;
         private readonly Dictionary<string, LuaFunction> _commands;
 
-        public CustomCommandsProviderService(IAldertoDbContext context)
+        public CustomCommandProviderService(IAldertoDbContext context)
         {
             _context = context;
             _luaState = new Lua();
@@ -68,10 +68,10 @@ namespace Alderto.Bot.Services
             // Function exists. Execute it.
             using (var c = new CancellationTokenSource())
             {
-                // Safeguard agains infinite loops and such.
+                // Safeguard against infinite loops and such.
                 c.CancelAfter(CustomCommandExecTimeout);
 
-                // Wrap an array of objects into a new array so the fucntion in Lua has args parameter as an array.
+                // Wrap an array of objects into a new array so the function in Lua has args parameter as an array.
                 return await Task.Run(NewMethod(args, func), c.Token);
             }
         }

@@ -11,6 +11,7 @@ namespace Alderto.Data
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<GuildConfiguration> GuildPreferences { get; set; }
 
         public AldertoDbContext(DbContextOptions options) : base(options)
         {

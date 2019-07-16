@@ -12,16 +12,16 @@ namespace Alderto.Data.Models
         /// </summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong Id { get; set; }
-
-        /// <summary>
-        /// Guild's chosen prefix
-        /// </summary>
-        public char? Prefix { get; set; }
         
         /// <summary>
         /// Time when guild premium status runs out. Returns null if is not premium.
         /// </summary>
         public DateTimeOffset? PremiumUntil { get; set; }
+
+        /// <summary>
+        /// The preferences of the guild.
+        /// </summary>
+        public virtual GuildConfiguration Configuration { get; set; }
 
         /// <summary>
         /// A collection of members the guild contains.
