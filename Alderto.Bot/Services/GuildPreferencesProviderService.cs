@@ -7,12 +7,11 @@ namespace Alderto.Bot.Services
 {
     public class GuildPreferencesProviderService : IGuildPreferencesProviderService
     {
-        private const string DefaultPrefix = ".";
-
         private readonly IAldertoDbContext _context;
         private readonly Dictionary<ulong, GuildConfiguration> _preferences;
 
         private readonly GuildConfiguration _defaultConfiguration;
+        
 
         public GuildPreferencesProviderService(IAldertoDbContext context)
         {
@@ -20,7 +19,10 @@ namespace Alderto.Bot.Services
             _preferences = new Dictionary<ulong, GuildConfiguration>();
             _defaultConfiguration = new GuildConfiguration
             {
-                Prefix = DefaultPrefix
+                Prefix = GuildConfiguration.DefaultPrefix,
+                CurrencySymbol = GuildConfiguration.DefaultCurrencySymbol,
+                TimelyRewardQuantity = GuildConfiguration.DefaultTimelyRewardQuantity,
+                TimelyCooldown = GuildConfiguration.DefaultTimelyCooldown
             };
         }
 

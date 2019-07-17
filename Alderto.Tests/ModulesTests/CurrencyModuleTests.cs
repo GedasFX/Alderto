@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Modules;
+using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Tests.MockedEntities;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace Alderto.Tests.ModulesTests
         public CurrencyModuleTests()
         {
             _context = new MockDbContext();
-            _module = new CurrencyModule(_context);
+            _module = new CurrencyModule(_context, new GuildPreferencesProviderService(_context));
         }
 
         [Fact]

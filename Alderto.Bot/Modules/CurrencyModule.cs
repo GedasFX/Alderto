@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
+using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Data.Extensions;
 using Discord;
@@ -12,22 +13,15 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const string CurrencySymbol = "<:olm:577476902521012225>";
-        private const int TimelyAmount = 3;
-        private const int MinTimeElapsedMs = 1000 * 60 * 60 * 6;
         private const bool AllowNegativePoints = true;
 
         private readonly IAldertoDbContext _context;
+        private readonly IGuildPreferencesProviderService _guildPreferencesProvider;
 
-        public CurrencyModule(IAldertoDbContext context)
+        public CurrencyModule(IAldertoDbContext context, IGuildPreferencesProviderService guildPreferencesProvider)
         {
             _context = context;
-        }
-
-        [Command("throw")]
-        public async Task Throw()
-        {
-            throw new Exception("dddd");
+            _guildPreferencesProvider = guildPreferencesProvider;
         }
 
         [Command("Give")]
@@ -79,8 +73,13 @@ namespace Alderto.Bot.Modules
 
         public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
+            var author = (IGuildUser) Context.Message.Author;
             var reply = new EmbedBuilder()
-                .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success);
+                .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success, author: author);
+
+            var currencySymbol =
+                (await _guildPreferencesProvider.GetPreferencesAsync(author.GuildId))
+                .GetCurrencySymbol();
 
             foreach (var user in guildUsers)
             {
@@ -110,7 +109,7 @@ namespace Alderto.Bot.Modules
                 }
 
                 // Format a nice output.
-                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {CurrencySymbol}", $"{user.Mention}");
+                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {currencySymbol}", $"{user.Mention}");
             }
 
             await _context.SaveChangesAsync();
@@ -125,9 +124,10 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
+            var currencySymbol = (await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId)).GetCurrencySymbol();
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {CurrencySymbol}");
+            await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
@@ -136,23 +136,27 @@ namespace Alderto.Bot.Modules
             var user = (IGuildUser)Context.User;
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(MinTimeElapsedMs) - DateTimeOffset.Now;
+            var preferences = await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId);
+            var timelyCooldown = preferences.GetTimelyCooldown();
+            var currencySymbol = preferences.GetCurrencySymbol();
+            var timelyAmount = preferences.GetTimelyRewardQuantity();
+
+            var timeRemaining = dbUser.CurrencyLastClaimed.AddSeconds(timelyCooldown) - DateTimeOffset.Now;
 
 
             if (timeRemaining.Ticks > 0)
             {
                 // Deny points as time delay hasn't ran out.
-                await this.ReplyErrorEmbedAsync($"You will be able to claim more {CurrencySymbol} in **{timeRemaining}**.");
+                await this.ReplyErrorEmbedAsync($"You will be able to claim more {currencySymbol} in **{timeRemaining}**.");
                 return;
             }
 
             // Give out points.
             dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
-            dbUser.CurrencyCount += TimelyAmount;
+            dbUser.CurrencyCount += timelyAmount;
             await _context.SaveChangesAsync();
 
-            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {CurrencySymbol}{(TimelyAmount == 1 || TimelyAmount == -1 ? "" : "s")} " +
-                                               $"{CurrencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
         }
     }
 }
