@@ -11,7 +11,7 @@ namespace Alderto.Bot.Services
 {
     public class CommandHandlingService : ICommandHandlingService
     {
-        private const char DefaultCommandPrefix = '.';
+        private const string DefaultCommandPrefix = ".";
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
@@ -72,9 +72,7 @@ namespace Alderto.Bot.Services
 
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix(prefix, ref argPos) ||
-                  message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot)
                 return;
 
             // Create a WebSocket-based command context based on the message

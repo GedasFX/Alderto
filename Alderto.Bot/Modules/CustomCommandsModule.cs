@@ -15,11 +15,11 @@ namespace Alderto.Bot.Modules
         }
 
         [Command]
-        public async Task ExecuteAsync(params object[] args)
+        public async Task ExecuteAsync(params string[] args)
         {
             // TODO: Create API for Lua code.
             // TODO: Handle LuaCommandNotFoundException
-            await _cmdProvider.RunCommandAsync(Context.Guild.Id, (string)args[0], args);
+            await _cmdProvider.RunCommandAsync(Context.Guild.Id, args[0], args);
         }
 
         [Command("Reload")]

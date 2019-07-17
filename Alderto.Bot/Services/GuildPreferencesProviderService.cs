@@ -7,7 +7,7 @@ namespace Alderto.Bot.Services
 {
     public class GuildPreferencesProviderService : IGuildPreferencesProviderService
     {
-        private const char DefaultPrefix = '.';
+        private const string DefaultPrefix = ".";
 
         private readonly IAldertoDbContext _context;
         private readonly Dictionary<ulong, GuildConfiguration> _preferences;

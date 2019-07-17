@@ -41,7 +41,7 @@ namespace Alderto.Data
             modelBuilder.Entity<Guild>()
                 .HasOne(g => g.Configuration)
                 .WithOne(c => c.Guild)
-                .HasForeignKey<GuildConfiguration>(configuration => configuration.Id);
+                .HasForeignKey<GuildConfiguration>(configuration => configuration.GuildId);
 
             // Custom commands
             modelBuilder.Entity<CustomCommand>()

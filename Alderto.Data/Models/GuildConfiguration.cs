@@ -6,15 +6,15 @@ namespace Alderto.Data.Models
     public class GuildConfiguration
     {
         /// <summary>
-        /// Discord guild identifier.
+        /// Discord guild identifier. Primary and foreign key for <see cref="Models.Guild"/>.
         /// </summary>
         [Key, ForeignKey(nameof(Guild))]
-        public ulong Id { get; set; }
+        public ulong GuildId { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/>'s chosen prefix
         /// </summary>
-        public char? Prefix { get; set; }
+        public string Prefix { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/> of which this is the configuration of
