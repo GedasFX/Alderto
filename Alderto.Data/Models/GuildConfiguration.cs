@@ -5,16 +5,6 @@ namespace Alderto.Data.Models
 {
     public class GuildConfiguration
     {
-        private const char DefaultPrefix = '.';
-
-        /// <summary>
-        /// Creates a new <see cref="GuildConfiguration"/> object with default settings.
-        /// </summary>
-        public GuildConfiguration()
-        {
-            Prefix = DefaultPrefix;
-        }
-
         /// <summary>
         /// Discord guild identifier.
         /// </summary>
@@ -22,10 +12,20 @@ namespace Alderto.Data.Models
         public ulong Id { get; set; }
 
         /// <summary>
-        /// Guild's chosen prefix
+        /// <see cref="Guild"/>'s chosen prefix
         /// </summary>
         public char? Prefix { get; set; }
 
+        /// <summary>
+        /// <see cref="Guild"/> of which this is the configuration of
+        /// </summary>
         public virtual Guild Guild { get; set; }
+
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="GuildConfiguration"/>.
+        /// </summary>
+        public GuildConfiguration()
+        {
+        }
     }
 }

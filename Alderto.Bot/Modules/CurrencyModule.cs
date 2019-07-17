@@ -12,7 +12,7 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const string CurrencySymbol = ":Bucketpin:";
+        private const string CurrencySymbol = "<:Bucketpin:472728542191550474>";
         private const int TimelyAmount = 3;
         private const int MinTimeElapsedMs = 1000 * 60 * 60 * 6;
         private const bool AllowNegativePoints = true;
@@ -22,6 +22,12 @@ namespace Alderto.Bot.Modules
         public CurrencyModule(IAldertoDbContext context)
         {
             _context = context;
+        }
+
+        [Command("throw")]
+        public async Task Throw()
+        {
+            throw new Exception("dddd");
         }
 
         [Command("Give")]

@@ -32,11 +32,19 @@ namespace Alderto.Data.Models
         /// A collection of all custom commands registered to the guild.
         /// </summary>
         public virtual IEnumerable<CustomCommand> CustomCommands { get; set; }
-        
+
         /// <summary>
-        /// Creates a guild
+        /// Initializes a new empty instance of <see cref="Guild"/>.
         /// </summary>
-        /// <param name="id"></param>
+        public Guild()
+        {
+            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Guild"/>, with primary key (<see cref="Id"/> set.
+        /// </summary>
+        /// <param name="id"><see cref="Id"/> property.</param>
         public Guild(ulong id)
         {
             Id = id;

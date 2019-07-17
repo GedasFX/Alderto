@@ -27,11 +27,28 @@ namespace Alderto.Data.Models
         /// </summary>
         public virtual IEnumerable<GuildMember> GuildMembers { get; set; }
 
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="Member"/>.
+        /// </summary>
+        public Member()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="GuildConfiguration"/>, with primary key (<see cref="Id"/>) set.
+        /// </summary>
         public Member(ulong id)
         {
             Id = id;
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="GuildConfiguration"/>, with primary key (<see cref="Id"/>),
+        /// and common properties (<see cref="Username"/> and <see cref="Discriminator"/>) set.
+        /// </summary>
+        /// <param name="id"><see cref="Id"/> property.</param>
+        /// <param name="username"><see cref="Username"/> property.</param>
+        /// <param name="discriminator"><see cref="Discriminator"/> property.</param>
         public Member(ulong id, string username, string discriminator) : this(id)
         {
             Username = username;

@@ -40,6 +40,9 @@ namespace Alderto.Bot
             .AddSingleton<CommandService>()
             .AddSingleton<ICommandHandlingService, CommandHandlingService>()
 
+            // Add Guild preferences provider
+            .AddSingleton<IGuildPreferencesProviderService, GuildPreferencesProviderService>()
+
             // Add Lua command handler
             .AddSingleton<ICustomCommandProviderService, CustomCommandProviderService>()
 
@@ -58,14 +61,14 @@ namespace Alderto.Bot
             var services = ConfigureServices();
 
             // Enable logging
-            await services.GetService<LoggingService>().InstallLogger();
+            await services.GetService<ILoggingService>().InstallLogger();
 
             // Start bot
             await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
             await _client.StartAsync();
 
             // Install Command handler
-            await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
+            await services.GetRequiredService<ICommandHandlingService>().InstallCommandsAsync();
 
             // Lock main thread to run indefinitely
             await Task.Delay(-1);

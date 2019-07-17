@@ -38,16 +38,23 @@ namespace Alderto.Data
                 .WithOne(cc => cc.Guild)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Guild>()
+                .HasOne(g => g.Configuration)
+                .WithOne(c => c.Guild)
+                .HasForeignKey<GuildConfiguration>(configuration => configuration.Id);
+
             // Custom commands
             modelBuilder.Entity<CustomCommand>()
-                .HasIndex(m => new { m.GuildId, m.TriggerKeyword })
-                .IsUnique();
+                .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 
             // Members
             modelBuilder.Entity<Member>()
                 .HasMany(m => m.GuildMembers)
                 .WithOne(gm => gm.Member)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild Preferences
+            
 
             base.OnModelCreating(modelBuilder);
         }
@@ -56,6 +63,8 @@ namespace Alderto.Data
         {
 #if DEBUG
             optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.UseSqlServer(
+                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
 #endif
             base.OnConfiguring(optionsBuilder);
         }

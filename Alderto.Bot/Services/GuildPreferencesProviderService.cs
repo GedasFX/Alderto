@@ -7,6 +7,8 @@ namespace Alderto.Bot.Services
 {
     public class GuildPreferencesProviderService : IGuildPreferencesProviderService
     {
+        private const char DefaultPrefix = '.';
+
         private readonly IAldertoDbContext _context;
         private readonly Dictionary<ulong, GuildConfiguration> _preferences;
 
@@ -16,9 +18,17 @@ namespace Alderto.Bot.Services
         {
             _context = context;
             _preferences = new Dictionary<ulong, GuildConfiguration>();
-            _defaultConfiguration = new GuildConfiguration();
+            _defaultConfiguration = new GuildConfiguration
+            {
+                Prefix = DefaultPrefix
+            };
         }
 
+        /// <summary>
+        /// Tries to get the guild preferences from the cache. If failed, fetches from database. If failed, uses default preferences. 
+        /// </summary>
+        /// <param name="guildId">Id of guild, to get preferences of</param>
+        /// <returns>Guild's specific (or default) preferences.</returns>
         public async Task<GuildConfiguration> GetPreferencesAsync(ulong guildId)
         {
             // Try getting cached configuration
@@ -31,7 +41,7 @@ namespace Alderto.Bot.Services
             // Add configuration (can be null) to the cache.
             _preferences.Add(guildId, cfg);
 
-            return cfg;
+            return cfg ?? _defaultConfiguration;
         }
     }
 }

@@ -9,13 +9,13 @@ namespace Alderto.Tests.ServicesTests
 {
     public class CustomCommandsProviderServiceTests
     {
-        private readonly CustomCommandsProviderService _service;
+        private readonly ICustomCommandProviderService _service;
         private readonly IAldertoDbContext _context;
 
         public CustomCommandsProviderServiceTests()
         {
             _context = new MockDbContext();
-            _service = new CustomCommandsProviderService(_context);
+            _service = new CustomCommandProviderService(_context);
         }
 
         [Fact]
