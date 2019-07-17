@@ -9,6 +9,8 @@ namespace Alderto.Bot.Services
 {
     public class LoggingService : ILoggingService
     {
+        private const ulong LoggingChannel = 601142976374374421;
+
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly ILogger _discordLogger;
@@ -41,14 +43,13 @@ namespace Alderto.Bot.Services
             return Task.CompletedTask;
         }
 
-        private Task LogCommand(LogMessage message)
+        private async Task LogCommand(LogMessage message)
         {
-            // Return an error message for async commands
-            if (message.Exception is CommandException command)
+            // Send a command execution exception to the stacktrace channel
+            if (message.Exception is CommandException commandException)
             {
-                // Don't risk blocking the logging task by awaiting a message send; rate limits!?
-                // TODO: Code from API. Maybe bad solution.
-                _ = command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
+                await ((IMessageChannel) _client.GetChannel(LoggingChannel))
+                    .SendMessageAsync($"```{commandException.Message}\n{commandException.InnerException}```");
             }
 
             _commandsLogger.Log(
@@ -57,7 +58,6 @@ namespace Alderto.Bot.Services
                 message,
                 message.Exception,
                 delegate { return message.ToString(prependTimestamp: true); });
-            return Task.CompletedTask;
         }
 
         private static LogLevel LogLevelFromSeverity(LogSeverity severity)

@@ -12,7 +12,7 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const string CurrencySymbol = "<:Bucketpin:472728542191550474>";
+        private const string CurrencySymbol = "<:olm:577476902521012225>";
         private const int TimelyAmount = 3;
         private const int MinTimeElapsedMs = 1000 * 60 * 60 * 6;
         private const bool AllowNegativePoints = true;
@@ -127,8 +127,7 @@ namespace Alderto.Bot.Modules
 
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            await this.ReplyEmbedAsync($"{user.Mention} has " +
-                $"{dbUser.CurrencyCount} {CurrencySymbol}{(dbUser.CurrencyCount == 1 || dbUser.CurrencyCount == -1 ? "" : "s")}.");
+            await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {CurrencySymbol}");
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
@@ -143,7 +142,7 @@ namespace Alderto.Bot.Modules
             if (timeRemaining.Ticks > 0)
             {
                 // Deny points as time delay hasn't ran out.
-                await this.ReplyErrorEmbedAsync($"You will be able to claim more {CurrencySymbol}s in **{timeRemaining}**.");
+                await this.ReplyErrorEmbedAsync($"You will be able to claim more {CurrencySymbol} in **{timeRemaining}**.");
                 return;
             }
 

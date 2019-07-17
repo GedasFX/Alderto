@@ -90,10 +90,9 @@ namespace Alderto.Bot.Services
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-#if DEBUG
-            if (!result.IsSuccess)
+
+            if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason, EmbedColor.Error).Build());
-#endif
         }
     }
 }
