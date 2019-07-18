@@ -65,7 +65,7 @@ namespace Alderto.Bot.Services
             // Get the prefix preference of a guild (if applicable)
             var prefix = DefaultCommandPrefix;
             if (message.Author is SocketGuildUser guildUser)
-                prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id))?.Prefix ?? DefaultCommandPrefix;
+                prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).GetPrefix();
 
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
@@ -92,7 +92,18 @@ namespace Alderto.Bot.Services
             // command.
 
             if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason, EmbedColor.Error).Build());
+            {
+                try
+                {
+                    var d = await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
+                }
+                catch (Discord.Net.HttpException e)
+                {
+                    if (e.DiscordCode == 50013)
+                        await context.Channel.SendMessageAsync("Bot requires guild permission EmbedLinks to function properly.");
+                }
+            }
         }
     }
 }
