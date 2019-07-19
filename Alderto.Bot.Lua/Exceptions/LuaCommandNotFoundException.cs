@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Alderto.Bot.Exceptions
+namespace Alderto.Bot.Lua.Exceptions
 {
     public class LuaCommandNotFoundException : Exception
     {

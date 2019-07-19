@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Bot.Services;
+using Alderto.Bot.Lua;
 using Discord.Commands;
 
 namespace Alderto.Bot.Modules
@@ -7,9 +7,9 @@ namespace Alderto.Bot.Modules
     [Group("Cc")]
     public class CustomCommandsModule : ModuleBase<SocketCommandContext>
     {
-        private readonly ICustomCommandProviderService _cmdProvider;
+        private readonly ICustomCommandProvider _cmdProvider;
 
-        public CustomCommandsModule(ICustomCommandProviderService cmdProvider)
+        public CustomCommandsModule(ICustomCommandProvider cmdProvider)
         {
             _cmdProvider = cmdProvider;
         }

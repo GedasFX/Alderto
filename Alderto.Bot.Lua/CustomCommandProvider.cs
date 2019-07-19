@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Alderto.Bot.Exceptions;
+using Alderto.Bot.Lua.Exceptions;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using NLua;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Bot.Lua
 {
-    public class CustomCommandProviderService : ICustomCommandProviderService
+    public class CustomCommandProvider : ICustomCommandProvider
     {
         /// <summary>
         /// Maximum amount of time allowed for a Lua Kernel to handle a command.
@@ -17,13 +17,13 @@ namespace Alderto.Bot.Services
         private const int CustomCommandExecTimeout = 100;
 
         private readonly IAldertoDbContext _context;
-        private readonly Lua _luaState;
+        private readonly NLua.Lua _luaState;
         private readonly Dictionary<string, LuaFunction> _commands;
 
-        public CustomCommandProviderService(IAldertoDbContext context)
+        public CustomCommandProvider(IAldertoDbContext context)
         {
             _context = context;
-            _luaState = new Lua();
+            _luaState = new NLua.Lua();
             _commands = new Dictionary<string, LuaFunction>();
 
             // Load Lua code

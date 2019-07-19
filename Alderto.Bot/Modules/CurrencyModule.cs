@@ -16,9 +16,9 @@ namespace Alderto.Bot.Modules
         private const bool AllowNegativePoints = true;
 
         private readonly IAldertoDbContext _context;
-        private readonly IGuildPreferencesProviderService _guildPreferencesProvider;
+        private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-        public CurrencyModule(IAldertoDbContext context, IGuildPreferencesProviderService guildPreferencesProvider)
+        public CurrencyModule(IAldertoDbContext context, IGuildPreferencesProvider guildPreferencesProvider)
         {
             _context = context;
             _guildPreferencesProvider = guildPreferencesProvider;

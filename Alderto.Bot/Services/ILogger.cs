@@ -2,7 +2,7 @@
 
 namespace Alderto.Bot.Services
 {
-    public interface ILoggingService
+    public interface ILogger
     {
         Task InstallLogger();
     }

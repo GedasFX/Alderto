@@ -16,7 +16,7 @@ namespace Alderto.Tests.ModulesTests
         public CurrencyModuleTests()
         {
             _context = new MockDbContext();
-            _module = new CurrencyModule(_context, new GuildPreferencesProviderService(_context));
+            _module = new CurrencyModule(_context, new GuildPreferencesProvider(_context));
         }
 
         [Fact]

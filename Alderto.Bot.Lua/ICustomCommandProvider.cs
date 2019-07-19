@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Bot.Exceptions;
+using Alderto.Bot.Lua.Exceptions;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Bot.Lua
 {
-    public interface ICustomCommandProviderService
+    public interface ICustomCommandProvider
     {
         /// <summary>
         /// Executes the command to be run on Lua kernel.

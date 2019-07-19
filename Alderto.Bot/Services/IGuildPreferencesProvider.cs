@@ -4,7 +4,7 @@ using Alderto.Data.Models;
 
 namespace Alderto.Bot.Services
 {
-    public interface IGuildPreferencesProviderService
+    public interface IGuildPreferencesProvider
     {
         /// <summary>
         /// Gets the guild's preferences. Can never be null.

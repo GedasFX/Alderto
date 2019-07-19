@@ -36,10 +36,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
-    <PackageReference Include="NLua" Version="1.4.18" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Alderto.Bot.Lua\Alderto.Bot.Lua.csproj" />
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
   </ItemGroup>
 

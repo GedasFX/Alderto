@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Alderto.Bot.Services;
+using Alderto.Bot.Lua;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
@@ -9,13 +9,13 @@ namespace Alderto.Tests.ServicesTests
 {
     public class CustomCommandsProviderServiceTests
     {
-        private readonly ICustomCommandProviderService _service;
+        private readonly ICustomCommandProvider _service;
         private readonly IAldertoDbContext _context;
 
         public CustomCommandsProviderServiceTests()
         {
             _context = new MockDbContext();
-            _service = new CustomCommandProviderService(_context);
+            _service = new CustomCommandProvider(_context);
         }
 
         [Fact]

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLua" Version="1.4.18" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
+  </ItemGroup>
+
+</Project>

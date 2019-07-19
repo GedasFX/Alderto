@@ -8,20 +8,20 @@ using Discord.WebSocket;
 
 namespace Alderto.Bot.Services
 {
-    public class CommandHandlingService : ICommandHandlingService
+    public class CommandHandler : ICommandHandler
     {
         private const string DefaultCommandPrefix = ".";
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly IGuildPreferencesProviderService _guildPreferences;
+        private readonly IGuildPreferencesProvider _guildPreferences;
 
-        public CommandHandlingService(
+        public CommandHandler(
             DiscordSocketClient client,
             CommandService commands,
             IServiceProvider services,
-            IGuildPreferencesProviderService guildPreferences)
+            IGuildPreferencesProvider guildPreferences)
         {
             _client = client;
             _commands = commands;
@@ -53,7 +53,7 @@ namespace Alderto.Bot.Services
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
 
-        private async Task HandleCommandAsync(SocketMessage messageParam)
+        public async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
             if (!(messageParam is SocketUserMessage message))

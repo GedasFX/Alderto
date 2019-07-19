@@ -7,16 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Alderto.Bot.Services
 {
-    public class LoggingService : ILoggingService
+    // Todo: implement better logger logic.
+    public class Logger : ILogger
     {
         private const ulong LoggingChannel = 601142976374374421;
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-        private readonly ILogger _discordLogger;
-        private readonly ILogger _commandsLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger _discordLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger _commandsLogger;
 
-        public LoggingService(DiscordSocketClient client, CommandService commands, ILoggerFactory logger)
+        public Logger(DiscordSocketClient client, CommandService commands, ILoggerFactory logger)
         {
             _client = client;
             _commands = commands;

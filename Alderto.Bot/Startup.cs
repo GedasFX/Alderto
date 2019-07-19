@@ -38,17 +38,20 @@ namespace Alderto.Bot
 
             // Add command handling services
             .AddSingleton<CommandService>()
-            .AddSingleton<ICommandHandlingService, CommandHandlingService>()
+            .AddSingleton<ICommandHandler, CommandHandler>()
 
             // Add Guild preferences provider
-            .AddSingleton<IGuildPreferencesProviderService, GuildPreferencesProviderService>()
+            .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
 
             // Add Lua command handler
-            .AddSingleton<ICustomCommandProviderService, CustomCommandProviderService>()
+            .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()
 
             // Add logger service
-            .AddLogging(lb => { lb.AddConsole(); })
-            .AddSingleton<ILoggingService, LoggingService>()
+            .AddLogging(lb =>
+            {
+                lb.AddConsole();
+            })
+            .AddSingleton<Services.ILogger, Logger>()
 
             // Add configuration
             .AddSingleton(_config)
@@ -61,14 +64,14 @@ namespace Alderto.Bot
             var services = ConfigureServices();
 
             // Enable logging
-            await services.GetService<ILoggingService>().InstallLogger();
+            await services.GetService<Services.ILogger>().InstallLogger();
 
             // Start bot
             await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
             await _client.StartAsync();
 
             // Install Command handler
-            await services.GetRequiredService<ICommandHandlingService>().InstallCommandsAsync();
+            await services.GetRequiredService<ICommandHandler>().InstallCommandsAsync();
 
             // Lock main thread to run indefinitely
             await Task.Delay(-1);

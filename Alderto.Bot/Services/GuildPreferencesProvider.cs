@@ -6,12 +6,12 @@ using Alderto.Data.Models;
 
 namespace Alderto.Bot.Services
 {
-    public class GuildPreferencesProviderService : IGuildPreferencesProviderService
+    public class GuildPreferencesProvider : IGuildPreferencesProvider
     {
         private readonly IAldertoDbContext _context;
         private readonly Dictionary<ulong, GuildConfiguration> _preferences;
 
-        public GuildPreferencesProviderService(IAldertoDbContext context)
+        public GuildPreferencesProvider(IAldertoDbContext context)
         {
             _context = context;
             _preferences = new Dictionary<ulong, GuildConfiguration>();

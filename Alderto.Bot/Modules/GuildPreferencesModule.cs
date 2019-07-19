@@ -16,9 +16,9 @@ namespace Alderto.Bot.Modules
         [Group("Get")]
         public class GetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesProviderService _guildPreferencesProvider;
+            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-            public GetPreferenceModule(IGuildPreferencesProviderService guildPreferencesProvider)
+            public GetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
             {
                 _guildPreferencesProvider = guildPreferencesProvider;
             }
@@ -34,9 +34,9 @@ namespace Alderto.Bot.Modules
         [Group("Set")]
         public class SetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesProviderService _guildPreferencesProvider;
+            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-            public SetPreferenceModule(IGuildPreferencesProviderService guildPreferencesProvider)
+            public SetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
             {
                 _guildPreferencesProvider = guildPreferencesProvider;
             }
