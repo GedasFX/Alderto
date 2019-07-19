@@ -1,4 +1,5 @@
 ﻿using Alderto.Data.Models;
+// ReSharper disable PossibleInvalidOperationException
 
 namespace Alderto.Bot.Extensions
 {
@@ -12,7 +13,7 @@ namespace Alderto.Bot.Extensions
         public static string GetPrefix(this GuildConfiguration guildPreferences)
         {
             var prefix = guildPreferences.Prefix;
-            return string.IsNullOrWhiteSpace(prefix) ? prefix : GuildConfiguration.DefaultPrefix;
+            return !string.IsNullOrWhiteSpace(prefix) ? prefix : GuildConfiguration.DefaultPrefix;
         }
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace Alderto.Bot.Extensions
         public static string GetCurrencySymbol(this GuildConfiguration guildPreferences)
         {
             var currencySymbol = guildPreferences.CurrencySymbol;
-            return string.IsNullOrWhiteSpace(currencySymbol) ? currencySymbol : GuildConfiguration.DefaultCurrencySymbol;
+            return !string.IsNullOrWhiteSpace(currencySymbol) ? currencySymbol : GuildConfiguration.DefaultCurrencySymbol;
         }
 
         /// <summary>

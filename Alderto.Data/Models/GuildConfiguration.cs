@@ -6,6 +6,11 @@ namespace Alderto.Data.Models
     public class GuildConfiguration
     {
         /// <summary>
+        /// Default configuration
+        /// </summary>
+        public static GuildConfiguration DefaultConfiguration => (GuildConfiguration)CfgDefaults.MemberwiseClone();
+
+        /// <summary>
         /// Default value for <see cref="GuildConfiguration.Prefix"/>
         /// </summary>
         public static string DefaultPrefix { get; } = ".";
@@ -24,6 +29,15 @@ namespace Alderto.Data.Models
         /// Default value for <see cref="GuildConfiguration.TimelyCooldown"/>
         /// </summary>
         public static int DefaultTimelyCooldown { get; } = 86400; // 24h
+
+
+        private static readonly GuildConfiguration CfgDefaults = new GuildConfiguration
+        {
+            Prefix = DefaultPrefix,
+            CurrencySymbol = DefaultCurrencySymbol,
+            TimelyRewardQuantity = DefaultTimelyRewardQuantity,
+            TimelyCooldown = DefaultTimelyCooldown
+        };
 
 
         /// <summary>
