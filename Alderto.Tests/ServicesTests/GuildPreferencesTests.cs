@@ -15,7 +15,7 @@ namespace Alderto.Tests.ServicesTests
         }
 
         [Fact]
-        async Task GetPreferences()
+        public async Task GetPreferences()
         {
             // Get preferences. Should be default
             var pref = await _provider.GetPreferencesAsync(1);

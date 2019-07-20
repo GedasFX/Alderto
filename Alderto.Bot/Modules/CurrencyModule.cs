@@ -13,8 +13,6 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const bool AllowNegativePoints = true;
-
         private readonly IAldertoDbContext _context;
         private readonly IGuildPreferencesProvider _guildPreferencesProvider;
         private readonly ICurrencyProvider _currencyProvider;

@@ -47,13 +47,15 @@ namespace Alderto.Data.Models
         public ulong GuildId { get; set; }
 
         /// <summary>
-        /// Prefix for commands.
+        /// Prefix for commands. MaxLength = 20.
         /// </summary>
+        [MaxLength(20)]
         public string Prefix { get; set; }
 
         /// <summary>
-        /// Text/EmoteString used for displaying currency.
+        /// Text/EmoteString used for displaying currency. MaxLength = 50.
         /// </summary>
+        [MaxLength(50)]
         public string CurrencySymbol { get; set; }
 
         /// <summary>

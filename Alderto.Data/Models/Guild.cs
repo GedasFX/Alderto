@@ -38,7 +38,6 @@ namespace Alderto.Data.Models
         /// </summary>
         public Guild()
         {
-            
         }
 
         /// <summary>

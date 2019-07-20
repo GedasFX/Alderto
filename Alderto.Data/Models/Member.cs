@@ -13,13 +13,16 @@ namespace Alderto.Data.Models
         public ulong Id { get; set; }
 
         /// <summary>
-        /// Last known username of the user.
+        /// Last known username of the user. Max Length: 32 (Discord limitation)
         /// </summary>
+        [MaxLength(32)]
         public string Username { get; set; }
 
         /// <summary>
-        /// Last known discriminator of the user.
+        /// Last known discriminator of the user. Is always a length of 4.
         /// </summary>
+        /// <example>0004 or 1234</example>
+        [MinLength(4), MaxLength(4)]
         public string Discriminator { get; set; }
 
         /// <summary>

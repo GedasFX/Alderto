@@ -19,12 +19,13 @@ namespace Alderto.Data.Models
         public ulong GuildId { get; set; }
 
         /// <summary>
-        /// Last known nickname of the user.
+        /// Last known nickname of the user. Max Length: 32 (Discord limitation)
         /// </summary>
+        [MaxLength(32)]
         public string Nickname { get; set; }
 
         /// <summary>
-        /// Time of last currency claim. Value is null if never claimed timely reward.
+        /// Time of last currency claim.
         /// </summary>
         public DateTimeOffset CurrencyLastClaimed { get; set; }
 

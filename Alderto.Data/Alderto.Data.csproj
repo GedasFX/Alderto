@@ -20,6 +20,10 @@
     <Compile Remove="Migrations\20190717210744_currencymodulepref.Designer.cs" />
     <Compile Remove="Migrations\20190717210831_currencymodulepref.cs" />
     <Compile Remove="Migrations\20190717210831_currencymodulepref.Designer.cs" />
+    <Compile Remove="Migrations\20190720165037_limitstringsize.cs" />
+    <Compile Remove="Migrations\20190720165037_limitstringsize.Designer.cs" />
+    <Compile Remove="Migrations\20190720165801_dropcustomcommands.cs" />
+    <Compile Remove="Migrations\20190720165801_dropcustomcommands.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
