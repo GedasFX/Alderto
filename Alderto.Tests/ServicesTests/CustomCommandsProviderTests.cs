@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Alderto.Tests.ServicesTests
 {
-    public class CustomCommandsProviderServiceTests
+    public class CustomCommandsProviderTests
     {
         private readonly ICustomCommandProvider _service;
         private readonly IAldertoDbContext _context;
 
-        public CustomCommandsProviderServiceTests()
+        public CustomCommandsProviderTests()
         {
             _context = new MockDbContext();
             _service = new CustomCommandProvider(_context);

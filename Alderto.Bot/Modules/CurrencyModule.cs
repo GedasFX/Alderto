@@ -17,11 +17,13 @@ namespace Alderto.Bot.Modules
 
         private readonly IAldertoDbContext _context;
         private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+        private readonly ICurrencyProvider _currencyProvider;
 
-        public CurrencyModule(IAldertoDbContext context, IGuildPreferencesProvider guildPreferencesProvider)
+        public CurrencyModule(IAldertoDbContext context, IGuildPreferencesProvider guildPreferencesProvider, ICurrencyProvider currencyProvider)
         {
             _context = context;
             _guildPreferencesProvider = guildPreferencesProvider;
+            _currencyProvider = currencyProvider;
         }
 
         [Command("Give")]
@@ -33,13 +35,13 @@ namespace Alderto.Bot.Modules
             // This is for giving, not taking
             if (qty <= 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: Given quantity must be > 0.");
+                await this.ReplyErrorEmbedAsync("Quantity must be greater than 0.");
                 return;
             }
 
             if (users.Length == 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: At least one user must be specified.");
+                await this.ReplyErrorEmbedAsync("At least one user must be specified.");
                 return;
             }
 
@@ -71,9 +73,9 @@ namespace Alderto.Bot.Modules
             await ReplyAsync(embed: reply);
         }
 
-        public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
+        private async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
-            var author = (IGuildUser) Context.Message.Author;
+            var author = (IGuildUser)Context.Message.Author;
             var reply = new EmbedBuilder()
                 .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success, author: author);
 
@@ -83,33 +85,11 @@ namespace Alderto.Bot.Modules
 
             foreach (var user in guildUsers)
             {
-                // Get the user
-                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
-                var oldCurrencyCount = dbUser.CurrencyCount;
-
-                if (qty > 0 && oldCurrencyCount > 0 && oldCurrencyCount + qty < 0)
-                {
-                    // overflow, set to max value instead.
-                    dbUser.CurrencyCount = int.MaxValue;
-                }
-                else if (qty < 0 && oldCurrencyCount < 0 && oldCurrencyCount + qty > 0)
-                {
-                    //underflow, set to min value instead
-                    dbUser.CurrencyCount = int.MinValue;
-                }
-                else
-                {
-                    // Add currency to the user
-                    dbUser.CurrencyCount += qty;
-                }
-
-                if (!AllowNegativePoints && dbUser.CurrencyCount < 0)
-                {
-                    dbUser.CurrencyCount = 0;
-                }
+                var member = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
+                await _currencyProvider.ModifyPointsAsync(member, qty, saveChanges: false);
 
                 // Format a nice output.
-                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {currencySymbol}", $"{user.Mention}");
+                reply.AddField($"---", $"New total for {user.Mention}: {member.CurrencyCount} {currencySymbol}");
             }
 
             await _context.SaveChangesAsync();

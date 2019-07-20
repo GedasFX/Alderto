@@ -40,8 +40,9 @@ namespace Alderto.Bot
             .AddSingleton<CommandService>()
             .AddSingleton<ICommandHandler, CommandHandler>()
 
-            // Add Guild preferences provider
+            // Add providers for various bot activities
             .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
+            .AddSingleton<ICurrencyProvider, CurrencyProvider>()
 
             // Add Lua command handler
             .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()

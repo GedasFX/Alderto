@@ -27,7 +27,7 @@ namespace Alderto.Bot.Extensions
                 builder.WithDescription(description);
 
             if (author != null)
-                builder.WithAuthor(author);
+                builder.WithFooter($"Req. by {author.Username}#{author.Discriminator}");
 
             // Apply additional changes.
             extra?.Invoke(builder);

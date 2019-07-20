@@ -1,4 +1,5 @@
-﻿using Alderto.Data;
+﻿using System;
+using Alderto.Data;
 using Alderto.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,13 +17,15 @@ namespace Alderto.Tests.MockedEntities
         {
             modelBuilder.Entity<GuildMember>()
                 .HasKey(m => new { m.MemberId, m.GuildId });
+            modelBuilder.Entity<CustomCommand>()
+                .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 
             base.OnModelCreating(modelBuilder);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("TestDb");
+            optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
             optionsBuilder.EnableSensitiveDataLogging();
 
             base.OnConfiguring(optionsBuilder);
