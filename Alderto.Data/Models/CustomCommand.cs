@@ -10,6 +10,7 @@ namespace Alderto.Data.Models
         /// Trigger keyword. First word to be triggered on ".cc trigger args..." command.
         /// </summary>
         [Key]
+        [MaxLength(100)]
         public string TriggerKeyword { get; set; }
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace Alderto.Data.Models
         ///     return 3
         /// end
         /// </example>
+        [MaxLength(2000)]
         public string LuaCode { get; set; }
 
         /// <summary>
