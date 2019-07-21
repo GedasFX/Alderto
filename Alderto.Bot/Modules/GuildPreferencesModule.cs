@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Services;
+using Discord;
 using Discord.Commands;
 
 namespace Alderto.Bot.Modules
 {
+    [RequireUserPermission(GuildPermission.Administrator)]
     [Group("Config"), Alias("Preferences", "Pref", "Cfg")]
     public class GuildPreferencesModule : ModuleBase<SocketCommandContext>
     {
