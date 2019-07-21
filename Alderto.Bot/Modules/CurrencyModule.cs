@@ -115,7 +115,7 @@ namespace Alderto.Bot.Modules
 
             var timeRemaining = await _currencyManager.GrantTimelyRewardAsync(dbUser, timelyAmount, timelyCooldown);
 
-            // If null - points were give out. Otherwise its time remaining until next claim.
+            // If null - points were given out. Otherwise its time remaining until next claim.
             if (timeRemaining != null)
             {
                 await this.ReplyErrorEmbedAsync($"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");

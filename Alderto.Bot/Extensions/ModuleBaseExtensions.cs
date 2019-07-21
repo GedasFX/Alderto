@@ -14,7 +14,7 @@ namespace Alderto.Bot.Extensions
         /// <param name="module">Command module</param>
         /// <param name="description"><see cref="EmbedBuilder.WithDescription"/></param>
         /// <param name="color"><see cref="EmbedColor"/> to be displayed to the right side of the embed. Defaults to <see cref="EmbedColor.Info"/></param>
-        /// <param name="author"></param>
+        /// <param name="author"><see cref="EmbedBuilder.WithAuthor"/></param>
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns></returns>
         public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module,

@@ -24,7 +24,7 @@ namespace Alderto.Bot.Services
         /// Updates the guild preferences. to the given model.
         /// </summary>
         /// <param name="guildId">Discord guild id.</param>
-        /// <param name="configuration">Configuration to set in store anc cache.</param>
+        /// <param name="configuration">Configuration to set in store and cache.</param>
         Task UpdatePreferencesAsync(ulong guildId, GuildConfiguration configuration);
     }
 }

@@ -40,8 +40,7 @@ namespace Alderto.Bot.Services
         /// </summary>
         /// <param name="recruitedMember">Recruited member.</param>
         /// <param name="recruiterMemberId">Discord user id of recruiter.</param>
-        /// <param name="recruitedAt">Time user joined. If recruited, Recruited time = Joined time.</param>
-        /// <returns></returns>
+        /// <param name="recruitedAt">Time user got recruited. Recruited time approx. equals joined time.</param>
         Task AddRecruitAsync(GuildMember recruitedMember, ulong recruiterMemberId, DateTimeOffset recruitedAt);
     }
 }

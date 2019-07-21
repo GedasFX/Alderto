@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
@@ -30,10 +31,7 @@ namespace Alderto.Bot.Modules
             foreach (var member in recruited)
             {
                 var dbUser = await _guildUserManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
-                dbUser.RecruiterMemberId = recruiterId;
-
-                // Ensure that joinedAt is registered. Is used for listing user recruits.
-                dbUser.JoinedAt = member.JoinedAt;
+                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.Now);
             }
 
             await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");

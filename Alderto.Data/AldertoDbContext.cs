@@ -53,9 +53,6 @@ namespace Alderto.Data
                 .WithOne(gm => gm.Member)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Guild Preferences
-            
-
             base.OnModelCreating(modelBuilder);
         }
 

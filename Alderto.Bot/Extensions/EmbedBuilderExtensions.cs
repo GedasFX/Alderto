@@ -12,7 +12,7 @@ namespace Alderto.Bot.Extensions
         /// <param name="description"><see cref="EmbedBuilder.WithDescription"/></param>
         /// <param name="embedColor"><see cref="Color"/> to be displayed to the right side of the embed.
         /// Use class <see cref="EmbedColor"/> properties, or a custom color. Defaults to <see cref="EmbedColor.Info"/></param>
-        /// <param name="author">EmbedBuilder.WithAuthor</param>
+        /// <param name="author"><see cref="EmbedBuilder.WithAuthor"/></param>
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns><see cref="builder"/></returns>
         public static EmbedBuilder WithDefault(this EmbedBuilder builder,
@@ -25,7 +25,7 @@ namespace Alderto.Bot.Extensions
 
             if (description != null)
                 builder.WithDescription(description);
-
+            
             if (author != null)
                 builder.WithFooter($"Req. by {author.Username}#{author.Discriminator}");
 
