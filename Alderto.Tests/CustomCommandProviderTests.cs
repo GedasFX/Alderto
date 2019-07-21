@@ -5,14 +5,14 @@ using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
 using Xunit;
 
-namespace Alderto.Tests.ServicesTests
+namespace Alderto.Tests
 {
-    public class CustomCommandsProviderTests
+    public class CustomCommandProviderTests
     {
         private readonly ICustomCommandProvider _service;
         private readonly IAldertoDbContext _context;
 
-        public CustomCommandsProviderTests()
+        public CustomCommandProviderTests()
         {
             _context = new MockDbContext();
             _service = new CustomCommandProvider(_context);

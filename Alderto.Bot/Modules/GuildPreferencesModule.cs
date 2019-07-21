@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Services;
-using Discord;
 using Discord.Commands;
 
 namespace Alderto.Bot.Modules
@@ -12,17 +11,17 @@ namespace Alderto.Bot.Modules
         [Group("Get")]
         public class GetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+            private readonly IGuildPreferencesManager _guildPreferencesManager;
 
-            public GetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
+            public GetPreferenceModule(IGuildPreferencesManager guildPreferencesManager)
             {
-                _guildPreferencesProvider = guildPreferencesProvider;
+                _guildPreferencesManager = guildPreferencesManager;
             }
 
             [Command("Prefix")]
             public async Task GetPrefix()
             {
-                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Prefix: **{pref.Prefix}**");
             }
         }
@@ -30,18 +29,18 @@ namespace Alderto.Bot.Modules
         [Group("Set")]
         public class SetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+            private readonly IGuildPreferencesManager _guildPreferencesManager;
 
-            public SetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
+            public SetPreferenceModule(IGuildPreferencesManager guildPreferencesManager)
             {
-                _guildPreferencesProvider = guildPreferencesProvider;
+                _guildPreferencesManager = guildPreferencesManager;
             }
 
             [Command("Prefix")]
             public async Task SetPrefix(string prefix)
             {
                 var guildId = Context.Guild.Id;
-                await _guildPreferencesProvider.UpdatePreferencesAsync(guildId, pref => pref.Prefix = prefix);
+                await _guildPreferencesManager.UpdatePreferencesAsync(guildId, pref => pref.Prefix = prefix);
                 await this.ReplySuccessEmbedAsync($"Prefix was changed to: **{prefix}**");
             }
         }

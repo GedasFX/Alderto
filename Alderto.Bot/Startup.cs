@@ -36,13 +36,16 @@ namespace Alderto.Bot
             // Add discord socket client
             .AddSingleton(_client)
 
+            // Add User provider
+            .AddSingleton<IGuildUserManager, GuildUserManager>()
+
             // Add command handling services
             .AddSingleton<CommandService>()
             .AddSingleton<ICommandHandler, CommandHandler>()
 
             // Add providers for various bot activities
-            .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
-            .AddSingleton<ICurrencyProvider, CurrencyProvider>()
+            .AddSingleton<IGuildPreferencesManager, GuildPreferencesManager>()
+            .AddSingleton<ICurrencyManager, CurrencyManager>()
 
             // Add Lua command handler
             .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()

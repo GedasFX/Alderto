@@ -19,6 +19,7 @@ namespace Alderto.Bot.Modules
         {
             // TODO: Create API for Lua code.
             // TODO: Handle LuaCommandNotFoundException
+            // ReSharper disable once CoVariantArrayConversion
             await _cmdProvider.RunCommandAsync(Context.Guild.Id, args[0], args);
         }
 

@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
+using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Data.Extensions;
 using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +13,12 @@ namespace Alderto.Bot.Modules
     [Group("Recruitment"), Alias("Recruit", "Recruited", "Rec")]
     public class RecruitmentModule : ModuleBase<SocketCommandContext>
     {
+        private readonly IGuildUserManager _guildUserManager;
         private readonly IAldertoDbContext _context;
 
-        public RecruitmentModule(IAldertoDbContext context)
+        public RecruitmentModule(IGuildUserManager guildUserManager, IAldertoDbContext context)
         {
+            _guildUserManager = guildUserManager;
             _context = context;
         }
 
@@ -27,14 +29,12 @@ namespace Alderto.Bot.Modules
             var recruiterId = recruiter.Id;
             foreach (var member in recruited)
             {
-                var dbUser = await _context.GetGuildMemberAsync(recruiter.GuildId, member.Id);
+                var dbUser = await _guildUserManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
                 dbUser.RecruiterMemberId = recruiterId;
 
                 // Ensure that joinedAt is registered. Is used for listing user recruits.
                 dbUser.JoinedAt = member.JoinedAt;
             }
-
-            await _context.SaveChangesAsync();
 
             await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");
         }
@@ -52,7 +52,7 @@ namespace Alderto.Bot.Modules
             {
                 foreach (var recruit in recruits)
                 {
-                    builder.AddField(recruit.JoinedAt.ToString(), value: $"<@{recruit.MemberId}>");
+                    builder.AddField(recruit.JoinedAt.ToString(), $"<@{recruit.MemberId}>");
                 }
 
                 builder.WithAuthor(member);
@@ -65,14 +65,14 @@ namespace Alderto.Bot.Modules
             if (member == null)
                 member = (IGuildUser)Context.User;
 
-            var dbMember = await _context.GetGuildMemberAsync(member.GuildId, member.Id);
+            var dbMember = await _guildUserManager.GetGuildMemberAsync(member.GuildId, member.Id);
             if (dbMember?.RecruiterMemberId == null)
             {
                 await this.ReplyEmbedAsync($"{member.Mention} was not recruited by anyone.");
                 return;
             }
 
-            var recruiter = await _context.GetGuildMemberAsync(member.GuildId, (ulong)dbMember.RecruiterMemberId);
+            var recruiter = await _guildUserManager.GetGuildMemberAsync(member.GuildId, (ulong)dbMember.RecruiterMemberId);
             await this.ReplyEmbedAsync($"{member.Mention} was recruited by <@{recruiter.MemberId}>.");
         }
     }

@@ -13,13 +13,13 @@ namespace Alderto.Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly IGuildPreferencesProvider _guildPreferences;
+        private readonly IGuildPreferencesManager _guildPreferences;
 
         public CommandHandler(
             DiscordSocketClient client,
             CommandService commands,
             IServiceProvider services,
-            IGuildPreferencesProvider guildPreferences)
+            IGuildPreferencesManager guildPreferences)
         {
             _client = client;
             _commands = commands;

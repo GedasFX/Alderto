@@ -1,18 +1,14 @@
 ﻿using System;
-using Alderto.Data;
-using Alderto.Tests.MockedEntities;
-using Microsoft.Extensions.DependencyInjection;
+using Discord;
 
-namespace Alderto.Tests
+namespace Alderto.Tests.MockedEntities
 {
     public static class Dummies
     {
-        public static MockGuildUser Alice { get; }
-        public static MockGuildUser Bob { get; }
+        public static IGuildUser Alice { get; }
+        public static IGuildUser Bob { get; }
 
-        public static MockGuild Guild { get; }
-
-        public static IServiceProvider ServiceProvider { get; }
+        public static IGuild Guild { get; }
 
         static Dummies()
         {
@@ -32,10 +28,6 @@ namespace Alderto.Tests
             {
                 Id = 5
             };
-            
-            ServiceProvider = new ServiceCollection()
-                .AddDbContext<IAldertoDbContext, MockDbContext>()
-                .BuildServiceProvider();
         }
     }
 }
