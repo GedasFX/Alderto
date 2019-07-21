@@ -77,9 +77,7 @@ namespace Alderto.Bot.Modules
             var reply = new EmbedBuilder()
                 .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success, author: author);
 
-            var currencySymbol =
-                (await _guildPreferencesProvider.GetPreferencesAsync(author.GuildId))
-                .GetCurrencySymbol();
+            var currencySymbol = (await _guildPreferencesProvider.GetPreferencesAsync(author.GuildId)).CurrencySymbol;
 
             foreach (var user in guildUsers)
             {
@@ -102,7 +100,7 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var currencySymbol = (await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId)).GetCurrencySymbol();
+            var currencySymbol = (await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
@@ -115,9 +113,9 @@ namespace Alderto.Bot.Modules
             var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
 
             var preferences = await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId);
-            var timelyCooldown = preferences.GetTimelyCooldown();
-            var currencySymbol = preferences.GetCurrencySymbol();
-            var timelyAmount = preferences.GetTimelyRewardQuantity();
+            var timelyCooldown = preferences.TimelyCooldown;
+            var currencySymbol = preferences.CurrencySymbol;
+            var timelyAmount = preferences.TimelyRewardQuantity;
 
             var timeRemaining = dbUser.CurrencyLastClaimed.AddSeconds(timelyCooldown) - DateTimeOffset.Now;
 

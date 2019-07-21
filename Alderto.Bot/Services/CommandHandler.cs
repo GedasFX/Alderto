@@ -10,8 +10,6 @@ namespace Alderto.Bot.Services
 {
     public class CommandHandler : ICommandHandler
     {
-        private const string DefaultCommandPrefix = ".";
-
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
@@ -62,11 +60,13 @@ namespace Alderto.Bot.Services
             // Create a number to track where the prefix ends and the command begins
             var argPos = 0;
 
-            // Get the prefix preference of a guild (if applicable)
-            var prefix = DefaultCommandPrefix;
-            if (message.Author is SocketGuildUser guildUser)
-                prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).GetPrefix();
+            // Check if message was sent in a guild context. If not - ignore.
+            // TODO: Make a redirect messages channel and maybe add command handler to DM
+            if (!(message.Author is SocketGuildUser guildUser))
+                return;
 
+            // Get the prefix preference of a guild (if applicable)
+            var prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).Prefix;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot)
@@ -95,13 +95,15 @@ namespace Alderto.Bot.Services
             {
                 try
                 {
-                    var d = await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
                 }
                 catch (Discord.Net.HttpException e)
                 {
+                    // 50013 occurs when bot cannot send embedded messages. All error reports use embeds.
                     if (e.DiscordCode == 50013)
-                        await context.Channel.SendMessageAsync("Bot requires guild permission EmbedLinks to function properly.");
+                        await context.Channel.SendMessageAsync(
+                            "Bot requires guild permission EmbedLinks to function properly.");
                 }
             }
         }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Services;
 using Discord;
@@ -10,7 +7,6 @@ using Discord.Commands;
 namespace Alderto.Bot.Modules
 {
     [Group("Config"), Alias("Preferences", "Pref", "Cfg")]
-    [RequireBotPermission(GuildPermission.SendMessages)] // Ensures bot is in guild
     public class GuildPreferencesModule : ModuleBase<SocketCommandContext>
     {
         [Group("Get")]
@@ -27,7 +23,7 @@ namespace Alderto.Bot.Modules
             public async Task GetPrefix()
             {
                 var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
-                await this.ReplySuccessEmbedAsync($"Prefix: **{pref.GetPrefix()}**");
+                await this.ReplySuccessEmbedAsync($"Prefix: **{pref.Prefix}**");
             }
         }
 

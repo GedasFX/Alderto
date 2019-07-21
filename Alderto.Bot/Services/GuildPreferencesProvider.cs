@@ -42,24 +42,30 @@ namespace Alderto.Bot.Services
             // First get the preferences.
             var config = await GetPreferencesAsync(guildId);
 
-            // If config.GuildId == 0, then it means that the guild uses default preferences.
-            // Default preferences are only applied, when the GetPreferencesAsync() cannot find them in database.
-            var guildPreferencesPresentInDatabase = config.GuildId > 0;
-
             // Apply changes.
             changes(config);
 
-            // Apply correct guildId. Do this after applying changes, as changes can modify GuildId.
-            config.GuildId = guildId;
+            // Continue with the the update
+            await UpdatePreferencesAsync(guildId, config);
+        }
+
+        public async Task UpdatePreferencesAsync(ulong guildId, GuildConfiguration configuration)
+        {
+            // If config.GuildId == 0, then it means that the guild uses default preferences.
+            // Default preferences are only applied, when the GetPreferencesAsync() cannot find them in database.
+            var guildPreferencesPresentInDatabase = configuration.GuildId > 0;
+
+            // Ensure the correct guild Id is applied.
+            configuration.GuildId = guildId;
 
             // Then update the database.
             if (guildPreferencesPresentInDatabase)
             {
-                _context.GuildPreferences.Update(config);
+                _context.GuildPreferences.Update(configuration);
             }
             else
             {
-                await _context.GuildPreferences.AddAsync(config);
+                await _context.GuildPreferences.AddAsync(configuration);
             }
 
             await _context.SaveChangesAsync();

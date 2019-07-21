@@ -24,6 +24,8 @@
     <Compile Remove="Migrations\20190720165037_limitstringsize.Designer.cs" />
     <Compile Remove="Migrations\20190720165801_dropcustomcommands.cs" />
     <Compile Remove="Migrations\20190720165801_dropcustomcommands.Designer.cs" />
+    <Compile Remove="Migrations\20190720173404_prefix.cs" />
+    <Compile Remove="Migrations\20190720173404_prefix.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
