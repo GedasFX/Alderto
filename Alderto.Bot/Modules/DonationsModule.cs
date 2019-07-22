@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
+using Alderto.Bot.Preconditions;
 using Alderto.Bot.Services;
 using Discord;
 using Discord.Commands;
@@ -18,7 +20,11 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Donated")]
-        public async Task Donated(IGuildUser donor, [Remainder] string donation)
+        [Summary("Registers a donation to the guild.")]
+        [RequireRole("Admin")]
+        public async Task Donated(
+            [Summary("User who has given a donation.")] IGuildUser donor, 
+            [Summary("The donation given.")] [Remainder] [MaxLength(100)] string donation)
         {
             if (string.IsNullOrWhiteSpace(donation) || donation.Length > 100)
                 return;
@@ -30,7 +36,9 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Donations")]
-        public async Task Donations(IGuildUser donor = null)
+        [Summary("Checks the user's donations.")]
+        public async Task Donations(
+            [Summary("User to check donations of.")] IGuildUser donor = null)
         {
             if (donor == null)
                 donor = (IGuildUser)Context.Message.Author;

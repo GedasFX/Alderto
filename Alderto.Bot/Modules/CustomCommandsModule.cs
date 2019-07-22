@@ -15,6 +15,7 @@ namespace Alderto.Bot.Modules
         }
 
         [Command]
+        [Summary("Executes a custom command. Set up commands in the WebUI.")]
         public async Task ExecuteAsync(params string[] args)
         {
             // TODO: Create API for Lua code.
@@ -24,6 +25,7 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Reload")]
+        [Summary("Reloads custom commands into memory. May fix broken commands.")]
         public async Task ReloadAsync()
         {
             await _cmdProvider.ReloadCommands(Context.Guild.Id);

@@ -24,8 +24,11 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Recruited"), Alias("Add")]
+        [Summary("Adds members as recruit of a member.")]
         [RequireRole("Admin")]
-        public async Task Recruited(IGuildUser recruiter, params IGuildUser[] recruited)
+        public async Task Recruited(
+            [Summary("Recruiter")] IGuildUser recruiter,
+            [Summary("Members recruited")] params IGuildUser[] recruited)
         {
             var recruiterId = recruiter.Id;
             foreach (var member in recruited)
@@ -38,7 +41,9 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("List")]
-        public async Task ListAsync(IGuildUser member = null)
+        [Summary("Lists all member recruited by the person.")]
+        public async Task ListAsync(
+            [Summary("Recruiter. Not specifying a user will list your own recruits.")] IGuildUser member = null)
         {
             if (member == null)
                 member = (IGuildUser)Context.User;
@@ -58,7 +63,9 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("By")]
-        public async Task ByAsync(IGuildUser member = null)
+        [Summary("Displays the member this person was recruited by.")]
+        public async Task ByAsync(
+            [Summary("Recruit. Not specifying a user will display your recruiter.")] IGuildUser member = null)
         {
             if (member == null)
                 member = (IGuildUser)Context.User;

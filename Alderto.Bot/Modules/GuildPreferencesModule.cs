@@ -22,6 +22,7 @@ namespace Alderto.Bot.Modules
             }
 
             [Command("Prefix")]
+            [Summary("Gets the guild's set prefix.")]
             public async Task Prefix()
             {
                 var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
@@ -29,6 +30,7 @@ namespace Alderto.Bot.Modules
             }
 
             [Command("CurrencySymbol"), Alias("CS")]
+            [Summary("Gets the guild's set currency symbol.")]
             public async Task CurrencySymbol()
             {
                 var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
@@ -36,6 +38,7 @@ namespace Alderto.Bot.Modules
             }
 
             [Command("TimelyCooldown"), Alias("TimelyCD", "TCD")]
+            [Summary("Gets the guild's set timely cooldown.")]
             public async Task TimelyCooldown()
             {
                 var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
@@ -43,6 +46,7 @@ namespace Alderto.Bot.Modules
             }
 
             [Command("TimelyRewardQuantity"), Alias("TimelyRQ", "TRQ")]
+            [Summary("Gets the guild's set timely reward quantity.")]
             public async Task TimelyRewardQuantity()
             {
                 var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
@@ -61,28 +65,36 @@ namespace Alderto.Bot.Modules
             }
 
             [Command("Prefix")]
-            public async Task Prefix(string prefix)
+            [Summary("Sets the guild's set prefix.")]
+            public async Task Prefix(
+                [Summary("Prefix.")] string prefix)
             {
                 await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, pref => pref.Prefix = prefix);
                 await this.ReplySuccessEmbedAsync($"Prefix was changed to: **{prefix}**");
             }
 
             [Command("CurrencySymbol"), Alias("CS")]
-            public async Task CurrencySymbol(string currencySymbol)
+            [Summary("Sets the guild's set currency symbol.")]
+            public async Task CurrencySymbol(
+                [Summary("Currency Symbol")] string currencySymbol)
             {
                 await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.CurrencySymbol = currencySymbol);
                 await this.ReplySuccessEmbedAsync($"Currency Symbol was changed to: **{currencySymbol}**");
             }
 
             [Command("TimelyCooldown"), Alias("TimelyCD", "TCD")]
-            public async Task TimelyCooldown(int cooldown)
+            [Summary("Sets the guild's set timely cooldown.")]
+            public async Task TimelyCooldown(
+                [Summary("Timely Cooldown (in seconds)")] int cooldown)
             {
                 await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyCooldown = cooldown);
                 await this.ReplySuccessEmbedAsync($"Timely Cooldown was changed to: **{TimeSpan.FromSeconds(cooldown)}**");
             }
 
             [Command("TimelyRewardQuantity"), Alias("TimelyRQ", "TRQ")]
-            public async Task TimelyRewardQuantity(int quantity)
+            [Summary("Sets the guild's set timely reward quantity.")]
+            public async Task TimelyRewardQuantity(
+                [Summary("Timely Reward Quantity")] int quantity)
             {
                 await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyRewardQuantity = quantity);
                 await this.ReplySuccessEmbedAsync($"Timely Reward Quantity was changed to: **{quantity}**");
