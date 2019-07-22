@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
@@ -84,6 +86,27 @@ namespace Alderto.Bot.Services
             recruitedMember.JoinedAt = recruitedAt;
 
             await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<GuildMember> ListRecruitsAsync(GuildMember member)
+        {
+            return _context.GuildMembers
+                .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.MemberId);
+        }
+
+        public async Task AcceptMemberAsync(IGuildUser user, string nickname = null, IRole role = null, ulong recruiterId = 0)
+        {
+            if (nickname != null)
+                await user.ModifyAsync(u => u.Nickname = nickname);
+
+            if (role != null)
+                await user.AddRoleAsync(role);
+
+            if (recruiterId != 0)
+            {
+                await AddRecruitAsync(await GetGuildMemberAsync(user), recruiterId, DateTimeOffset.UtcNow);
+            }
+
         }
     }
 }

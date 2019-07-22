@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Services;
@@ -52,6 +53,15 @@ namespace Alderto.Bot.Modules
                 var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Timely Reward Quantity: **{pref.TimelyRewardQuantity}**");
             }
+
+            [Command("AcceptedRole"), Alias("Role")]
+            [Summary("Gets the guild's set default accepted role.")]
+            public async Task AcceptedRole()
+            {
+                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                await this.ReplySuccessEmbedAsync(
+                    $"Accepted role: **ID: {pref.AcceptedMemberRoleId}, Name: {Context.Guild.Roles.SingleOrDefault(r => r.Id == pref.AcceptedMemberRoleId)?.Name}**");
+            }
         }
 
         [Group("Set")]
@@ -98,6 +108,39 @@ namespace Alderto.Bot.Modules
             {
                 await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyRewardQuantity = quantity);
                 await this.ReplySuccessEmbedAsync($"Timely Reward Quantity was changed to: **{quantity}**");
+            }
+
+            [Command("AcceptedRole"), Alias("Role")]
+            [Summary("Sets the guild's set default accepted role.")]
+            public async Task AcceptedRole(
+                [Summary("Name of the default accepted role")]
+                string roleName)
+            {
+                // Get the roles.
+                var roles = Context.Guild.Roles.Where(r => r.Name == roleName).ToArray();
+
+                // Ensure there is no ambiguity.
+                if (roles.Length > 1)
+                {
+                    await this.ReplyErrorEmbedAsync(
+                        "Multiple roles with the same name were found. Make sure the role is uniquely named. Can change the name of the role once the initialization process is over.");
+                    return;
+                }
+
+                if (roles.Length == 0)
+                {
+                    await this.ReplyErrorEmbedAsync(
+                        "No roles with the given name were found. Is the role name correct?");
+                    return;
+                }
+
+                // No ambiguity detected. Continue.
+                var role = roles[0];
+
+                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id,
+                    configuration => configuration.AcceptedMemberRoleId = role.Id);
+                await this.ReplySuccessEmbedAsync(
+                    $"Accepted role was changed to: **ID: {role.Id}, Name: {role.Name}**");
             }
         }
     }
