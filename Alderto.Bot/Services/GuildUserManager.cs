@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Services
 {
@@ -54,7 +55,7 @@ namespace Alderto.Bot.Services
         /// <returns>DbContext tracked <see cref="GuildMember"/>, or null, if <see cref="addIfNonExistent"/> was set to false.</returns>
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong memberId, bool addIfNonExistent = true)
         {
-            var member = await _context.GuildMembers.FindAsync(memberId, guildId);
+            var member = await _context.GuildMembers.SingleOrDefaultAsync(g => g.GuildId == guildId && g.MemberId == memberId);
 
             // Check if member exists. If yes - return it
             if (member != null)

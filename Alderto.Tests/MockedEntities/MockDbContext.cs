@@ -12,6 +12,7 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<GuildConfiguration> GuildPreferences { get; set; }
+        public DbSet<GuildMemberDonation> GuildMemberDonations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

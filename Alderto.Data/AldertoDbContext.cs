@@ -12,6 +12,7 @@ namespace Alderto.Data
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<GuildConfiguration> GuildPreferences { get; set; }
+        public DbSet<GuildMemberDonation> GuildMemberDonations { get; set; }
 
         public AldertoDbContext(DbContextOptions options) : base(options)
         {
@@ -23,35 +24,20 @@ namespace Alderto.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Guild Members
             modelBuilder.Entity<GuildMember>()
-                .HasKey(m => new { m.MemberId, m.GuildId });
+                .HasIndex(g => new { g.GuildId, g.MemberId })
+                .IsUnique();
 
             // Guilds
             modelBuilder.Entity<Guild>()
-                .HasMany(g => g.GuildMembers)
-                .WithOne(m => m.Guild)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Guild>()
-                .HasMany(g => g.CustomCommands)
-                .WithOne(cc => cc.Guild)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Guild>()
                 .HasOne(g => g.Configuration)
                 .WithOne(c => c.Guild)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey<GuildConfiguration>(configuration => configuration.GuildId);
 
             // Custom commands
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
-
-            // Members
-            modelBuilder.Entity<Member>()
-                .HasMany(m => m.GuildMembers)
-                .WithOne(gm => gm.Member)
-                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -84,14 +84,23 @@ namespace Alderto.Bot.Services
 
             // Delete successful triggers.
             if (result.IsSuccess)
-                await message.DeleteAsync();
+            {
+                try
+                {
+                    await message.DeleteAsync();
+                }
+                catch (Discord.Net.HttpException)
+                {
+                    // Delete most likely failed due to no ManageMessages permission. Ignore regardless.
+                }
+            }
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
 
-            if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
+            else if (result.Error != CommandError.UnknownCommand)
             {
                 try
                 {

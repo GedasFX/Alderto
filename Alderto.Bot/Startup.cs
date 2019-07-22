@@ -17,10 +17,16 @@ namespace Alderto.Bot
     {
         private readonly DiscordSocketClient _client;
         private readonly IConfiguration _config;
+        private readonly CommandService _commandService;
 
         public Startup()
         {
             _config = BuildConfig();
+            _commandService = new CommandService(new CommandServiceConfig
+            {
+                DefaultRunMode = RunMode.Async,
+                IgnoreExtraArgs = true
+            });
 
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -40,7 +46,7 @@ namespace Alderto.Bot
             .AddSingleton<IGuildUserManager, GuildUserManager>()
 
             // Add command handling services
-            .AddSingleton<CommandService>()
+            .AddSingleton(_commandService)
             .AddSingleton<ICommandHandler, CommandHandler>()
 
             // Add providers for various bot activities
