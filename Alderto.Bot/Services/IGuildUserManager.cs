@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
@@ -42,5 +43,21 @@ namespace Alderto.Bot.Services
         /// <param name="recruiterMemberId">Discord user id of recruiter.</param>
         /// <param name="recruitedAt">Time user got recruited. Recruited time approx. equals joined time.</param>
         Task AddRecruitAsync(GuildMember recruitedMember, ulong recruiterMemberId, DateTimeOffset recruitedAt);
+
+        /// <summary>
+        /// Provides a collection of members recruited by the given person.
+        /// </summary>
+        /// <param name="member">Member to get recruits of.</param>
+        /// <returns>A collection of members recruited by the given person.</returns>
+        IEnumerable<GuildMember> ListRecruitsAsync(GuildMember member);
+
+        /// <summary>
+        /// Accepts the member to the guild.
+        /// </summary>
+        /// <param name="user">Guild user to accept</param>
+        /// <param name="nickname">[Optional] Change accepted user's nickname (Nickname policy)</param>
+        /// <param name="role">[Optional] Add user to accepted role (Role policy)</param>
+        /// <param name="recruiterId">[Optional] Add user as a recruit of someone (Recruitment policy)</param>
+        Task AcceptMemberAsync(IGuildUser user, string nickname = null, IRole role = null, ulong recruiterId = 0);
     }
 }

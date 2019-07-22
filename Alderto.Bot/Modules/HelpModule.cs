@@ -26,11 +26,5 @@ namespace Alderto.Bot.Modules
                 }
             });
         }
-
-        [Group("Currency")]
-        public class Currency
-        {
-
-        }
     }
 }

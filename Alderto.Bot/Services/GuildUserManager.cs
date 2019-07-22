@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Services
 {
@@ -54,7 +57,7 @@ namespace Alderto.Bot.Services
         /// <returns>DbContext tracked <see cref="GuildMember"/>, or null, if <see cref="addIfNonExistent"/> was set to false.</returns>
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong memberId, bool addIfNonExistent = true)
         {
-            var member = await _context.GuildMembers.FindAsync(memberId, guildId);
+            var member = await _context.GuildMembers.SingleOrDefaultAsync(g => g.GuildId == guildId && g.MemberId == memberId);
 
             // Check if member exists. If yes - return it
             if (member != null)
@@ -83,6 +86,27 @@ namespace Alderto.Bot.Services
             recruitedMember.JoinedAt = recruitedAt;
 
             await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<GuildMember> ListRecruitsAsync(GuildMember member)
+        {
+            return _context.GuildMembers
+                .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.MemberId);
+        }
+
+        public async Task AcceptMemberAsync(IGuildUser user, string nickname = null, IRole role = null, ulong recruiterId = 0)
+        {
+            if (nickname != null)
+                await user.ModifyAsync(u => u.Nickname = nickname);
+
+            if (role != null)
+                await user.AddRoleAsync(role);
+
+            if (recruiterId != 0)
+            {
+                await AddRecruitAsync(await GetGuildMemberAsync(user), recruiterId, DateTimeOffset.UtcNow);
+            }
+
         }
     }
 }

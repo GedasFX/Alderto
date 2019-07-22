@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,15 +8,19 @@ namespace Alderto.Data.Models
     public class GuildMember
     {
         /// <summary>
+        /// Local Id.
+        /// </summary>
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
+        /// <summary>
         /// Discord Member Id.
         /// </summary>
-        [Key]
         public ulong MemberId { get; set; }
 
         /// <summary>
         /// Discord Guild Id in which member is member of.
         /// </summary>
-        [Key]
         public ulong GuildId { get; set; }
 
         /// <summary>
@@ -55,6 +60,11 @@ namespace Alderto.Data.Models
         /// </summary>
         [ForeignKey(nameof(MemberId))]
         public virtual Member Member { get; set; }
+        
+        /// <summary>
+        /// A collection of donations the user has provided.
+        /// </summary>
+        public virtual IEnumerable<GuildMemberDonation> Donations { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.

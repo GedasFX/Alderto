@@ -24,7 +24,8 @@ namespace Alderto.Bot.Modules
         [Command("Give")]
         [Summary("Gives an amount of points to the listed users")]
         [RequireRole("Admin")]
-        public async Task GiveAsync([Summary("Amount of points to give")] int qty,
+        public async Task GiveAsync(
+            [Summary("Amount of points to give")] int qty,
             [Summary("Users to give points to")] params IGuildUser[] users)
         {
             // This is for giving, not taking
@@ -48,7 +49,8 @@ namespace Alderto.Bot.Modules
         [Command("Take")]
         [Summary("Takes an amount of points from the listed users")]
         [RequireRole("Admin")]
-        public async Task TakeAsync([Summary("Amount of points to take")] int qty,
+        public async Task TakeAsync(
+            [Summary("Amount of points to take")] int qty,
             [Summary("Users to take points from")] params IGuildUser[] users)
         {
             // This is for taking, not giving
@@ -91,7 +93,8 @@ namespace Alderto.Bot.Modules
 
         [Command("$")]
         [Summary("Checks the amount of points a given user has.")]
-        public async Task CheckAsync([Summary("Person to check. If none provided, checks personal points.")] IGuildUser user = null)
+        public async Task CheckAsync(
+            [Summary("Person to check. If no user was provided, checks personal points.")] IGuildUser user = null)
         {
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
@@ -103,6 +106,7 @@ namespace Alderto.Bot.Modules
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
+        [Summary("Grants a timely currency reward.")]
         public async Task Timely()
         {
             var user = (IGuildUser)Context.User;

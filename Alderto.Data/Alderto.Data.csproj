@@ -26,6 +26,18 @@
     <Compile Remove="Migrations\20190720165801_dropcustomcommands.Designer.cs" />
     <Compile Remove="Migrations\20190720173404_prefix.cs" />
     <Compile Remove="Migrations\20190720173404_prefix.Designer.cs" />
+    <Compile Remove="Migrations\20190722150202_donation.cs" />
+    <Compile Remove="Migrations\20190722150202_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190722150742_donation.cs" />
+    <Compile Remove="Migrations\20190722150742_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190722151254_donation.cs" />
+    <Compile Remove="Migrations\20190722151254_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190722151525_donation.cs" />
+    <Compile Remove="Migrations\20190722151525_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190722151905_donation.cs" />
+    <Compile Remove="Migrations\20190722151905_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190722152338_donation.cs" />
+    <Compile Remove="Migrations\20190722152338_donation.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

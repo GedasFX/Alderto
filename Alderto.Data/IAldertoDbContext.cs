@@ -36,9 +36,15 @@ namespace Alderto.Data
         DbSet<Member> Members { get; }
 
         /// <summary>
-        /// Guild preferences. 1-to-0..1 relation with Guilds. Primary key: [<see cref="GuildConfiguration.Id"/>]
+        /// Guild preferences. 1-to-0..1 relation with Guilds. Primary key: [<see cref="GuildConfiguration.GuildId"/>]
         /// </summary>
         DbSet<GuildConfiguration> GuildPreferences { get; }
+
+        /// <summary>
+        /// Guild preferences. 1-to-0..1 relation with Guilds. Primary key: [<see cref="GuildConfiguration.GuildId"/>]
+        /// </summary>
+        DbSet<GuildMemberDonation> GuildMemberDonations { get; }
+
 
         /// <summary>
         ///     Provides access to database related information and operations for this context.

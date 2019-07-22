@@ -30,17 +30,22 @@ namespace Alderto.Data.Models
         /// </summary>
         public static int DefaultTimelyCooldown { get; } = 86400; // 24h
 
+        /// <summary>
+        /// Default value for <see cref="GuildConfiguration.AcceptedMemberRoleId"/>
+        /// </summary>
+        public static ulong DefaultAcceptedMemberRoleId { get; } = 0;
+
 
         private static readonly GuildConfiguration CfgDefaults = new GuildConfiguration
         {
             Prefix = DefaultPrefix,
             CurrencySymbol = DefaultCurrencySymbol,
             TimelyRewardQuantity = DefaultTimelyRewardQuantity,
-            TimelyCooldown = DefaultTimelyCooldown
+            TimelyCooldown = DefaultTimelyCooldown,
+            AcceptedMemberRoleId = DefaultAcceptedMemberRoleId
         };
 
         
-
         /// <summary>
         /// Discord guild identifier. Primary and foreign key for <see cref="Models.Guild"/>.
         /// If GuildId > 0, the configuration is determined to be in the database. Make sure you know what you are doing modifying this value.
@@ -69,6 +74,11 @@ namespace Alderto.Data.Models
         /// Timely currency claim reward cooldown. This is time measured in seconds.
         /// </summary>
         public int TimelyCooldown { get; set; }
+
+        /// <summary>
+        /// Id of role, whenever user was accepted to the guild.
+        /// </summary>
+        public ulong AcceptedMemberRoleId { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/> of which owns this configuration.

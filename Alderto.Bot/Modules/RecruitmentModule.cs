@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
 using Alderto.Bot.Services;
-using Alderto.Data;
 using Discord;
 using Discord.Commands;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
@@ -15,36 +12,40 @@ namespace Alderto.Bot.Modules
     public class RecruitmentModule : ModuleBase<SocketCommandContext>
     {
         private readonly IGuildUserManager _guildUserManager;
-        private readonly IAldertoDbContext _context;
+        private readonly IGuildPreferencesManager _guildPreferencesManager;
 
-        public RecruitmentModule(IGuildUserManager guildUserManager, IAldertoDbContext context)
+        public RecruitmentModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferencesManager)
         {
             _guildUserManager = guildUserManager;
-            _context = context;
+            _guildPreferencesManager = guildPreferencesManager;
         }
 
         [Command("Recruited"), Alias("Add")]
+        [Summary("Adds members as recruit of a member.")]
         [RequireRole("Admin")]
-        public async Task Recruited(IGuildUser recruiter, params IGuildUser[] recruited)
+        public async Task Recruited(
+            [Summary("Recruiter")] IGuildUser recruiter,
+            [Summary("Members recruited")] params IGuildUser[] recruited)
         {
             var recruiterId = recruiter.Id;
             foreach (var member in recruited)
             {
                 var dbUser = await _guildUserManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
-                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.Now);
+                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.UtcNow);
             }
 
             await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");
         }
 
         [Command("List")]
-        public async Task ListAsync(IGuildUser member = null)
+        [Summary("Lists all member recruited by the person.")]
+        public async Task List(
+            [Summary("Recruiter. Not specifying a user will list your own recruits.")] IGuildUser user = null)
         {
-            if (member == null)
-                member = (IGuildUser)Context.User;
-            var recruits = _context.GuildMembers
-                .Include(g => g.Member)
-                .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.Id);
+            if (user == null)
+                user = (IGuildUser)Context.User;
+
+            var recruits = _guildUserManager.ListRecruitsAsync(await _guildUserManager.GetGuildMemberAsync(user));
 
             await this.ReplyEmbedAsync(extra: builder =>
             {
@@ -53,12 +54,14 @@ namespace Alderto.Bot.Modules
                     builder.AddField(recruit.JoinedAt.ToString(), $"<@{recruit.MemberId}>");
                 }
 
-                builder.WithAuthor(member);
+                builder.WithAuthor(user);
             });
         }
 
         [Command("By")]
-        public async Task ByAsync(IGuildUser member = null)
+        [Summary("Displays the member this person was recruited by.")]
+        public async Task By(
+            [Summary("Recruit. Not specifying a user will display your recruiter.")] IGuildUser member = null)
         {
             if (member == null)
                 member = (IGuildUser)Context.User;

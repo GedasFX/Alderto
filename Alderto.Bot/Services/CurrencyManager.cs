@@ -47,14 +47,14 @@ namespace Alderto.Bot.Services
 
         public async Task<TimeSpan?> GrantTimelyRewardAsync(GuildMember member, int amount, int cooldown)
         {
-            var timeRemaining = member.CurrencyLastClaimed.AddSeconds(cooldown) - DateTimeOffset.Now;
+            var timeRemaining = member.CurrencyLastClaimed.AddSeconds(cooldown) - DateTimeOffset.UtcNow;
 
             // If time remaining is positive, that means cooldown hasn't expired yet.
             if (timeRemaining.Ticks > 0)
                 return timeRemaining;
 
             // Cooldown expired. Update user.
-            member.CurrencyLastClaimed = DateTimeOffset.Now;
+            member.CurrencyLastClaimed = DateTimeOffset.UtcNow;
             member.CurrencyCount += amount;
 
             await _context.SaveChangesAsync();
