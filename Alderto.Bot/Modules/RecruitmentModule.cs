@@ -31,7 +31,7 @@ namespace Alderto.Bot.Modules
             foreach (var member in recruited)
             {
                 var dbUser = await _guildUserManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
-                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.Now);
+                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.UtcNow);
             }
 
             await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");

@@ -1,9 +1,12 @@
-﻿using Alderto.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Alderto.Data;
 using Alderto.Data.Models;
 
 namespace Alderto.Bot.Services
 {
-    public class DonationsManager
+    public class DonationsManager : IDonationsManager
     {
         private readonly IAldertoDbContext _context;
 
@@ -12,15 +15,26 @@ namespace Alderto.Bot.Services
             _context = context;
         }
 
-        public void AddDonation(GuildMember member, string donation)
+        public async Task AddDonationAsync(GuildMember member, string donation)
         {
             _context.Attach(member);
 
-            _context.GuildMemberDonations.AddAsync(new GuildMemberDonation
+            await _context.GuildMemberDonations.AddAsync(new GuildMemberDonation
             {
                 GuildMemberId = member.Id,
+                DonationDate = DateTimeOffset.UtcNow,
                 Donation = donation
             });
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<GuildMemberDonation>> ListDonationsAsync(GuildMember member)
+        {
+            _context.Attach(member);
+
+            await _context.Entry(member).Collection(m => m.Donations).LoadAsync();
+            return member.Donations;
         }
     }
 }

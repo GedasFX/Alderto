@@ -19,6 +19,11 @@ namespace Alderto.Data.Models
         public string Donation { get; set; }
 
         /// <summary>
+        /// Date and time when donation occured.
+        /// </summary>
+        public DateTimeOffset DonationDate { get; set; }
+
+        /// <summary>
         /// Foreign key to user, who provided the donation.
         /// </summary>
         public Guid GuildMemberId { get; set; }

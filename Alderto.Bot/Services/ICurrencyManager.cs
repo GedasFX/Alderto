@@ -15,7 +15,7 @@ namespace Alderto.Bot.Services
 
         /// <summary>
         /// Modifies the points the user <see cref="guildMember"/> has by <see cref="amount"/>.
-        /// Also changes the <see cref="GuildMember.CurrencyLastClaimed"/> property to <see cref="DateTimeOffset.Now"/>.
+        /// Also changes the <see cref="GuildMember.CurrencyLastClaimed"/> property to <see cref="DateTimeOffset.UtcNow"/>.
         /// If cooldown has not expired - returns time remaining, otherwise - null.
         /// </summary>
         /// <param name="guildMember"><see cref="GuildMember"/> to modify.</param>
