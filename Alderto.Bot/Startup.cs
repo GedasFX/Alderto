@@ -36,16 +36,26 @@ namespace Alderto.Bot
             // Add discord socket client
             .AddSingleton(_client)
 
+            // Add User provider
+            .AddSingleton<IGuildUserManager, GuildUserManager>()
+
             // Add command handling services
             .AddSingleton<CommandService>()
-            .AddSingleton<CommandHandlingService>()
+            .AddSingleton<ICommandHandler, CommandHandler>()
+
+            // Add providers for various bot activities
+            .AddSingleton<IGuildPreferencesManager, GuildPreferencesManager>()
+            .AddSingleton<ICurrencyManager, CurrencyManager>()
 
             // Add Lua command handler
-            .AddSingleton<CustomCommandsProviderService>()
+            .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()
 
             // Add logger service
-            .AddLogging(lb => { lb.AddConsole(); })
-            .AddSingleton<LoggingService>()
+            .AddLogging(lb =>
+            {
+                lb.AddConsole();
+            })
+            .AddSingleton<Services.ILogger, Logger>()
 
             // Add configuration
             .AddSingleton(_config)
@@ -58,14 +68,14 @@ namespace Alderto.Bot
             var services = ConfigureServices();
 
             // Enable logging
-            await services.GetService<LoggingService>().InstallLogger();
+            await services.GetService<Services.ILogger>().InstallLogger();
 
             // Start bot
             await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
             await _client.StartAsync();
 
             // Install Command handler
-            await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
+            await services.GetRequiredService<ICommandHandler>().InstallCommandsAsync();
 
             // Lock main thread to run indefinitely
             await Task.Delay(-1);
@@ -76,7 +86,8 @@ namespace Alderto.Bot
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddUserSecrets("c53fe5d3-16e9-400d-a588-4859345371e5")
-                .AddJsonFile("config.json")
+                .AddJsonFile("settings.json")
+                .AddJsonFile("configuration.json")
                 .AddJsonFile("commands.json")
                 .Build();
         }

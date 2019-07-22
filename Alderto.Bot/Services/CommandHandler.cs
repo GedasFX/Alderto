@@ -1,34 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Bot.TypeReaders;
-using Alderto.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Bot.Services
 {
-    public class CommandHandlingService
+    public class CommandHandler : ICommandHandler
     {
-        private const char DefaultCommandPrefix = '.';
-
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly IAldertoDbContext _context;
+        private readonly IGuildPreferencesManager _guildPreferences;
 
-        private readonly Dictionary<ulong, char> _guildPrefixes = new Dictionary<ulong, char>();
-
-        public CommandHandlingService(DiscordSocketClient client, CommandService commands, IServiceProvider services)
+        public CommandHandler(
+            DiscordSocketClient client,
+            CommandService commands,
+            IServiceProvider services,
+            IGuildPreferencesManager guildPreferences)
         {
             _client = client;
             _commands = commands;
             _services = services;
-            _context = _services.GetService<IAldertoDbContext>();
+            _guildPreferences = guildPreferences;
         }
 
         public async Task InstallCommandsAsync()
@@ -44,8 +40,6 @@ namespace Alderto.Bot.Services
                 return Task.CompletedTask;
             };
 
-            _commands.AddTypeReader(typeof(object), new ObjectTypeReader());
-
             // Here we discover all of the command modules in the entry 
             // assembly and load them. Starting from Discord.NET 2.0, a
             // service provider is required to be passed into the
@@ -57,33 +51,25 @@ namespace Alderto.Bot.Services
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
 
-        private async Task HandleCommandAsync(SocketMessage messageParam)
+        public async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
-            if (!(messageParam is SocketUserMessage message)) return;
+            if (!(messageParam is SocketUserMessage message))
+                return;
 
             // Create a number to track where the prefix ends and the command begins
             var argPos = 0;
 
-            // Get the prefix preference of a guild (if applicable)
-            var prefix = DefaultCommandPrefix;
-            if (message.Author is SocketGuildUser guildUser)
-            {
-                var guildId = guildUser.Guild.Id;
-                if (!_guildPrefixes.TryGetValue(guildId, out prefix))
-                {
-                    var guild = await _context.Guilds.FindAsync(guildId);
+            // Check if message was sent in a guild context. If not - ignore.
+            // TODO: Make a redirect messages channel and maybe add command handler to DM
+            if (!(message.Author is SocketGuildUser guildUser))
+                return;
 
-                    // If guild is null or its prefix is null, use default prefix, otherwise, use whatever the guild has set.
-                    prefix = guild?.Prefix ?? DefaultCommandPrefix;
-                    _guildPrefixes[guildId] = prefix;
-                }
-            }
+            // Get the prefix preference of a guild (if applicable)
+            var prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).Prefix;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix(prefix, ref argPos) ||
-                  message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot)
                 return;
 
             // Create a WebSocket-based command context based on the message
@@ -104,10 +90,22 @@ namespace Alderto.Bot.Services
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-#if DEBUG
-            if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDefault(result.ErrorReason, EmbedColor.Error).Build());
-#endif
+
+            if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
+            {
+                try
+                {
+                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
+                }
+                catch (Discord.Net.HttpException e)
+                {
+                    // 50013 occurs when bot cannot send embedded messages. All error reports use embeds.
+                    if (e.DiscordCode == 50013)
+                        await context.Channel.SendMessageAsync(
+                            "Bot requires guild permission EmbedLinks to function properly.");
+                }
+            }
         }
     }
 }

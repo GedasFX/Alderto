@@ -11,6 +11,7 @@ namespace Alderto.Data
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<GuildConfiguration> GuildPreferences { get; set; }
 
         public AldertoDbContext(DbContextOptions options) : base(options)
         {
@@ -37,10 +38,14 @@ namespace Alderto.Data
                 .WithOne(cc => cc.Guild)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Guild>()
+                .HasOne(g => g.Configuration)
+                .WithOne(c => c.Guild)
+                .HasForeignKey<GuildConfiguration>(configuration => configuration.GuildId);
+
             // Custom commands
             modelBuilder.Entity<CustomCommand>()
-                .HasIndex(m => new { m.GuildId, m.TriggerKeyword })
-                .IsUnique();
+                .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 
             // Members
             modelBuilder.Entity<Member>()
@@ -55,6 +60,8 @@ namespace Alderto.Data
         {
 #if DEBUG
             optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.UseSqlServer(
+                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
 #endif
             base.OnConfiguring(optionsBuilder);
         }

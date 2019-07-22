@@ -1,21 +1,21 @@
 using System.Threading.Tasks;
-using Alderto.Bot.Services;
+using Alderto.Bot.Lua;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
 using Xunit;
 
-namespace Alderto.Tests.ServicesTests
+namespace Alderto.Tests
 {
-    public class CustomCommandsProviderServiceTests
+    public class CustomCommandProviderTests
     {
-        private readonly CustomCommandsProviderService _service;
+        private readonly ICustomCommandProvider _service;
         private readonly IAldertoDbContext _context;
 
-        public CustomCommandsProviderServiceTests()
+        public CustomCommandProviderTests()
         {
             _context = new MockDbContext();
-            _service = new CustomCommandsProviderService(_context);
+            _service = new CustomCommandProvider(_context);
         }
 
         [Fact]

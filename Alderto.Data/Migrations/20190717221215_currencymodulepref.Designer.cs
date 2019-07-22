@@ -4,14 +4,16 @@ using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    partial class AldertoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190717221215_currencymodulepref")]
+    partial class currencymodulepref
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,11 +78,9 @@ namespace Alderto.Data.Migrations
                     b.Property<decimal>("GuildId")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-                    b.Property<string>("TriggerKeyword")
-                        .HasMaxLength(20);
+                    b.Property<string>("TriggerKeyword");
 
-                    b.Property<string>("LuaCode")
-                        .HasMaxLength(2000);
+                    b.Property<string>("LuaCode");
 
                     b.HasKey("GuildId", "TriggerKeyword");
 
@@ -104,17 +104,13 @@ namespace Alderto.Data.Migrations
                     b.Property<decimal>("GuildId")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-                    b.Property<string>("CurrencySymbol")
-                        .IsRequired()
-                        .HasMaxLength(50);
+                    b.Property<string>("CurrencySymbol");
 
-                    b.Property<string>("Prefix")
-                        .IsRequired()
-                        .HasMaxLength(20);
+                    b.Property<string>("Prefix");
 
-                    b.Property<int>("TimelyCooldown");
+                    b.Property<int?>("TimelyCooldown");
 
-                    b.Property<int>("TimelyRewardQuantity");
+                    b.Property<int?>("TimelyRewardQuantity");
 
                     b.HasKey("GuildId");
 
@@ -135,8 +131,7 @@ namespace Alderto.Data.Migrations
 
                     b.Property<DateTimeOffset?>("JoinedAt");
 
-                    b.Property<string>("Nickname")
-                        .HasMaxLength(32);
+                    b.Property<string>("Nickname");
 
                     b.Property<decimal?>("RecruiterMemberId")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
@@ -153,11 +148,9 @@ namespace Alderto.Data.Migrations
                     b.Property<decimal>("Id")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-                    b.Property<string>("Discriminator")
-                        .HasMaxLength(4);
+                    b.Property<string>("Discriminator");
 
-                    b.Property<string>("Username")
-                        .HasMaxLength(32);
+                    b.Property<string>("Username");
 
                     b.HasKey("Id");
 

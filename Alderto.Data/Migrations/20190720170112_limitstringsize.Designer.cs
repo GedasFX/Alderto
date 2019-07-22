@@ -4,14 +4,16 @@ using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    partial class AldertoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190720170112_limitstringsize")]
+    partial class limitstringsize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,16 +107,14 @@ namespace Alderto.Data.Migrations
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.Property<string>("CurrencySymbol")
-                        .IsRequired()
                         .HasMaxLength(50);
 
                     b.Property<string>("Prefix")
-                        .IsRequired()
                         .HasMaxLength(20);
 
-                    b.Property<int>("TimelyCooldown");
+                    b.Property<int?>("TimelyCooldown");
 
-                    b.Property<int>("TimelyRewardQuantity");
+                    b.Property<int?>("TimelyRewardQuantity");
 
                     b.HasKey("GuildId");
 

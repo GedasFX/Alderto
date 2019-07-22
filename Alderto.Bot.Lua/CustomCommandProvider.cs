@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Alderto.Bot.Exceptions;
+using Alderto.Bot.Lua.Exceptions;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using NLua;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Bot.Lua
 {
-    public class CustomCommandsProviderService
+    public class CustomCommandProvider : ICustomCommandProvider
     {
         /// <summary>
         /// Maximum amount of time allowed for a Lua Kernel to handle a command.
@@ -17,13 +17,13 @@ namespace Alderto.Bot.Services
         private const int CustomCommandExecTimeout = 100;
 
         private readonly IAldertoDbContext _context;
-        private readonly Lua _luaState;
+        private readonly NLua.Lua _luaState;
         private readonly Dictionary<string, LuaFunction> _commands;
 
-        public CustomCommandsProviderService(IAldertoDbContext context)
+        public CustomCommandProvider(IAldertoDbContext context)
         {
             _context = context;
-            _luaState = new Lua();
+            _luaState = new NLua.Lua();
             _commands = new Dictionary<string, LuaFunction>();
 
             // Load Lua code
@@ -68,10 +68,10 @@ namespace Alderto.Bot.Services
             // Function exists. Execute it.
             using (var c = new CancellationTokenSource())
             {
-                // Safeguard agains infinite loops and such.
+                // Safeguard against infinite loops and such.
                 c.CancelAfter(CustomCommandExecTimeout);
 
-                // Wrap an array of objects into a new array so the fucntion in Lua has args parameter as an array.
+                // Wrap an array of objects into a new array so the function in Lua has args parameter as an array.
                 return await Task.Run(NewMethod(args, func), c.Token);
             }
         }

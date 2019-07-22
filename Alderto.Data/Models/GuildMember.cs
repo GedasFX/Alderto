@@ -19,12 +19,13 @@ namespace Alderto.Data.Models
         public ulong GuildId { get; set; }
 
         /// <summary>
-        /// Last known nickname of the user.
+        /// Last known nickname of the user. Max Length: 32 (Discord limitation)
         /// </summary>
+        [MaxLength(32)]
         public string Nickname { get; set; }
 
         /// <summary>
-        /// Time of last currency claim. Value is null if never claimed timely reward.
+        /// Time of last currency claim.
         /// </summary>
         public DateTimeOffset CurrencyLastClaimed { get; set; }
 
@@ -56,7 +57,14 @@ namespace Alderto.Data.Models
         public virtual Member Member { get; set; }
 
         /// <summary>
-        /// Creates a new member object with the given Guild id and Member id.
+        /// Initializes a new empty instance of <see cref="GuildMember"/>.
+        /// </summary>
+        public GuildMember()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="GuildMember"/>, with primary key (<see cref="MemberId"/> and <see cref="GuildId"/>) set.
         /// </summary>
         /// <param name="guildId">Id og the guild user is in.</param>
         /// <param name="memberId">Id of the user.</param>

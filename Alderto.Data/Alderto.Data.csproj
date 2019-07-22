@@ -8,9 +8,29 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20190717192318_flip.cs" />
+    <Compile Remove="Migrations\20190717192318_flip.Designer.cs" />
+    <Compile Remove="Migrations\20190717193037_flip.cs" />
+    <Compile Remove="Migrations\20190717193037_flip.Designer.cs" />
+    <Compile Remove="Migrations\20190717205624_currencysymbolpref.cs" />
+    <Compile Remove="Migrations\20190717205624_currencysymbolpref.Designer.cs" />
+    <Compile Remove="Migrations\20190717210357_currencymodulepref.cs" />
+    <Compile Remove="Migrations\20190717210357_currencymodulepref.Designer.cs" />
+    <Compile Remove="Migrations\20190717210744_currencymodulepref.cs" />
+    <Compile Remove="Migrations\20190717210744_currencymodulepref.Designer.cs" />
+    <Compile Remove="Migrations\20190717210831_currencymodulepref.cs" />
+    <Compile Remove="Migrations\20190717210831_currencymodulepref.Designer.cs" />
+    <Compile Remove="Migrations\20190720165037_limitstringsize.cs" />
+    <Compile Remove="Migrations\20190720165037_limitstringsize.Designer.cs" />
+    <Compile Remove="Migrations\20190720165801_dropcustomcommands.cs" />
+    <Compile Remove="Migrations\20190720165801_dropcustomcommands.Designer.cs" />
+    <Compile Remove="Migrations\20190720173404_prefix.cs" />
+    <Compile Remove="Migrations\20190720173404_prefix.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.2.0" />
   </ItemGroup>

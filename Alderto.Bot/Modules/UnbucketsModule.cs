@@ -14,11 +14,11 @@ namespace Alderto.Bot.Modules
     {
         [Command("Accept")]
         [Summary("Changes the username of a user and gives him a Member role")]
-        [RequireRole("Admin")]
+        [RequireBotPermission(GuildPermission.ManageNicknames | GuildPermission.ManageRoles)]
         public async Task AcceptAsync([Summary("User")] IGuildUser user,
             [Remainder] [Summary("Username")] string username)
         {
-            await user.ModifyAsync(u => u.Nickname = username);
+            await user.ModifyAsync(u => u.Nickname = username ?? user.Username);
             await user.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(r => r.Name == "Member"));
 
             await this.ReplySuccessEmbedAsync($"{Context.Message.Author.Mention} has accepted {user.Mention}.");

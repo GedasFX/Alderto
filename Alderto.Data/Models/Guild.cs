@@ -12,16 +12,16 @@ namespace Alderto.Data.Models
         /// </summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong Id { get; set; }
-
-        /// <summary>
-        /// Guild's chosen prefix
-        /// </summary>
-        public char? Prefix { get; set; }
         
         /// <summary>
         /// Time when guild premium status runs out. Returns null if is not premium.
         /// </summary>
         public DateTimeOffset? PremiumUntil { get; set; }
+
+        /// <summary>
+        /// The preferences of the guild.
+        /// </summary>
+        public virtual GuildConfiguration Configuration { get; set; }
 
         /// <summary>
         /// A collection of members the guild contains.
@@ -32,11 +32,18 @@ namespace Alderto.Data.Models
         /// A collection of all custom commands registered to the guild.
         /// </summary>
         public virtual IEnumerable<CustomCommand> CustomCommands { get; set; }
-        
+
         /// <summary>
-        /// Creates a guild
+        /// Initializes a new empty instance of <see cref="Guild"/>.
         /// </summary>
-        /// <param name="id"></param>
+        public Guild()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Guild"/>, with primary key (<see cref="Id"/> set.
+        /// </summary>
+        /// <param name="id"><see cref="Id"/> property.</param>
         public Guild(ulong id)
         {
             Id = id;

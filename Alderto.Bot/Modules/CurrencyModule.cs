@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Data;
-using Alderto.Data.Extensions;
+using Alderto.Bot.Services;
 using Discord;
 using Discord.Commands;
 
@@ -12,16 +10,15 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private const string CurrencySymbol = ":Bucketpin:";
-        private const int TimelyAmount = 3;
-        private const int MinTimeElapsedMs = 1000 * 60 * 60 * 6;
-        private const bool AllowNegativePoints = true;
+        private readonly IGuildUserManager _guildUserManager;
+        private readonly IGuildPreferencesManager _guildPreferences;
+        private readonly ICurrencyManager _currencyManager;
 
-        private readonly IAldertoDbContext _context;
-
-        public CurrencyModule(IAldertoDbContext context)
+        public CurrencyModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferences, ICurrencyManager currencyManager)
         {
-            _context = context;
+            _guildUserManager = guildUserManager;
+            _guildPreferences = guildPreferences;
+            _currencyManager = currencyManager;
         }
 
         [Command("Give")]
@@ -33,13 +30,13 @@ namespace Alderto.Bot.Modules
             // This is for giving, not taking
             if (qty <= 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: Given quantity must be > 0.");
+                await this.ReplyErrorEmbedAsync("Quantity must be greater than 0.");
                 return;
             }
 
             if (users.Length == 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: At least one user must be specified.");
+                await this.ReplyErrorEmbedAsync("At least one user must be specified.");
                 return;
             }
 
@@ -57,57 +54,37 @@ namespace Alderto.Bot.Modules
             // This is for taking, not giving
             if (qty <= 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: Given quantity must be > 0.");
+                await this.ReplyErrorEmbedAsync("Quantity must be greater than 0.");
                 return;
             }
 
             if (users.Length == 0)
             {
-                await this.ReplyErrorEmbedAsync("No changes made: At least one user must be specified.");
+                await this.ReplyErrorEmbedAsync("At least one user must be specified.");
                 return;
             }
 
             var reply = await ModifyAsyncExec(-qty, users);
+
             await ReplyAsync(embed: reply);
         }
 
-        public async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
+        private async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
+            var author = (IGuildUser)Context.Message.Author;
+            var currencySymbol = (await _guildPreferences.GetPreferencesAsync(author.GuildId)).CurrencySymbol;
             var reply = new EmbedBuilder()
-                .WithDefault(description: "**The following changes have been made:**", embedColor: EmbedColor.Success);
+                .WithDefault(embedColor: EmbedColor.Success, author: author);
 
+            var no = 1;
             foreach (var user in guildUsers)
             {
-                // Get the user
-                var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
-                var oldCurrencyCount = dbUser.CurrencyCount;
-
-                if (qty > 0 && oldCurrencyCount > 0 && oldCurrencyCount + qty < 0)
-                {
-                    // overflow, set to max value instead.
-                    dbUser.CurrencyCount = int.MaxValue;
-                }
-                else if (qty < 0 && oldCurrencyCount < 0 && oldCurrencyCount + qty > 0)
-                {
-                    //underflow, set to min value instead
-                    dbUser.CurrencyCount = int.MinValue;
-                }
-                else
-                {
-                    // Add currency to the user
-                    dbUser.CurrencyCount += qty;
-                }
-
-                if (!AllowNegativePoints && dbUser.CurrencyCount < 0)
-                {
-                    dbUser.CurrencyCount = 0;
-                }
+                var member = await _guildUserManager.GetGuildMemberAsync(user);
+                await _currencyManager.ModifyPointsAsync(member, qty);
 
                 // Format a nice output.
-                reply.AddField($"{oldCurrencyCount} -> {dbUser.CurrencyCount} {CurrencySymbol}", $"{user.Mention}");
+                reply.AddField($"No. {no++}:", $"{user.Mention}: {member.CurrencyCount - qty} -> {member.CurrencyCount} {currencySymbol}");
             }
-
-            await _context.SaveChangesAsync();
 
             return reply.Build();
         }
@@ -119,35 +96,34 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
-            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
+            var currencySymbol = (await _guildPreferences.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
+            var dbUser = await _guildUserManager.GetGuildMemberAsync(user);
 
-            await this.ReplyEmbedAsync($"{user.Mention} has " +
-                $"{dbUser.CurrencyCount} {CurrencySymbol}{(dbUser.CurrencyCount == 1 || dbUser.CurrencyCount == -1 ? "" : "s")}.");
+            await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
         }
 
         [Command("Timely"), Alias("Tub", "ClaimTub")]
         public async Task Timely()
         {
             var user = (IGuildUser)Context.User;
-            var dbUser = await _context.GetGuildMemberAsync(user.GuildId, user.Id);
+            var dbUser = await _guildUserManager.GetGuildMemberAsync(user.GuildId, user.Id);
 
-            var timeRemaining = dbUser.CurrencyLastClaimed.AddMilliseconds(MinTimeElapsedMs) - DateTimeOffset.Now;
+            var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
+            var timelyCooldown = preferences.TimelyCooldown;
+            var currencySymbol = preferences.CurrencySymbol;
+            var timelyAmount = preferences.TimelyRewardQuantity;
 
+            var timeRemaining = await _currencyManager.GrantTimelyRewardAsync(dbUser, timelyAmount, timelyCooldown);
 
-            if (timeRemaining.Ticks > 0)
+            // If null - points were given out. Otherwise its time remaining until next claim.
+            if (timeRemaining != null)
             {
-                // Deny points as time delay hasn't ran out.
-                await this.ReplyErrorEmbedAsync($"You will be able to claim more {CurrencySymbol}s in **{timeRemaining}**.");
+                await this.ReplyErrorEmbedAsync($"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");
                 return;
             }
 
-            // Give out points.
-            dbUser.CurrencyLastClaimed = DateTimeOffset.Now;
-            dbUser.CurrencyCount += TimelyAmount;
-            await _context.SaveChangesAsync();
-
-            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {CurrencySymbol}{(TimelyAmount == 1 || TimelyAmount == -1 ? "" : "s")} " +
-                                               $"{CurrencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+            // Points were given out.
+            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
         }
     }
 }
