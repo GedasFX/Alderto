@@ -18,6 +18,6 @@ namespace Alderto.Bot.Services
         /// </summary>
         /// <param name="member">User to get donations of.</param>
         /// <returns>A collection of donations the user has made.</returns>
-        Task<IEnumerable<GuildMemberDonation>> ListDonationsAsync(GuildMember member);
+        Task<IEnumerable<GuildMemberDonation>> GetDonationsAsync(GuildMember member);
     }
 }

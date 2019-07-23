@@ -21,7 +21,8 @@ namespace Alderto.Bot.Services
 
             await _context.GuildMemberDonations.AddAsync(new GuildMemberDonation
             {
-                GuildMemberId = member.Id,
+                MemberId = member.MemberId,
+                GuildId = member.GuildId,
                 DonationDate = DateTimeOffset.UtcNow,
                 Donation = donation
             });
@@ -29,7 +30,7 @@ namespace Alderto.Bot.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<GuildMemberDonation>> ListDonationsAsync(GuildMember member)
+        public async Task<IEnumerable<GuildMemberDonation>> GetDonationsAsync(GuildMember member)
         {
             _context.Attach(member);
 

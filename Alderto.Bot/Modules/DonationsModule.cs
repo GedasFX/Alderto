@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
@@ -23,7 +24,7 @@ namespace Alderto.Bot.Modules
         [Summary("Registers a donation to the guild.")]
         [RequireRole("Admin")]
         public async Task Donated(
-            [Summary("User who has given a donation.")] IGuildUser donor, 
+            [Summary("User who has given a donation.")] IGuildUser donor,
             [Summary("The donation given.")] [Remainder] [MaxLength(100)] string donation)
         {
             if (string.IsNullOrWhiteSpace(donation) || donation.Length > 100)
@@ -45,15 +46,15 @@ namespace Alderto.Bot.Modules
 
             var user = await _userManager.GetGuildMemberAsync(donor);
 
-            var donations = await _donationsManager.ListDonationsAsync(user);
-            if (donations == null)
-                await this.ReplyErrorEmbedAsync("User has not made any donations.");
+            var donations = (await _donationsManager.GetDonationsAsync(user)).ToArray();
+            if (donations.Length == 0)
+                await this.ReplyErrorEmbedAsync($"{donor.Mention} has not made any donations.");
             else
-                await this.ReplySuccessEmbedAsync("User has made the following donations:", builder =>
+                await this.ReplySuccessEmbedAsync($"{donor.Mention} has made the following donations:", builder =>
                 {
                     foreach (var donation in donations)
                     {
-                        builder.AddField($"{donation.DonationDate}", $"{donation.Donation}");
+                        builder.AddField($"{donation.Id}: {donation.DonationDate}", $"**{donation.Donation}**");
                     }
                 });
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Alderto.Data.Models
 {
@@ -10,7 +9,7 @@ namespace Alderto.Data.Models
         /// Primary Key.
         /// </summary>
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Donation the user has provided.
@@ -24,14 +23,18 @@ namespace Alderto.Data.Models
         public DateTimeOffset DonationDate { get; set; }
 
         /// <summary>
-        /// Foreign key to user, who provided the donation.
+        /// Foreign key to the guild, in which the user resides.
         /// </summary>
-        public Guid GuildMemberId { get; set; }
+        public ulong GuildId { get; set; }
+
+        /// <summary>
+        /// Foreign key to the member, who has given the donation.
+        /// </summary>
+        public ulong MemberId { get; set; }
 
         /// <summary>
         /// User, who provided the donation.
         /// </summary>
-        [ForeignKey(nameof(GuildMemberId))]
         public virtual GuildMember GuildMember { get; set; }
     }
 }
