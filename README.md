@@ -15,7 +15,7 @@ Process:
 3) Find `settings.json` file and fill it out.
    * If you have trouble filling out connection string, this should satisfy most, if not all, of the cases:
    ```
-   "DbConnectionString": "Data Source=[Database URL];Database=[Database Name];Integrated Security=False;User ID=[Username];Password=[Password];Connect Timeout=30"
+   "DbConnectionString": "Data Source=[Database URL];Database=[Database Name];User ID=[Username];Password=[Password];Connect Timeout=30"
    ```
    * `"DiscordApp:ClientId"` and `"DiscordApp:ClientSecret"` can be found at https://discordapp.com/developers/applications/[Your_Bot_Application_ID]/information
    * `"DiscordApp:BotToken"` can be found at https://discordapp.com/developers/applications/[Your_Bot_Application_ID]/bots
