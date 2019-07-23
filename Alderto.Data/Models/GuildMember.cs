@@ -8,12 +8,6 @@ namespace Alderto.Data.Models
     public class GuildMember
     {
         /// <summary>
-        /// Local Id.
-        /// </summary>
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
-
-        /// <summary>
         /// Discord Member Id.
         /// </summary>
         public ulong MemberId { get; set; }

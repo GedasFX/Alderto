@@ -6,11 +6,11 @@ using Alderto.Data.Models;
 
 namespace Alderto.Bot.Services
 {
-    public class DonationsManager : IDonationsManager
+    public class GuildBankManager : IGuildBankManager
     {
         private readonly IAldertoDbContext _context;
 
-        public DonationsManager(IAldertoDbContext context)
+        public GuildBankManager(IAldertoDbContext context)
         {
             _context = context;
         }
@@ -21,7 +21,8 @@ namespace Alderto.Bot.Services
 
             await _context.GuildMemberDonations.AddAsync(new GuildMemberDonation
             {
-                GuildMemberId = member.Id,
+                MemberId = member.MemberId,
+                GuildId = member.GuildId,
                 DonationDate = DateTimeOffset.UtcNow,
                 Donation = donation
             });
@@ -29,12 +30,23 @@ namespace Alderto.Bot.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<GuildMemberDonation>> ListDonationsAsync(GuildMember member)
+        public async Task<IEnumerable<GuildMemberDonation>> GetDonationsAsync(GuildMember member)
         {
             _context.Attach(member);
 
             await _context.Entry(member).Collection(m => m.Donations).LoadAsync();
             return member.Donations;
+        }
+
+        public Task<GuildMemberDonation> GetDonationAsync(int id)
+        {
+            return _context.GuildMemberDonations.FindAsync(id);
+        }
+
+        public async Task RemoveDonationAsync(GuildMemberDonation donation)
+        {
+            _context.Remove(donation);
+            await _context.SaveChangesAsync();
         }
     }
 }

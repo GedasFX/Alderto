@@ -4,14 +4,16 @@ using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    partial class AldertoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190723145507_pkchangeyetagain")]
+    partial class pkchangeyetagain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,6 +138,9 @@ namespace Alderto.Data.Migrations
 
                     b.Property<DateTimeOffset>("CurrencyLastClaimed");
 
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
                     b.Property<DateTimeOffset?>("JoinedAt");
 
                     b.Property<string>("Nickname")
@@ -145,6 +150,8 @@ namespace Alderto.Data.Migrations
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.HasKey("GuildId", "MemberId");
+
+                    b.HasAlternateKey("Id");
 
                     b.HasIndex("MemberId");
 

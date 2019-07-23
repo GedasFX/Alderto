@@ -38,6 +38,10 @@
     <Compile Remove="Migrations\20190722151905_donation.Designer.cs" />
     <Compile Remove="Migrations\20190722152338_donation.cs" />
     <Compile Remove="Migrations\20190722152338_donation.Designer.cs" />
+    <Compile Remove="Migrations\20190723144035_pkchangeyetagain.cs" />
+    <Compile Remove="Migrations\20190723144035_pkchangeyetagain.Designer.cs" />
+    <Compile Remove="Migrations\20190723150859_intolong.cs" />
+    <Compile Remove="Migrations\20190723150859_intolong.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

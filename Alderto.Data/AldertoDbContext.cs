@@ -25,15 +25,18 @@ namespace Alderto.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GuildMember>()
-                .HasIndex(g => new { g.GuildId, g.MemberId })
-                .IsUnique();
+                .HasKey(g => new { g.GuildId, g.MemberId });
 
             // Guilds
             modelBuilder.Entity<Guild>()
                 .HasOne(g => g.Configuration)
                 .WithOne(c => c.Guild)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey<GuildConfiguration>(configuration => configuration.GuildId);
+                .HasForeignKey<GuildConfiguration>(c => c.GuildId);
+
+            modelBuilder.Entity<GuildMemberDonation>()
+                .HasOne(d => d.GuildMember)
+                .WithMany(m => m.Donations)
+                .HasForeignKey(k => new { k.GuildId, k.MemberId });
 
             // Custom commands
             modelBuilder.Entity<CustomCommand>()
