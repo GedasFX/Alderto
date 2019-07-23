@@ -12,12 +12,10 @@ namespace Alderto.Bot.Modules
     public class RecruitmentModule : ModuleBase<SocketCommandContext>
     {
         private readonly IGuildUserManager _guildUserManager;
-        private readonly IGuildPreferencesManager _guildPreferencesManager;
 
-        public RecruitmentModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferencesManager)
+        public RecruitmentModule(IGuildUserManager guildUserManager)
         {
             _guildUserManager = guildUserManager;
-            _guildPreferencesManager = guildPreferencesManager;
         }
 
         [Command("Recruited"), Alias("Add")]

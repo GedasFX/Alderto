@@ -4,7 +4,7 @@ using Alderto.Data.Models;
 
 namespace Alderto.Bot.Services
 {
-    public interface IDonationsManager
+    public interface IGuildBankManager
     {
         /// <summary>
         /// Registers a donation the user has given to the guild.
@@ -19,5 +19,18 @@ namespace Alderto.Bot.Services
         /// <param name="member">User to get donations of.</param>
         /// <returns>A collection of donations the user has made.</returns>
         Task<IEnumerable<GuildMemberDonation>> GetDonationsAsync(GuildMember member);
+
+        /// <summary>
+        /// Finds the donation given by the primary key.
+        /// </summary>
+        /// <param name="id">Primary key of a donation.</param>
+        /// <returns></returns>
+        Task<GuildMemberDonation> GetDonationAsync(int id);
+
+        /// <summary>
+        /// Removes a given <see cref="donation"/> from the store.
+        /// </summary>
+        /// <param name="donation">Donation to remove from the store.</param>
+        Task RemoveDonationAsync(GuildMemberDonation donation);
     }
 }
