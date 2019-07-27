@@ -1,13 +1,14 @@
+using System;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
-using AspNet.Security.OAuth.Discord;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web
 {
@@ -49,12 +50,24 @@ namespace Alderto.Web
             services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
+                    };
                 });
 
             // Add Mvc
