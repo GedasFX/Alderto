@@ -2,15 +2,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Alderto.Data.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using AspNet.Security.OAuth.Discord;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web.Controllers
@@ -19,15 +15,11 @@ namespace Alderto.Web.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _configuration;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger, IConfiguration configuration)
+        public AccountController(ILogger<AccountController> logger, IConfiguration configuration)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _logger = logger;
             _configuration = configuration;
         }
@@ -38,17 +30,10 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-        [Route("logout"), Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await _signInManager.SignOutAsync();
-            return Ok();
-        }
-
         //[HttpPost]
         [Route("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Login()
         {
             // Authorized using discord. Create JWT token.
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -64,6 +49,7 @@ namespace Alderto.Web.Controllers
                 expires: DateTime.UtcNow.AddDays(7)
             );
 
+            _logger.LogInformation($"User {User.Identity.Name} has logged in.");
             return new OkObjectResult(tokenHandler.WriteToken(token));
         }
     }

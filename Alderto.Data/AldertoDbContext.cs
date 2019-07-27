@@ -1,11 +1,9 @@
 ﻿using Alderto.Data.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data
 {
-    public class AldertoDbContext : IdentityDbContext<ApplicationUser, IdentityRole<ulong>, ulong>, IAldertoDbContext
+    public class AldertoDbContext : DbContext, IAldertoDbContext
     {
         public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }

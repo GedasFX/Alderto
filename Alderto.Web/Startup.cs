@@ -1,11 +1,9 @@
 using System;
-using System.Threading.Tasks;
 using Alderto.Data;
-using Alderto.Data.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -26,32 +24,13 @@ namespace Alderto.Web
         {
             // Add database
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
-            services.AddDbContext<AldertoDbContext>(); // For identity.
-
-            // Identity management. 
-            services.AddIdentity<ApplicationUser, IdentityRole<ulong>>()
-                .AddEntityFrameworkStores<AldertoDbContext>();
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    context.HttpContext.Response.StatusCode = 401;
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.HttpContext.Response.StatusCode = 403;
-                    return Task.CompletedTask;
-                };
-            });
 
             // Use discord as authentication service.
             services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddDiscord(options =>
                 {
@@ -68,6 +47,10 @@ namespace Alderto.Web
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
                     };
+                })
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "IDENTITY";
                 });
 
             // Add Mvc
