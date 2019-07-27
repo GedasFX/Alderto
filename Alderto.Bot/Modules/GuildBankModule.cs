@@ -77,7 +77,7 @@ namespace Alderto.Bot.Modules
                 await _guildBankManager.RemoveDonationAsync(donation);
 
                 await this.ReplySuccessEmbedAsync(
-                    $"Successfully removed <!{donation.MemberId}>'s donation of **{donation.Donation}**.");
+                    $"Successfully removed <@{donation.MemberId}>'s donation of **{donation.Donation}**.");
             }
         }
     }
