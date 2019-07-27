@@ -12,7 +12,7 @@ namespace Alderto.Bot.Modules
     [Group("Config"), Alias("Preferences", "Pref", "Cfg")]
     public class GuildPreferencesModule : ModuleBase<SocketCommandContext>
     {
-        [Group("Get")]
+        [Group, Alias("Get")]
         public class GetPreferenceModule : ModuleBase<SocketCommandContext>
         {
             private readonly IGuildPreferencesManager _guildPreferencesManager;
