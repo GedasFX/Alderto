@@ -45,14 +45,15 @@ namespace Alderto.Web
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
                     };
                 })
                 .AddCookie(options =>
                 {
-                    options.Cookie.Name = "IDENTITY";
+                    options.Cookie.Name = ".Discord.Identity";
                 });
-
+            
             // Add Mvc
             services.AddMvc();
 
