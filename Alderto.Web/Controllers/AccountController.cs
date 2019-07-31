@@ -1,13 +1,13 @@
-﻿using System;
+﻿using AspNet.Security.OAuth.Discord;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using AspNet.Security.OAuth.Discord;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web.Controllers
 {
@@ -45,16 +45,15 @@ namespace Alderto.Web.Controllers
                 subject: new ClaimsIdentity(userClaims),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SigningSecret"])),
-                    SecurityAlgorithms.HmacSha256Signature),
-                expires: DateTime.UtcNow.AddDays(7)
+                    SecurityAlgorithms.HmacSha256Signature)
             );
 
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
 
-            return Content($"<script>" +
+            return Content("<script>" +
                             $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
-                            $"window.close();" +
-                           $"</script>",
+                             "window.close();" +
+                           "</script>",
                 "text/html");
         }
     }
