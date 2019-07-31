@@ -14,11 +14,14 @@ export class ErrorInterceptor implements HttpInterceptor {
       if (err.status === 401) {
         // auto logout if 401 response returned from api
         this.accountService.logout();
-        this.accountService.loginDiscord();
-        location.reload(true);
+        this.accountService.loginDiscord().subscribe((u: any) => {
+          if (u !== null) {
+            location.reload(true);
+          }
+        });
       }
 
-      const error = err.error.message || err.statusText;
+      const error = err.message || err.statusText;
       return throwError(error);
     }));
   }

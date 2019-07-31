@@ -16,9 +16,11 @@ export class AccountService {
     this.user = this.userSubject.asObservable();
   }
 
-  public loginDiscord() {
+  public loginDiscord(): Observable<User> {
     window.open(window.location.origin + '/api/account/login', null, 'width=600,height=800');
     window.addEventListener('message', this.loginDiscordCallback);
+
+    return this.user;
   }
 
   private loginDiscordCallback = (message: MessageEvent) => {
@@ -42,6 +44,7 @@ export class AccountService {
     window.removeEventListener('message', this.loginDiscordCallback);
   };
 
+  // TODO: More through logout. Roles change in-between changes?
   public logout() {
     localStorage.removeItem('user');
     this.userSubject.next(null);

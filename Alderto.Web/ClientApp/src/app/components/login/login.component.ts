@@ -11,6 +11,9 @@ export class LoginComponent {
   constructor(private readonly account: AccountService) {  }
 
   public loginDiscord() {
-    this.account.loginDiscord();
+    this.account.loginDiscord().subscribe((u: any) => {
+      if (u !== null)
+        location.reload(true);
+    });
   }
 }
