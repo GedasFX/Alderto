@@ -22,8 +22,11 @@
     "@auth0/angular-jwt": "^3.0.0",
     "@coreui/angular": "^2.5.2",
     "@coreui/coreui": "^2.1.12",
+    "font-awesome": "^4.7.0",
     "jwt-decode": "^2.2.0",
+    "ngx-bootstrap": "^5.1.0",
     "rxjs": "~6.4.0",
+    "simple-line-icons": "^2.4.1",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"
   },

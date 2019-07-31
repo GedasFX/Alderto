@@ -3,16 +3,16 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { AppComponent, AccountComponent } from './layout';
 
 import { AppHeaderModule, AppSidebarModule, AppFooterModule } from '@coreui/angular';
-import { LoginComponent } from './components/login/login.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    AccountComponent
   ],
   imports: [
     BrowserModule,
@@ -20,7 +20,8 @@ import { JwtInterceptor, ErrorInterceptor } from './interceptors';
     AppHeaderModule,
     AppSidebarModule,
     AppFooterModule,
-    HttpClientModule
+    HttpClientModule,
+    BsDropdownModule.forRoot()
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
