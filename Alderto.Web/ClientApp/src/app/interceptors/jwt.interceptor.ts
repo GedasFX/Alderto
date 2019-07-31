@@ -9,8 +9,6 @@ export class JwtInterceptor implements HttpInterceptor {
   constructor(private readonly accountService: AccountService) { }
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log(request);
-
     // add authorization header with jwt token if available
     const currentUser = this.accountService.getUser();
     if (currentUser && currentUser.token) {
