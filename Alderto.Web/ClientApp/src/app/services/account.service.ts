@@ -26,6 +26,7 @@ export class AccountService {
   private loginDiscordCallback = (message: MessageEvent) => {
     if (message.origin !== window.location.origin) return;
 
+    console.log(message.data);
     try {
       const decodedJwt = jwt_decode(message.data);
       const user = new User(decodedJwt.nameid, message.data, decodedJwt.unique_name, decodedJwt.role);

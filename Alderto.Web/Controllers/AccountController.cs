@@ -1,20 +1,13 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Mime;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AspNet.Security.OAuth.Discord;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
@@ -57,34 +50,12 @@ namespace Alderto.Web.Controllers
             );
 
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
-            var json = JsonConvert.SerializeObject(new
-            {
-                User = new
-                {
-                    Id = User.FindFirst(ClaimTypes.NameIdentifier).Value,
-                    Username = User.Identity.Name,
-                    Role = "User"
-                },
-                Token = tokenHandler.WriteToken(token)
-            });
+
             return Content($"<script>" +
-                            $"window.opener.postMessage('{json}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
+                            $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
                             $"window.close();" +
                            $"</script>",
                 "text/html");
         }
-
-        //[Route("login")]
-        //public IActionResult Login(string returnUrl = null)
-        //{
-        //    //var properties = _signInManager
-        //    //    .ConfigureExternalAuthenticationProperties(
-        //    //        provider: "Discord",  
-        //    //        redirectUrl: Url.Action(action: nameof(LogInCallback), new { returnUrl }));
-
-        //        return Challenge(
-        //                new AuthenticationProperties { RedirectUri = Url.Action(nameof(LoginCallback), new { returnUrl }) },
-        //                DiscordAuthenticationDefaults.AuthenticationScheme);
-        //}
     }
 }
