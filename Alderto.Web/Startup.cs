@@ -1,5 +1,4 @@
 using System;
-using Alderto.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -22,9 +21,6 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add database
-            services.AddDbContext<IAldertoDbContext, AldertoDbContext>();
-
             // Use discord as authentication service.
             services
                 .AddAuthentication(options =>
@@ -55,7 +51,7 @@ namespace Alderto.Web
                 {
                     options.Cookie.Name = ".Session";
                 });
-            
+
             // Add Mvc
             services.AddMvc();
 
