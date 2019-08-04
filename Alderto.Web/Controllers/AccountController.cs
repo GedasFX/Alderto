@@ -33,7 +33,7 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-        //[HttpPost]
+        [HttpPost]
         [Route("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Login()
@@ -55,7 +55,6 @@ namespace Alderto.Web.Controllers
                     new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SigningSecret"])),
                     SecurityAlgorithms.HmacSha256Signature),
                 expires: authResult.Properties.ExpiresUtc?.DateTime
-                
             );
 
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
