@@ -32,17 +32,19 @@ namespace Alderto.Web.Controllers
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Login()
         {
+            // Authorized using discord. Create JWT token.
+
             // Fetch the authentication result. It contains the access token to discord.
             var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // Authorized using discord. Create JWT token.
             var tokenHandler = new JwtSecurityTokenHandler();
             
+            // Add claims to the JWT.
             var userClaims = authResult.Principal.Claims.ToList();
-            
             userClaims.Add(new Claim(ClaimTypes.Role, "User"));
             userClaims.Add(new Claim("discord_token", authResult.Properties.Items[".Token.access_token"]));
 
+            // Create the token.
             var token = tokenHandler.CreateJwtSecurityToken(
                 subject: new ClaimsIdentity(userClaims),
                 signingCredentials: new SigningCredentials(
@@ -54,6 +56,7 @@ namespace Alderto.Web.Controllers
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
             await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
 
+            // Returns the token to the creator of the window.
             return Content("<script>" +
                             $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
                              "window.close();" +
