@@ -17,7 +17,7 @@ export class AccountService {
   }
   
   public loginDiscord(): Observable<User> {
-    window.open(window.location.origin + '/api/account/login', null, 'width=600,height=800');
+    window.open('/api/account/login', null, 'width=600,height=800');
     window.addEventListener('message', this.loginDiscordCallback);
 
     return this.user;
@@ -26,7 +26,6 @@ export class AccountService {
   private loginDiscordCallback = (message: MessageEvent) => {
     if (message.origin !== window.location.origin) return;
 
-    console.log(message.data);
     try {
       const decodedJwt = jwt_decode(message.data);
       const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord_token, decodedJwt.unique_name, decodedJwt.role);

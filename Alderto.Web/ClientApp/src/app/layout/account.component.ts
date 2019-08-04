@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
-import { AccountService } from '../services/account.service';
+import { AccountService, DiscordService } from '../services';
+import { DiscordUser } from '../models/discord_user';
 
 @Component({
   selector: 'app-account',
@@ -9,8 +10,16 @@ import { AccountService } from '../services/account.service';
 })
 export class AccountComponent {
   private readonly loggedIn: boolean;
-  constructor(private readonly account: AccountService) {
+  private userImg: string = "";
+
+  constructor(private readonly account: AccountService, private readonly discordService: DiscordService) {
     this.loggedIn = account.isLoggedIn();
+
+    if (this.loggedIn) {
+      this.discordService.getUser().subscribe((dUser: DiscordUser) => {
+        this.userImg = `https://cdn.discordapp.com/avatars/${dUser.id}/${dUser.avatar}.jpg?size=64`;
+      });
+    }
   }
 
   public loginDiscord() {
