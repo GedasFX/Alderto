@@ -27,12 +27,6 @@ namespace Alderto.Web.Controllers
             _configuration = configuration;
         }
 
-        [Route("some"), Authorize]
-        public IActionResult Some()
-        {
-            return Ok();
-        }
-
         [HttpPost]
         [Route("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
