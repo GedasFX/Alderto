@@ -5,9 +5,9 @@ using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
-    public interface IGuildUserManager
+    public interface IGuildMemberManager
     {
         /// <summary>
         /// Adds a member to <see cref="IAldertoDbContext.GuildMembers"/> and, if needed,

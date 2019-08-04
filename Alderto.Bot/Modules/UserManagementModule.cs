@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
@@ -12,12 +12,12 @@ namespace Alderto.Bot.Modules
     [RequireRole("Admin")]
     public class UserManagementModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IGuildUserManager _guildUserManager;
+        private readonly IGuildMemberManager _guildMemberManager;
         private readonly IGuildPreferencesManager _guildPreferencesManager;
 
-        public UserManagementModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferencesManager)
+        public UserManagementModule(IGuildMemberManager guildMemberManager, IGuildPreferencesManager guildPreferencesManager)
         {
-            _guildUserManager = guildUserManager;
+            _guildMemberManager = guildMemberManager;
             _guildPreferencesManager = guildPreferencesManager;
         }
 
@@ -32,7 +32,7 @@ namespace Alderto.Bot.Modules
 
             try
             {
-                await _guildUserManager.AcceptMemberAsync(user, nickname,
+                await _guildMemberManager.AcceptMemberAsync(user, nickname,
                     Context.Guild.Roles.SingleOrDefault(r => r.Id == pref.AcceptedMemberRoleId));
             }
             catch (HttpException)

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 

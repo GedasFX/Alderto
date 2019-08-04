@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Alderto.Data;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -43,7 +44,7 @@ namespace Alderto.Bot
             .AddSingleton(_client)
 
             // Add User provider
-            .AddSingleton<IGuildUserManager, GuildUserManager>()
+            .AddSingleton<IGuildMemberManager, GuildMemberManager>()
 
             // Add command handling services
             .AddSingleton(_commandService)

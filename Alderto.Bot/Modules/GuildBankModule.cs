@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 
@@ -16,12 +16,12 @@ namespace Alderto.Bot.Modules
         public class DonationsModule : ModuleBase<SocketCommandContext>
         {
             private readonly IGuildBankManager _guildBankManager;
-            private readonly IGuildUserManager _userManager;
+            private readonly IGuildMemberManager _memberManager;
 
-            public DonationsModule(IGuildBankManager guildBankManager, IGuildUserManager userManager)
+            public DonationsModule(IGuildBankManager guildBankManager, IGuildMemberManager memberManager)
             {
                 _guildBankManager = guildBankManager;
-                _userManager = userManager;
+                _memberManager = memberManager;
             }
 
             [Command]
@@ -32,7 +32,7 @@ namespace Alderto.Bot.Modules
                 if (donor == null)
                     donor = (IGuildUser)Context.Message.Author;
 
-                var user = await _userManager.GetGuildMemberAsync(donor);
+                var user = await _memberManager.GetGuildMemberAsync(donor);
 
                 var donations = (await _guildBankManager.GetDonationsAsync(user)).ToArray();
                 if (donations.Length == 0)
@@ -57,7 +57,7 @@ namespace Alderto.Bot.Modules
                 if (string.IsNullOrWhiteSpace(donation) || donation.Length > 100)
                     return;
 
-                var user = await _userManager.GetGuildMemberAsync(donor);
+                var user = await _memberManager.GetGuildMemberAsync(donor);
                 await _guildBankManager.AddDonationAsync(user, donation);
 
                 await this.ReplySuccessEmbedAsync($"{donor.Mention}'s donation of **{donation}** has been registered.");

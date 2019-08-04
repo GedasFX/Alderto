@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Alderto.Tests.MockedEntities;
 using Xunit;
 

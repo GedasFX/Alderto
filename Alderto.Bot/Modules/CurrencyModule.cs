@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 
@@ -10,13 +10,13 @@ namespace Alderto.Bot.Modules
 {
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IGuildUserManager _guildUserManager;
+        private readonly IGuildMemberManager _guildMemberManager;
         private readonly IGuildPreferencesManager _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
 
-        public CurrencyModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferences, ICurrencyManager currencyManager)
+        public CurrencyModule(IGuildMemberManager guildMemberManager, IGuildPreferencesManager guildPreferences, ICurrencyManager currencyManager)
         {
-            _guildUserManager = guildUserManager;
+            _guildMemberManager = guildMemberManager;
             _guildPreferences = guildPreferences;
             _currencyManager = currencyManager;
         }
@@ -81,7 +81,7 @@ namespace Alderto.Bot.Modules
             var no = 1;
             foreach (var user in guildUsers)
             {
-                var member = await _guildUserManager.GetGuildMemberAsync(user);
+                var member = await _guildMemberManager.GetGuildMemberAsync(user);
                 await _currencyManager.ModifyPointsAsync(member, qty);
 
                 // Format a nice output.
@@ -100,7 +100,7 @@ namespace Alderto.Bot.Modules
                 user = (IGuildUser)Context.Message.Author;
 
             var currencySymbol = (await _guildPreferences.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
-            var dbUser = await _guildUserManager.GetGuildMemberAsync(user);
+            var dbUser = await _guildMemberManager.GetGuildMemberAsync(user);
 
             await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
         }
@@ -110,7 +110,7 @@ namespace Alderto.Bot.Modules
         public async Task Timely()
         {
             var user = (IGuildUser)Context.User;
-            var dbUser = await _guildUserManager.GetGuildMemberAsync(user.GuildId, user.Id);
+            var dbUser = await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id);
 
             var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
             var timelyCooldown = preferences.TimelyCooldown;

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Bot.Services;
-using Alderto.Data;
+using Alderto.Services;
 using Alderto.Tests.MockedEntities;
 using Xunit;
 
@@ -8,12 +7,12 @@ namespace Alderto.Tests
 {
     public class UserProviderTests
     {
-        private readonly IGuildUserManager _manager;
+        private readonly IGuildMemberManager _manager;
 
         public UserProviderTests()
         {
             var context = new MockDbContext();
-            _manager = new GuildUserManager(context);
+            _manager = new GuildMemberManager(context);
         }
 
         [Fact]
