@@ -1,10 +1,16 @@
-﻿using Alderto.Data.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using AspNet.Security.OAuth.Discord;
+﻿using AspNet.Security.OAuth.Discord;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Alderto.Web.Controllers
 {
@@ -12,77 +18,50 @@ namespace Alderto.Web.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger)
+        public AccountController(ILogger<AccountController> logger, IConfiguration configuration)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _logger = logger;
-        }
-
-        [Route("some"), Authorize]
-        public IActionResult Some()
-        {
-            return Ok();
-        }
-
-        [Route("logout"), Authorize]
-        public async Task<IActionResult> LogOut()
-        {
-            await _signInManager.SignOutAsync();
-            return Ok();
+            _configuration = configuration;
         }
 
         [HttpPost]
         [Route("login")]
-        public IActionResult LogIn(string returnUrl = null)
+        [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Login()
         {
-            var properties = _signInManager
-                .ConfigureExternalAuthenticationProperties(
-                    provider: "Discord",
-                    redirectUrl: Url.Action(action: nameof(LogInCallback), new { returnUrl }));
+            // Authorized using discord. Create JWT token.
 
-            return Challenge(properties, DiscordAuthenticationDefaults.AuthenticationScheme);
-        }
+            // Fetch the authentication result. It contains the access token to discord.
+            var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        [Route("login-callback")]
-        public async Task<IActionResult> LogInCallback(string returnUrl = null)
-        {
-            // If return url was not specified, just return 200.
-            var onSuccess = returnUrl == null ? (IActionResult)Ok() : LocalRedirect(returnUrl);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            
+            // Add claims to the JWT.
+            var userClaims = authResult.Principal.Claims.ToList();
+            userClaims.Add(new Claim(ClaimTypes.Role, "User"));
+            userClaims.Add(new Claim("discord_token", authResult.Properties.Items[".Token.access_token"]));
 
-            // Collect information from the external login provider.
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            // Create the token.
+            var token = tokenHandler.CreateJwtSecurityToken(
+                subject: new ClaimsIdentity(userClaims),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SigningSecret"])),
+                    SecurityAlgorithms.HmacSha256Signature),
+                expires: authResult.Properties.ExpiresUtc?.DateTime
+            );
 
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return onSuccess;
-            }
+            _logger.LogInformation($"User {User.Identity.Name} has logged in.");
+            await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
 
-            // User is not registered. Register him.
-            var user = new ApplicationUser(info.Principal.Identity.Name)
-            {
-                Id = ulong.Parse(info.ProviderKey)
-            };
-            await _userManager.CreateAsync(user);
-            await _userManager.AddLoginAsync(user, info);
-
-            // Retry sign in after user was registered.
-            result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation($"{info.Principal.Identity.Name} was registered and logged in with {info.LoginProvider} provider.");
-                return onSuccess;
-            }
-
-            // User failed to register. Internal error.
-            return StatusCode(500);
+            // Returns the token to the creator of the window.
+            return Content("<script>" +
+                            $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
+                             "window.close();" +
+                           "</script>",
+                "text/html");
         }
     }
 }
