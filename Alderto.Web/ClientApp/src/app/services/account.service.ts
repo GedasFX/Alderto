@@ -15,7 +15,7 @@ export class AccountService {
     this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
     this.user = this.userSubject.asObservable();
   }
-
+  
   public loginDiscord(): Observable<User> {
     window.open(window.location.origin + '/api/account/login', null, 'width=600,height=800');
     window.addEventListener('message', this.loginDiscordCallback);
@@ -29,7 +29,7 @@ export class AccountService {
     console.log(message.data);
     try {
       const decodedJwt = jwt_decode(message.data);
-      const user = new User(decodedJwt.nameid, message.data, decodedJwt.unique_name, decodedJwt.role);
+      const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord_token, decodedJwt.unique_name, decodedJwt.role);
 
       this.userSubject.next(user);
       localStorage.setItem('user', JSON.stringify(user));

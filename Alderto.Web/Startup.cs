@@ -31,11 +31,13 @@ namespace Alderto.Web
                 {
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                    options.SaveTokens = true;
                 })
                 .AddJwtBearer(options =>
                 {
@@ -51,7 +53,7 @@ namespace Alderto.Web
                 })
                 .AddCookie(options =>
                 {
-                    options.Cookie.Name = ".Discord.Identity";
+                    options.Cookie.Name = ".Session";
                 });
             
             // Add Mvc
