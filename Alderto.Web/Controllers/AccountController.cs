@@ -27,7 +27,6 @@ namespace Alderto.Web.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
         [Route("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Login()

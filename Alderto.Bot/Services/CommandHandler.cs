@@ -49,7 +49,7 @@ namespace Alderto.Bot.Services
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
         }
 
         public async Task HandleCommandAsync(SocketMessage messageParam)
