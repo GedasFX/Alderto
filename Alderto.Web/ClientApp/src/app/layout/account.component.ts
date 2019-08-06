@@ -9,8 +9,8 @@ import { DiscordUser } from '../models/discord_user';
   styleUrls: ['./account.component.scss']
 })
 export class AccountComponent {
-  private readonly loggedIn: boolean;
-  private userImg: string = "";
+  public readonly loggedIn: boolean;
+  public userImg: string = "";
 
   constructor(private readonly account: AccountService, private readonly discordService: DiscordService) {
     this.loggedIn = account.isLoggedIn();

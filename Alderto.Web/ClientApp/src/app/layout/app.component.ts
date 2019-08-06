@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AccountService, DiscordService } from '../services';
+import { AccountService } from '../services';
+import { navItems } from '../_nav';
 
 @Component({
   selector: 'body',
@@ -9,6 +10,8 @@ import { AccountService, DiscordService } from '../services';
 export class AppComponent {
   constructor(private readonly http: HttpClient,
     private readonly accountService: AccountService) { }
+
+  public navItems = navItems;
 
   public somee() {
     this.http.post('/api/account/some', null).subscribe((data: any) => {
