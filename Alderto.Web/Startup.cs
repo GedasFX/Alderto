@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -34,6 +35,8 @@ namespace Alderto.Web
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
                     options.SaveTokens = true;
+
+                    options.Scope.Add("guilds");
                 })
                 .AddJwtBearer(options =>
                 {

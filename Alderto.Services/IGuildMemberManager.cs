@@ -59,5 +59,12 @@ namespace Alderto.Services
         /// <param name="role">[Optional] Add user to accepted role (Role policy)</param>
         /// <param name="recruiterId">[Optional] Add user as a recruit of someone (Recruitment policy)</param>
         Task AcceptMemberAsync(IGuildUser user, string nickname = null, IRole role = null, ulong recruiterId = 0);
+
+        /// <summary>
+        /// Lists all guilds the given user is in.
+        /// </summary>
+        /// <param name="userId">The id of the given user.</param>
+        /// <returns>A collection of guilds user resides in.</returns>
+        IEnumerable<Guild> ListUserGuilds(ulong userId);
     }
 }

@@ -7,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ServerSelectComponent implements OnInit {
   public currentServerIcon: string = "/assets/img/unknown.svg";
+  public currentServerName: string = "Please select a server";
+
+  public serverList: IGuild = [];
 
   constructor() { }
 

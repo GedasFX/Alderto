@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AccountService, DiscordService } from '../services';
 import { IDiscordUser } from '../models/discord_user';
@@ -8,12 +8,14 @@ import { IDiscordUser } from '../models/discord_user';
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
 })
-export class AccountComponent {
-  public readonly loggedIn: boolean;
-  public userImg: string = "/assets/img/unknown.svg";
+export class AccountComponent implements OnInit {
 
-  constructor(private readonly account: AccountService, private readonly discordService: DiscordService) {
-    this.loggedIn = account.isLoggedIn();
+  constructor(
+    private readonly account: AccountService,
+    private readonly discordService: DiscordService) { }
+
+  public ngOnInit() {
+    this.loggedIn = this.account.isLoggedIn();
 
     if (this.loggedIn) {
       this.discordService.getUser().subscribe((dUser: IDiscordUser) => {
@@ -21,6 +23,9 @@ export class AccountComponent {
       });
     }
   }
+
+  public loggedIn: boolean;
+  public userImg: string = "/assets/img/unknown.svg";
 
   public loginDiscord() {
     this.account.loginDiscord().subscribe((u: any) => {
