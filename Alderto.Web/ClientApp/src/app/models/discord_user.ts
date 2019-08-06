@@ -1,8 +1,8 @@
-export class DiscordUser {
-  public id: number;
-  public username: string;
-  public discriminator: string;
-  public avatar: string;
-  public flags: number;
-  public premium_type: number;
+export interface IDiscordUser {
+  id: number;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  flags: number;
+  premium_type: number;
 }

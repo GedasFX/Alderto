@@ -6,7 +6,7 @@ export class User {
   public username: string;
   public role: string;
 
-  constructor(id: number = 0, token: string = null, discordToken = null, username: string = null, role: string = null) {
+  constructor(id?: number, token?: string, discordToken?: string, username?: string, role?: string) {
     this.id = id;
     this.token = token;
     this.discordToken = discordToken;

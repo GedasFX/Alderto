@@ -90,10 +90,10 @@ namespace Alderto.Web
 
             app.UseSpa(spa =>
             {
-                //if (env.IsDevelopment())
-                //{
-                //    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
-                //}
+                if (env.IsDevelopment())
+                {
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                }
             });
         }
     }
