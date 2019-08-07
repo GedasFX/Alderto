@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -16,47 +15,24 @@ namespace Alderto.Bot
 {
     public class Startup
     {
-        private readonly DiscordSocketClient _client;
-        private readonly IConfiguration _config;
-        private readonly CommandService _commandService;
-
-        public Startup()
-        {
-            _config = BuildConfig();
-            _commandService = new CommandService(new CommandServiceConfig
-            {
-                DefaultRunMode = RunMode.Async,
-                IgnoreExtraArgs = true
-            });
-
-            _client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = LogSeverity.Debug
-            });
-        }
-
-        public IServiceProvider ConfigureServices() => new ServiceCollection()
+        public IServiceProvider ConfigureServices(IConfiguration config) => new ServiceCollection()
             // Add database
             .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder =>
-                builder.UseSqlServer(_config["DbConnectionString"]))
+                builder.UseSqlServer(config["DbConnectionString"]))
 
             // Add discord socket client
-            .AddSingleton(_client)
-
-            // Add User provider
-            .AddSingleton<IGuildMemberManager, GuildMemberManager>()
+            .AddDiscordClient(LogSeverity.Debug)
 
             // Add command handling services
-            .AddSingleton(_commandService)
-            .AddSingleton<ICommandHandler, CommandHandler>()
+            .AddCommandService(RunMode.Async, ignoreExtraArgs: true)
+            .AddCommandHandler()
 
-            // Add providers for various bot activities
-            .AddSingleton<IGuildPreferencesManager, GuildPreferencesManager>()
-            .AddSingleton<ICurrencyManager, CurrencyManager>()
-            .AddSingleton<IGuildBankManager, GuildBankManager>()
+            // Add managers for various bot modules.
+            .AddBotManagers()
 
-            // Add Lua command handler
-            .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()
+            // Add Lua command provider.
+            // TODO: Decide if the bot should enable this.
+            .AddLuaCommandHandler()
 
             // Add logger service
             .AddLogging(lb =>
@@ -66,21 +42,24 @@ namespace Alderto.Bot
             .AddSingleton<Services.ILogger, Logger>()
 
             // Add configuration
-            .AddSingleton(_config)
+            .AddSingleton(config)
 
             // Build
             .BuildServiceProvider();
 
         public async Task RunAsync()
         {
-            var services = ConfigureServices();
+            var config = BuildConfig();
+            var services = ConfigureServices(config);
 
             // Enable logging
             await services.GetService<Services.ILogger>().InstallLogger();
 
+            var client = services.GetService<DiscordSocketClient>();
+
             // Start bot
-            await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
-            await _client.StartAsync();
+            await client.LoginAsync(TokenType.Bot, config["DiscordApp:BotToken"]);
+            await client.StartAsync();
 
             // Install Command handler
             await services.GetRequiredService<ICommandHandler>().InstallCommandsAsync();

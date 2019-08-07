@@ -1,6 +1,5 @@
 using System;
 using Alderto.Web.Extensions;
-using Discord.Rest;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
