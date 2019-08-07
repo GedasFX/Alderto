@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IGuild } from '../models/guild';
 
 @Component({
   selector: '.app-server-select',
@@ -9,7 +10,7 @@ export class ServerSelectComponent implements OnInit {
   public currentServerIcon: string = "/assets/img/unknown.svg";
   public currentServerName: string = "Please select a server";
 
-  public serverList: IGuild = [];
+  public serverList: IGuild[] = [];
 
   constructor() { }
 

@@ -1,5 +1,6 @@
 using System;
-using Microsoft.AspNetCore.Authentication;
+using Alderto.Web.Extensions;
+using Discord.Rest;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +56,9 @@ namespace Alderto.Web
                     options.Cookie.Name = ".Session";
                 });
 
+            // Add the ability to make REST calls on the behalf of the bot.
+            services.AddDiscordClient(Configuration["DiscordApp:BotToken"]);
+
             // Add Mvc
             services.AddMvc();
 
@@ -76,7 +80,8 @@ namespace Alderto.Web
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
             app.UseSpaStaticFiles();
 
             app.UseAuthentication();

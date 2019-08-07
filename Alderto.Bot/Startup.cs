@@ -37,7 +37,7 @@ namespace Alderto.Bot
 
         public IServiceProvider ConfigureServices() => new ServiceCollection()
             // Add database
-            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder => 
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder =>
                 builder.UseSqlServer(_config["DbConnectionString"]))
 
             // Add discord socket client

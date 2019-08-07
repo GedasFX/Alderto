@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
@@ -37,11 +38,11 @@ namespace Alderto.Web.Controllers
             var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            
+
             // Add claims to the JWT.
             var userClaims = authResult.Principal.Claims.ToList();
             userClaims.Add(new Claim(ClaimTypes.Role, "User"));
-            userClaims.Add(new Claim("discord_token", authResult.Properties.Items[".Token.access_token"]));
+            userClaims.Add(new Claim("discord", authResult.Properties.Items[".Token.access_token"]));
 
             // Create the token.
             var token = tokenHandler.CreateJwtSecurityToken(
@@ -55,7 +56,7 @@ namespace Alderto.Web.Controllers
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
             await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
 
-            // Returns the token to the creator of the window.
+            // Returns the token to the creator of the window. Faking a view.
             return Content("<script>" +
                             $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
                              "window.close();" +

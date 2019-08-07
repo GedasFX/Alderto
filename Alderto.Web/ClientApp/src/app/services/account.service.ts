@@ -44,7 +44,7 @@ export class AccountService {
 
     try {
       const decodedJwt = jwt_decode(message.data);
-      const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord_token, decodedJwt.unique_name, decodedJwt.role);
+      const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord, decodedJwt.unique_name, decodedJwt.role);
 
       this.userSubject.next(user);
       localStorage.setItem('user', JSON.stringify(user));
