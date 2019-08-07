@@ -16,7 +16,7 @@ namespace Alderto.Bot
                 .AddDiscordClient(LogSeverity.Debug)
 
                 // Add command handling services
-                .AddCommandService(RunMode.Async, ignoreExtraArgs: true)
+                .AddCommandService(RunMode.Sync, ignoreExtraArgs: true)
                 .AddCommandHandler()
 
                 // Add managers for various bot modules.
@@ -64,7 +64,7 @@ namespace Alderto.Bot
         /// </summary>
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         public static IServiceCollection AddLuaCommandHandler(this IServiceCollection services) =>
-            services.AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>();
+            services.AddScoped<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>();
 
         /// <summary>
         /// Adds a bunch of managers for various bot Modules activities to the service collection.
@@ -75,12 +75,12 @@ namespace Alderto.Bot
             services
 
                 // Add User provider
-                .AddSingleton<IGuildMemberManager, GuildMemberManager>()
+                .AddScoped<IGuildMemberManager, GuildMemberManager>()
 
                 // Add providers for various bot activities
-                .AddSingleton<IGuildPreferencesManager, GuildPreferencesManager>()
-                .AddSingleton<ICurrencyManager, CurrencyManager>()
-                .AddSingleton<IGuildBankManager, GuildBankManager>();
+                .AddScoped<IGuildPreferencesManager, GuildPreferencesManager>()
+                .AddScoped<ICurrencyManager, CurrencyManager>()
+                .AddScoped<IGuildBankManager, GuildBankManager>();
 
             return services;
         }

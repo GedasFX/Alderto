@@ -24,7 +24,7 @@ namespace Alderto.Bot
             .AddDiscordClient(LogSeverity.Debug)
 
             // Add command handling services
-            .AddCommandService(RunMode.Async, ignoreExtraArgs: true)
+            .AddCommandService(RunMode.Sync, ignoreExtraArgs: true)
             .AddCommandHandler()
 
             // Add managers for various bot modules.
