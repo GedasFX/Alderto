@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { ViewBaseComponent } from '../view-base.component';
 
 @Component({
   templateUrl: 'overview.component.html'
 })
-export class OverviewComponent {
-
-  constructor(private readonly httpClient: HttpClient) { }
+export class OverviewComponent extends ViewBaseComponent {
+  constructor(route: ActivatedRoute) { super(route); }
 }

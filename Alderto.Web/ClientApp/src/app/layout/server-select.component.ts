@@ -13,11 +13,10 @@ export class ServerSelectComponent implements OnInit {
 
   public serverList: IGuild[] = [];
 
-  constructor(private readonly http : HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   public ngOnInit() {
     this.http.get<IGuild[]>('/api/user/mutual-guilds').subscribe((guilds: IGuild[]) => {
-      console.log(guilds[0]);
       this.serverList = guilds;
     });
   }

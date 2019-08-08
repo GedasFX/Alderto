@@ -9,11 +9,16 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'bank',
+    redirectTo: '666666/bank',
     //canActivate: [AuthGuard]
   },
   {
-    path: 'bank',
+    path: ':id',
+    pathMatch: 'full',
+    redirectTo: ':id/bank'
+  },
+  {
+    path: ':id/bank',
     loadChildren: () => import('./views/bank/bank.module').then(m => m.BankModule),
     //canActivate: [AuthGuard]
   },
