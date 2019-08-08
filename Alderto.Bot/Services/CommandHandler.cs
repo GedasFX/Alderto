@@ -27,11 +27,9 @@ namespace Alderto.Bot.Services
             _commands = commands;
             _services = services;
             _guildPreferences = guildPreferences;
-
-            _ = InstallCommandsAsync();
         }
 
-        private async Task InstallCommandsAsync()
+        public async Task StartAsync()
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;

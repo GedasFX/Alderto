@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Alderto.Data;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +52,7 @@ namespace Alderto.Bot
             // Effectively start the bot.
             // Initializes all of the necessary singleton services from the the IServiceProvider.
             // There has to be a better way to do this, but this does the job well enough.
-            services.GetService<CommandHandler>();
+            await services.GetService<CommandHandler>().StartAsync();
 
             // Lock main thread to run indefinitely.
             await Task.Delay(-1);

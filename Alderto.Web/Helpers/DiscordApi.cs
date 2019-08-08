@@ -67,6 +67,7 @@ namespace Alderto.Web.Helpers
             }
 
             string output;
+            // ReSharper disable once AssignNullToNotNullAttribute
             using (var stream = new StreamReader(response.GetResponseStream()))
             {
                 output = await stream.ReadToEndAsync();

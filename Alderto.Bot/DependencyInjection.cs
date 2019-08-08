@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
-using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace Alderto.Bot
 {
-    public static class BotServicesExtensions
+    public static class DependencyInjection
     {
         /// <summary>
         /// Adds a singleton instance of <see cref="DiscordSocketClient"/> to the service collection. Can specify a Log Level.
@@ -67,7 +66,10 @@ namespace Alderto.Bot
         public static IServiceCollection AddCommandService(this IServiceCollection services,
             Action<CommandServiceConfig> config = null) =>
             services.AddSingleton<CommandService, CommandServiceWrapper>()
-                .Configure<CommandServiceConfig>(localConfig => { config?.Invoke(localConfig); });
+                .Configure<CommandServiceConfig>(localConfig =>
+                {
+                    config?.Invoke(localConfig);
+                });
 
         private class CommandServiceWrapper : CommandService
         {
@@ -107,31 +109,5 @@ namespace Alderto.Bot
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         public static IServiceCollection AddCommandHandler(this IServiceCollection services) =>
             services.AddSingleton<CommandHandler>();
-
-        /// <summary>
-        /// Adds a singleton instance of <see cref="Lua.ICustomCommandProvider"/> to the service collection.
-        /// </summary>
-        /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
-        public static IServiceCollection AddLuaCommandHandler(this IServiceCollection services) =>
-            services.AddScoped<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>();
-
-        /// <summary>
-        /// Adds a bunch of managers for various bot Modules activities to the service collection.
-        /// </summary>
-        /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
-        public static IServiceCollection AddBotManagers(this IServiceCollection services)
-        {
-            services
-
-                // Add User provider
-                .AddScoped<IGuildMemberManager, GuildMemberManager>()
-
-                // Add providers for various bot activities
-                .AddScoped<IGuildPreferencesManager, GuildPreferencesManager>()
-                .AddScoped<ICurrencyManager, CurrencyManager>()
-                .AddScoped<IGuildBankManager, GuildBankManager>();
-
-            return services;
-        }
     }
 }
