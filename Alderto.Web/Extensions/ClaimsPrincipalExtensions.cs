@@ -26,5 +26,15 @@ namespace Alderto.Web.Extensions
         {
             return user.FindFirst("discord").Value;
         }
+
+        /// <summary>
+        /// Gets the discord id claim of the user.
+        /// </summary>
+        /// <param name="user">Claims Principal.</param>
+        /// <returns>Discord user id.</returns>
+        public static ulong GetId(this ClaimsPrincipal user)
+        {
+            return ulong.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
+        }
     }
 }

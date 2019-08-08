@@ -1,7 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Alderto.Web.Extensions;
-using Alderto.Web.Services;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
+using Alderto.Web.Models.Discord;
+using Discord.WebSocket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,23 +12,25 @@ namespace Alderto.Web.Controllers
     [ApiController, Authorize, Route("api/user")]
     public class UserController : Controller
     {
-        private readonly DiscordRestBot _bot;
+        private readonly DiscordSocketClient _bot;
 
-        public UserController(DiscordRestBot bot)
+        public UserController(DiscordSocketClient bot)
         {
             _bot = bot;
         }
 
         [HttpGet, Route("mutual-guilds")]
-        public async Task<IActionResult> MutualGuilds()
+        public IActionResult MutualGuilds()
         {
-            var userClient = new DiscordRestUser(User.GetDiscordToken());
-            var userGuilds = await userClient.GetGuildsAsync();
-            var botGuilds = await _bot.GetGuildsAsync();
+            var user = _bot.GetUser(Convert.ToUInt64(User.FindFirst(ClaimTypes.NameIdentifier).Value));
+            var mutualGuilds = user.MutualGuilds.Select(g => new DiscordGuild
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Icon = g.IconId
+            });
             
-            var jointGuilds = userGuilds.Join(botGuilds, userGuild => userGuild.Id, botGuild => botGuild.Id, (u, b) => u);
-
-            return Content(JsonConvert.SerializeObject(jointGuilds));
+            return Content(JsonConvert.SerializeObject(mutualGuilds));
         }
     }
 }

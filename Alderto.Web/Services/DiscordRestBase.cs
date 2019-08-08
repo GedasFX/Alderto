@@ -13,9 +13,9 @@ namespace Alderto.Web.Services
             _authHeader = authHeader;
         }
 
-        public async Task<Guild[]> GetGuildsAsync()
+        public async Task<DiscordGuild[]> GetGuildsAsync()
         {
-            return await FetchAsync<Guild[]>("/users/@me/guilds");
+            return await FetchAsync<DiscordGuild[]>("/users/@me/guilds");
         }
 
         public async Task<T> FetchAsync<T>(string path, string method = "GET", string jsonData = null)

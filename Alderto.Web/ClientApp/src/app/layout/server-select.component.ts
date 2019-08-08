@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IGuild } from '../models/guild';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: '.app-server-select',
@@ -12,9 +13,13 @@ export class ServerSelectComponent implements OnInit {
 
   public serverList: IGuild[] = [];
 
-  constructor() { }
+  constructor(private readonly http : HttpClient) { }
 
-  ngOnInit() {
+  public ngOnInit() {
+    this.http.get<IGuild[]>('/api/user/mutual-guilds').subscribe((guilds: IGuild[]) => {
+      console.log(guilds[0]);
+      this.serverList = guilds;
+    });
   }
 
 }

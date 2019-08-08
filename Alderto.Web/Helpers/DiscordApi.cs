@@ -84,7 +84,7 @@ namespace Alderto.Web.Helpers
         /// <returns>True if user is confirmed to be Admin</returns>
         public static async Task<bool> VerifyAdminAsync(ulong guildId, string authHeader)
         {
-            var data = await FetchAsync<Guild[]>($"/users/@me/guilds?after={guildId - 1}&limit=1", authHeader: authHeader);
+            var data = await FetchAsync<DiscordGuild[]>($"/users/@me/guilds?after={guildId - 1}&limit=1", authHeader: authHeader);
 
             // This should only work if there is 1 and only 1 guild. Do not confirm admin rights on 0 or many guilds. Possible attack.
             var guild = data?.SingleOrDefault();

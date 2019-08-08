@@ -1,8 +1,7 @@
 export interface IGuild {
+  icon: string;
   id: number;
-  username: string;
-  discriminator: string;
-  avatar: string;
-  flags: number;
-  premium_type: number;
+  name: string;
+  owner: boolean;
+  permissions: number;
 }

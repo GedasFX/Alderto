@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { AccountService, DiscordService } from '../services';
-import { IDiscordUser } from '../models/discord_user';
+import { IUser } from '../models/user';
 
 @Component({
   selector: 'app-account',
@@ -18,7 +18,7 @@ export class AccountComponent implements OnInit {
     this.loggedIn = this.account.isLoggedIn();
 
     if (this.loggedIn) {
-      this.discordService.getUser().subscribe((dUser: IDiscordUser) => {
+      this.discordService.getUser().subscribe((dUser: IUser) => {
         this.userImg = `https://cdn.discordapp.com/avatars/${dUser.id}/${dUser.avatar}.jpg?size=64`;
       });
     }

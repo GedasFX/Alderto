@@ -3,13 +3,6 @@
     {{ currentServerName }} <span class="caret"></span>
   </a>
   <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-    <li *ngFor="let server of serverList" role="menuitem"><a class="dropdown-item" href="#">{{ server }}</a></li>>
-    <li role="menuitem"><a class="dropdown-item" href="#">Action</a></li>
-    <li role="menuitem"><a class="dropdown-item" href="#">Another action</a></li>
-    <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
-    <li class="divider dropdown-divider"></li>
-    <li role="menuitem">
-      <a class="dropdown-item" href="#">Separated link</a>
-    </li>
+    <li *ngFor="let server of serverList" role="menuitem"><a class="dropdown-item">{{ server.name }}</a></li>
   </ul>
 </div>
