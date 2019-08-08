@@ -13,12 +13,12 @@ namespace Alderto.Bot.Modules
     public class UserManagementModule : ModuleBase<SocketCommandContext>
     {
         private readonly IGuildMemberManager _guildMemberManager;
-        private readonly IGuildPreferencesManager _guildPreferencesManager;
+        private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-        public UserManagementModule(IGuildMemberManager guildMemberManager, IGuildPreferencesManager guildPreferencesManager)
+        public UserManagementModule(IGuildMemberManager guildMemberManager, IGuildPreferencesProvider guildPreferencesProvider)
         {
             _guildMemberManager = guildMemberManager;
-            _guildPreferencesManager = guildPreferencesManager;
+            _guildPreferencesProvider = guildPreferencesProvider;
         }
 
         [Command("Accept")]
@@ -28,7 +28,7 @@ namespace Alderto.Bot.Modules
             [Summary("User")] IGuildUser user,
             [Remainder] [Summary("Nickname. Does not change nickname if none was specified.")] string nickname = null)
         {
-            var pref = await _guildPreferencesManager.GetPreferencesAsync(user.GuildId);
+            var pref = await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId);
 
             try
             {

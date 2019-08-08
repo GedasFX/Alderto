@@ -11,10 +11,12 @@ namespace Alderto.Bot.Modules
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
         private readonly IGuildMemberManager _guildMemberManager;
-        private readonly IGuildPreferencesManager _guildPreferences;
+        private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
 
-        public CurrencyModule(IGuildMemberManager guildMemberManager, IGuildPreferencesManager guildPreferences, ICurrencyManager currencyManager)
+        public CurrencyModule(IGuildMemberManager guildMemberManager, 
+            IGuildPreferencesProvider guildPreferences,
+            ICurrencyManager currencyManager)
         {
             _guildMemberManager = guildMemberManager;
             _guildPreferences = guildPreferences;

@@ -31,7 +31,9 @@ namespace Alderto.Web
             // === <General> ===
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
-                options.UseSqlServer(Configuration["DbConnectionString"]));
+                {
+                    options.UseSqlServer(Configuration["DbConnectionString"]);
+                });
 
             // Add database accessors.
             services.AddBotManagers();
@@ -94,7 +96,7 @@ namespace Alderto.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
             // Start the bot.
-            _ = cmdHandler.StartAsync();
+            cmdHandler.StartAsync().Wait();
 
             if (env.IsDevelopment())
             {

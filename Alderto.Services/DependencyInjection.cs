@@ -16,7 +16,7 @@ namespace Alderto.Services
                 .AddScoped<IGuildMemberManager, GuildMemberManager>()
 
                 // Add providers for various bot activities
-                .AddScoped<IGuildPreferencesManager, GuildPreferencesManager>()
+                .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
                 .AddScoped<ICurrencyManager, CurrencyManager>()
                 .AddScoped<IGuildBankManager, GuildBankManager>();
 

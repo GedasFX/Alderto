@@ -15,13 +15,13 @@ namespace Alderto.Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly IGuildPreferencesManager _guildPreferences;
+        private readonly IGuildPreferencesProvider _guildPreferences;
 
         public CommandHandler(
             DiscordSocketClient client,
             CommandService commands,
             IServiceProvider services,
-            IGuildPreferencesManager guildPreferences)
+            IGuildPreferencesProvider guildPreferences)
         {
             _client = client;
             _commands = commands;
@@ -50,9 +50,13 @@ namespace Alderto.Bot.Services
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
+            using (var scope = _services.CreateScope())
+            {
+                await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
+            }
+            
         }
-
+        
         public async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
