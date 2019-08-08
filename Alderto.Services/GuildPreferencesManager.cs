@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
@@ -9,12 +8,10 @@ namespace Alderto.Services
     public class GuildPreferencesManager : IGuildPreferencesManager
     {
         private readonly IAldertoDbContext _context;
-        private readonly Dictionary<ulong, GuildConfiguration> _preferences;
 
         public GuildPreferencesManager(IAldertoDbContext context)
         {
             _context = context;
-            _preferences = new Dictionary<ulong, GuildConfiguration>();
         }
 
         /// <summary>
@@ -24,17 +21,8 @@ namespace Alderto.Services
         /// <returns>Guild's specific (or default) preferences.</returns>
         public async Task<GuildConfiguration> GetPreferencesAsync(ulong guildId)
         {
-            // Try getting cached configuration
-            if (_preferences.TryGetValue(guildId, out var cfg))
-                return cfg;
-
-            // Config does not exist in the cache. Check database. If does not exist in db - use defaults.
-            cfg = await _context.GuildPreferences.FindAsync(guildId) ?? GuildConfiguration.DefaultConfiguration;
-
-            // Add configuration to the cache. If adding default configuration, property GuildId equals 0.
-            _preferences.Add(guildId, cfg);
-
-            return cfg;
+            // Check database for preferences. If they do not exist - use defaults.
+            return await _context.GuildPreferences.FindAsync(guildId) ?? GuildConfiguration.DefaultConfiguration;
         }
 
         public async Task UpdatePreferencesAsync(ulong guildId, Action<GuildConfiguration> changes)
