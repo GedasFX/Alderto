@@ -96,7 +96,7 @@ namespace Alderto.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
             // Start the bot.
-            cmdHandler.StartAsync().Wait();
+            _ = cmdHandler.StartAsync();
 
             if (env.IsDevelopment())
             {
