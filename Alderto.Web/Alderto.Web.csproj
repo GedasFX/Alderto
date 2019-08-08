@@ -20,25 +20,15 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
-    <Compile Remove="Areas\**" />
-    <Compile Remove="ReferenceApp\**" />
     <Content Remove="$(SpaRoot)**" />
-    <Content Remove="Areas\**" />
-    <Content Remove="ReferenceApp\**" />
+    <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="Areas\**" />
-    <EmbeddedResource Remove="ReferenceApp\**" />
-    <None Remove="Areas\**" />
-    <None Remove="ReferenceApp\**" />
+    <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-  
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
@@ -12,13 +12,13 @@ namespace Alderto.Bot.Modules
     [RequireRole("Admin")]
     public class UserManagementModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IGuildUserManager _guildUserManager;
-        private readonly IGuildPreferencesManager _guildPreferencesManager;
+        private readonly IGuildMemberManager _guildMemberManager;
+        private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-        public UserManagementModule(IGuildUserManager guildUserManager, IGuildPreferencesManager guildPreferencesManager)
+        public UserManagementModule(IGuildMemberManager guildMemberManager, IGuildPreferencesProvider guildPreferencesProvider)
         {
-            _guildUserManager = guildUserManager;
-            _guildPreferencesManager = guildPreferencesManager;
+            _guildMemberManager = guildMemberManager;
+            _guildPreferencesProvider = guildPreferencesProvider;
         }
 
         [Command("Accept")]
@@ -28,11 +28,11 @@ namespace Alderto.Bot.Modules
             [Summary("User")] IGuildUser user,
             [Remainder] [Summary("Nickname. Does not change nickname if none was specified.")] string nickname = null)
         {
-            var pref = await _guildPreferencesManager.GetPreferencesAsync(user.GuildId);
+            var pref = await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId);
 
             try
             {
-                await _guildUserManager.AcceptMemberAsync(user, nickname,
+                await _guildMemberManager.AcceptMemberAsync(user, nickname,
                     Context.Guild.Roles.SingleOrDefault(r => r.Id == pref.AcceptedMemberRoleId));
             }
             catch (HttpException)

@@ -1,26 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AccountService, DiscordService } from '../services';
-import { DiscordUser } from '../models/discord_user';
+import { IUser } from '../models/user';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
 })
-export class AccountComponent {
-  private readonly loggedIn: boolean;
-  private userImg: string = "";
+export class AccountComponent implements OnInit {
 
-  constructor(private readonly account: AccountService, private readonly discordService: DiscordService) {
-    this.loggedIn = account.isLoggedIn();
+  constructor(
+    private readonly account: AccountService,
+    private readonly discordService: DiscordService) { }
+
+  public ngOnInit() {
+    this.loggedIn = this.account.isLoggedIn();
 
     if (this.loggedIn) {
-      this.discordService.getUser().subscribe((dUser: DiscordUser) => {
+      this.discordService.getUser().subscribe((dUser: IUser) => {
         this.userImg = `https://cdn.discordapp.com/avatars/${dUser.id}/${dUser.avatar}.jpg?size=64`;
       });
     }
   }
+
+  public loggedIn: boolean;
+  public userImg: string = "/assets/img/unknown.svg";
 
   public loginDiscord() {
     this.account.loginDiscord().subscribe((u: any) => {

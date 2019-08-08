@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Alderto.Data.Models;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
-    public interface IGuildPreferencesManager
+    public interface IGuildPreferencesProvider
     {
         /// <summary>
         /// Gets the guild's preferences. Can never be null.
@@ -19,12 +19,5 @@ namespace Alderto.Bot.Services
         /// <param name="guildId">Discord guild id.</param>
         /// <param name="changes">Changes to apply to the config.</param>
         Task UpdatePreferencesAsync(ulong guildId, Action<GuildConfiguration> changes);
-
-        /// <summary>
-        /// Updates the guild preferences. to the given model.
-        /// </summary>
-        /// <param name="guildId">Discord guild id.</param>
-        /// <param name="configuration">Configuration to set in store and cache.</param>
-        Task UpdatePreferencesAsync(ulong guildId, GuildConfiguration configuration);
     }
 }

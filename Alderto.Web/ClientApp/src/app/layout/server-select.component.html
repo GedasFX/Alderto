@@ -1,0 +1,8 @@
+<div class="btn-group" dropdown>
+  <a dropdownToggle class="btn dropdown-toggle">
+    {{ currentServerName }} <span class="caret"></span>
+  </a>
+  <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+    <li *ngFor="let server of serverList" role="menuitem"><a class="dropdown-item" [routerLink]="['/', server.id]">{{ server.name }}</a></li>
+  </ul>
+</div>

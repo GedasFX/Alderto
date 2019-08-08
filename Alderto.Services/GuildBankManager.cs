@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
     public class GuildBankManager : IGuildBankManager
     {

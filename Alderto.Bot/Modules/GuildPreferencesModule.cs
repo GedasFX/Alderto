@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 
@@ -15,18 +15,18 @@ namespace Alderto.Bot.Modules
         [Group, Alias("Get")]
         public class GetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesManager _guildPreferencesManager;
+            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-            public GetPreferenceModule(IGuildPreferencesManager guildPreferencesManager)
+            public GetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
             {
-                _guildPreferencesManager = guildPreferencesManager;
+                _guildPreferencesProvider = guildPreferencesProvider;
             }
 
             [Command("Prefix")]
             [Summary("Gets the guild's set prefix.")]
             public async Task Prefix()
             {
-                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Prefix: **{pref.Prefix}**");
             }
 
@@ -34,7 +34,7 @@ namespace Alderto.Bot.Modules
             [Summary("Gets the guild's set currency symbol.")]
             public async Task CurrencySymbol()
             {
-                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Currency Symbol: **{pref.CurrencySymbol}**");
             }
 
@@ -42,7 +42,7 @@ namespace Alderto.Bot.Modules
             [Summary("Gets the guild's set timely cooldown.")]
             public async Task TimelyCooldown()
             {
-                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Timely Cooldown: **{TimeSpan.FromSeconds(pref.TimelyCooldown)}**");
             }
 
@@ -50,7 +50,7 @@ namespace Alderto.Bot.Modules
             [Summary("Gets the guild's set timely reward quantity.")]
             public async Task TimelyRewardQuantity()
             {
-                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync($"Timely Reward Quantity: **{pref.TimelyRewardQuantity}**");
             }
 
@@ -58,7 +58,7 @@ namespace Alderto.Bot.Modules
             [Summary("Gets the guild's set default accepted role.")]
             public async Task AcceptedRole()
             {
-                var pref = await _guildPreferencesManager.GetPreferencesAsync(Context.Guild.Id);
+                var pref = await _guildPreferencesProvider.GetPreferencesAsync(Context.Guild.Id);
                 await this.ReplySuccessEmbedAsync(
                     $"Accepted role: **ID: {pref.AcceptedMemberRoleId}, Name: {Context.Guild.Roles.SingleOrDefault(r => r.Id == pref.AcceptedMemberRoleId)?.Name}**");
             }
@@ -67,11 +67,11 @@ namespace Alderto.Bot.Modules
         [Group("Set")]
         public class SetPreferenceModule : ModuleBase<SocketCommandContext>
         {
-            private readonly IGuildPreferencesManager _guildPreferencesManager;
+            private readonly IGuildPreferencesProvider _guildPreferencesProvider;
 
-            public SetPreferenceModule(IGuildPreferencesManager guildPreferencesManager)
+            public SetPreferenceModule(IGuildPreferencesProvider guildPreferencesProvider)
             {
-                _guildPreferencesManager = guildPreferencesManager;
+                _guildPreferencesProvider = guildPreferencesProvider;
             }
 
             [Command("Prefix")]
@@ -79,7 +79,7 @@ namespace Alderto.Bot.Modules
             public async Task Prefix(
                 [Summary("Prefix.")] string prefix)
             {
-                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, pref => pref.Prefix = prefix);
+                await _guildPreferencesProvider.UpdatePreferencesAsync(Context.Guild.Id, pref => pref.Prefix = prefix);
                 await this.ReplySuccessEmbedAsync($"Prefix was changed to: **{prefix}**");
             }
 
@@ -88,7 +88,7 @@ namespace Alderto.Bot.Modules
             public async Task CurrencySymbol(
                 [Summary("Currency Symbol")] string currencySymbol)
             {
-                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.CurrencySymbol = currencySymbol);
+                await _guildPreferencesProvider.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.CurrencySymbol = currencySymbol);
                 await this.ReplySuccessEmbedAsync($"Currency Symbol was changed to: **{currencySymbol}**");
             }
 
@@ -97,7 +97,7 @@ namespace Alderto.Bot.Modules
             public async Task TimelyCooldown(
                 [Summary("Timely Cooldown (in seconds)")] int cooldown)
             {
-                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyCooldown = cooldown);
+                await _guildPreferencesProvider.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyCooldown = cooldown);
                 await this.ReplySuccessEmbedAsync($"Timely Cooldown was changed to: **{TimeSpan.FromSeconds(cooldown)}**");
             }
 
@@ -106,7 +106,7 @@ namespace Alderto.Bot.Modules
             public async Task TimelyRewardQuantity(
                 [Summary("Timely Reward Quantity")] int quantity)
             {
-                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyRewardQuantity = quantity);
+                await _guildPreferencesProvider.UpdatePreferencesAsync(Context.Guild.Id, configuration => configuration.TimelyRewardQuantity = quantity);
                 await this.ReplySuccessEmbedAsync($"Timely Reward Quantity was changed to: **{quantity}**");
             }
 
@@ -137,7 +137,7 @@ namespace Alderto.Bot.Modules
                 // No ambiguity detected. Continue.
                 var role = roles[0];
 
-                await _guildPreferencesManager.UpdatePreferencesAsync(Context.Guild.Id,
+                await _guildPreferencesProvider.UpdatePreferencesAsync(Context.Guild.Id,
                     configuration => configuration.AcceptedMemberRoleId = role.Id);
                 await this.ReplySuccessEmbedAsync(
                     $"Accepted role was changed to: **ID: {role.Id}, Name: {role.Name}**");

@@ -1,8 +1,24 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { User } from '../models/user';
 import * as jwt_decode from 'jwt-decode';
+
+export class User {
+  public id: number;
+  public token: string;
+  public discordToken: string;
+
+  public username: string;
+  public role: string;
+
+  constructor(id?: number, token?: string, discordToken?: string, username?: string, role?: string) {
+    this.id = id;
+    this.token = token;
+    this.discordToken = discordToken;
+    this.username = username;
+    this.role = role;
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +44,7 @@ export class AccountService {
 
     try {
       const decodedJwt = jwt_decode(message.data);
-      const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord_token, decodedJwt.unique_name, decodedJwt.role);
+      const user = new User(decodedJwt.nameid, message.data, decodedJwt.discord, decodedJwt.unique_name, decodedJwt.role);
 
       this.userSubject.next(user);
       localStorage.setItem('user', JSON.stringify(user));

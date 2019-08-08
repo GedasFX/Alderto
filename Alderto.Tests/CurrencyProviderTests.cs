@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Alderto.Bot.Services;
 using Alderto.Data;
+using Alderto.Services;
 using Alderto.Tests.MockedEntities;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -11,20 +11,20 @@ namespace Alderto.Tests
     {
         private readonly ICurrencyManager _manager;
         private readonly IAldertoDbContext _context;
-        private readonly GuildUserManager _guildUserManager;
+        private readonly GuildMemberManager _guildMemberManager;
 
         public CurrencyProviderTests()
         {
             _context = new MockDbContext();
             _manager = new CurrencyManager(_context);
-            _guildUserManager = new GuildUserManager(_context);
+            _guildMemberManager = new GuildMemberManager(_context);
         }
 
         [Fact]
         public async Task Give()
         {
             var user = Dummies.Alice;
-            await _manager.ModifyPointsAsync(await _guildUserManager.GetGuildMemberAsync(user.GuildId, user.Id), deltaPoints: 20);
+            await _manager.ModifyPointsAsync(await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id), deltaPoints: 20);
             var dbUser = await _context.GuildMembers.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
 
             Assert.Equal(expected: 20, dbUser.CurrencyCount);
@@ -34,7 +34,7 @@ namespace Alderto.Tests
         public async Task Timely()
         {
             var user = Dummies.Alice;
-            var member = await _guildUserManager.GetGuildMemberAsync(user);
+            var member = await _guildMemberManager.GetGuildMemberAsync(user);
             
             // At the start, the currency count should be 0.
             Assert.Equal(expected: 0, member.CurrencyCount);

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Bot.Services;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 
@@ -11,11 +11,11 @@ namespace Alderto.Bot.Modules
     [Group("Recruitment"), Alias("Recruit", "Recruited", "Rec")]
     public class RecruitmentModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IGuildUserManager _guildUserManager;
+        private readonly IGuildMemberManager _guildMemberManager;
 
-        public RecruitmentModule(IGuildUserManager guildUserManager)
+        public RecruitmentModule(IGuildMemberManager guildMemberManager)
         {
-            _guildUserManager = guildUserManager;
+            _guildMemberManager = guildMemberManager;
         }
 
         [Command("Recruited"), Alias("Add")]
@@ -28,8 +28,8 @@ namespace Alderto.Bot.Modules
             var recruiterId = recruiter.Id;
             foreach (var member in recruited)
             {
-                var dbUser = await _guildUserManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
-                await _guildUserManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.UtcNow);
+                var dbUser = await _guildMemberManager.GetGuildMemberAsync(recruiter.GuildId, member.Id);
+                await _guildMemberManager.AddRecruitAsync(dbUser, recruiterId, DateTimeOffset.UtcNow);
             }
 
             await this.ReplySuccessEmbedAsync($"Successfully registered {recruited.Length} user(s) as recruits of {recruiter.Mention}.");
@@ -43,7 +43,7 @@ namespace Alderto.Bot.Modules
             if (user == null)
                 user = (IGuildUser)Context.User;
 
-            var recruits = _guildUserManager.ListRecruitsAsync(await _guildUserManager.GetGuildMemberAsync(user));
+            var recruits = _guildMemberManager.ListRecruitsAsync(await _guildMemberManager.GetGuildMemberAsync(user));
 
             await this.ReplyEmbedAsync(extra: builder =>
             {
@@ -64,14 +64,14 @@ namespace Alderto.Bot.Modules
             if (member == null)
                 member = (IGuildUser)Context.User;
 
-            var dbMember = await _guildUserManager.GetGuildMemberAsync(member.GuildId, member.Id);
+            var dbMember = await _guildMemberManager.GetGuildMemberAsync(member.GuildId, member.Id);
             if (dbMember?.RecruiterMemberId == null)
             {
                 await this.ReplyEmbedAsync($"{member.Mention} was not recruited by anyone.");
                 return;
             }
 
-            var recruiter = await _guildUserManager.GetGuildMemberAsync(member.GuildId, (ulong)dbMember.RecruiterMemberId);
+            var recruiter = await _guildMemberManager.GetGuildMemberAsync(member.GuildId, (ulong)dbMember.RecruiterMemberId);
             await this.ReplyEmbedAsync($"{member.Mention} was recruited by <@{recruiter.MemberId}>.");
         }
     }

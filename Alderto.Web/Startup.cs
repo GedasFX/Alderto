@@ -1,8 +1,15 @@
 using System;
+using Alderto.Bot;
+using Alderto.Bot.Services;
+using Alderto.Data;
+using Alderto.Services;
+using Discord;
+using Discord.Commands;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -21,6 +28,17 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // === <General> ===
+            // Add database.
+            services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+                {
+                    options.UseSqlServer(Configuration["DbConnectionString"]);
+                });
+
+            // Add database accessors.
+            services.AddBotManagers();
+
+            // === <Web> ===
             // Use discord as authentication service.
             services
                 .AddAuthentication(options =>
@@ -34,6 +52,8 @@ namespace Alderto.Web
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
                     options.SaveTokens = true;
+
+                    options.Scope.Add("guilds");
                 })
                 .AddJwtBearer(options =>
                 {
@@ -56,12 +76,28 @@ namespace Alderto.Web
             services.AddMvc();
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
+
+            // === <Bot> ===
+            // Add discord socket client
+            services.AddDiscordSocketClient(Configuration["DiscordApp:BotToken"],
+                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
+
+            // Add command handling services
+            services.AddCommandService(serviceConfig =>
+            {
+                serviceConfig.DefaultRunMode = RunMode.Sync;
+                serviceConfig.IgnoreExtraArgs = true;
+            });
+            services.AddCommandHandler();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
+            // Start the bot.
+            _ = cmdHandler.StartAsync();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -73,7 +109,8 @@ namespace Alderto.Web
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
             app.UseSpaStaticFiles();
 
             app.UseAuthentication();
@@ -90,15 +127,9 @@ namespace Alderto.Web
 
             app.UseSpa(spa =>
             {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
                 if (env.IsDevelopment())
                 {
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
-                    //spa.UseAngularCliServer("start");
                 }
             });
         }

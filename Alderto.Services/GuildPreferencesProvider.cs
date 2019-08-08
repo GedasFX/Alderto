@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
-    public class GuildPreferencesManager : IGuildPreferencesManager
+    public class GuildPreferencesProvider : IGuildPreferencesProvider
     {
-        private readonly IAldertoDbContext _context;
+        private readonly IServiceProvider _services;
         private readonly Dictionary<ulong, GuildConfiguration> _preferences;
 
-        public GuildPreferencesManager(IAldertoDbContext context)
+        public GuildPreferencesProvider(IServiceProvider services)
         {
-            _context = context;
+            _services = services;
             _preferences = new Dictionary<ulong, GuildConfiguration>();
         }
 
@@ -29,7 +30,11 @@ namespace Alderto.Bot.Services
                 return cfg;
 
             // Config does not exist in the cache. Check database. If does not exist in db - use defaults.
-            cfg = await _context.GuildPreferences.FindAsync(guildId) ?? GuildConfiguration.DefaultConfiguration;
+            using (var scope = _services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetService<IAldertoDbContext>();
+                cfg = await context.GuildPreferences.FindAsync(guildId) ?? GuildConfiguration.DefaultConfiguration;
+            }
 
             // Add configuration to the cache. If adding default configuration, property GuildId equals 0.
             _preferences.Add(guildId, cfg);
@@ -42,33 +47,33 @@ namespace Alderto.Bot.Services
             // First get the preferences.
             var config = await GetPreferencesAsync(guildId);
 
-            // Apply changes.
+            // If config.GuildId == 0, then it means that the guild uses default preferences.
+            // Default preferences [id == 0] are applied only when the GetPreferencesAsync() cannot find them in database.
+            var guildPreferencesPresentInDatabase = config.GuildId > 0;
+
+            // Apply changes to Object.
             changes(config);
 
             // Continue with the the update
-            await UpdatePreferencesAsync(guildId, config);
-        }
-
-        public async Task UpdatePreferencesAsync(ulong guildId, GuildConfiguration configuration)
-        {
-            // If config.GuildId == 0, then it means that the guild uses default preferences.
-            // Default preferences are only applied, when the GetPreferencesAsync() cannot find them in database.
-            var guildPreferencesPresentInDatabase = configuration.GuildId > 0;
-
+            
             // Ensure the correct guild Id is applied.
-            configuration.GuildId = guildId;
+            config.GuildId = guildId;
 
             // Then update the database.
-            if (guildPreferencesPresentInDatabase)
+            using (var scope = _services.CreateScope())
             {
-                _context.GuildPreferences.Update(configuration);
-            }
-            else
-            {
-                await _context.GuildPreferences.AddAsync(configuration);
-            }
+                var context = scope.ServiceProvider.GetService<IAldertoDbContext>();
+                if (guildPreferencesPresentInDatabase)
+                {
+                    context.GuildPreferences.Update(config);
+                }
+                else
+                {
+                    await context.GuildPreferences.AddAsync(config);
+                }
 
-            await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

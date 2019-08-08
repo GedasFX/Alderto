@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
-using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
-    public class GuildUserManager : IGuildUserManager
+    public class GuildMemberManager : IGuildMemberManager
     {
         private readonly IAldertoDbContext _context;
 
-        public GuildUserManager(IAldertoDbContext context)
+        public GuildMemberManager(IAldertoDbContext context)
         {
             _context = context;
         }
@@ -106,7 +105,6 @@ namespace Alderto.Bot.Services
             {
                 await AddRecruitAsync(await GetGuildMemberAsync(user), recruiterId, DateTimeOffset.UtcNow);
             }
-
         }
     }
 }

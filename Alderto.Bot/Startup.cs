@@ -3,9 +3,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Alderto.Data;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,76 +15,46 @@ namespace Alderto.Bot
 {
     public class Startup
     {
-        private readonly DiscordSocketClient _client;
-        private readonly IConfiguration _config;
-        private readonly CommandService _commandService;
-
-        public Startup()
-        {
-            _config = BuildConfig();
-            _commandService = new CommandService(new CommandServiceConfig
-            {
-                DefaultRunMode = RunMode.Async,
-                IgnoreExtraArgs = true
-            });
-
-            _client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = LogSeverity.Debug
-            });
-        }
-
-        public IServiceProvider ConfigureServices() => new ServiceCollection()
+        public IServiceProvider ConfigureServices(IConfiguration config) => new ServiceCollection()
             // Add database
-            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder => 
-                builder.UseSqlServer(_config["DbConnectionString"]))
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder =>
+                builder.UseSqlServer(config["DbConnectionString"]))
 
             // Add discord socket client
-            .AddSingleton(_client)
-
-            // Add User provider
-            .AddSingleton<IGuildUserManager, GuildUserManager>()
+            .AddDiscordSocketClient(config["DiscordApp:BotToken"],
+                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; })
 
             // Add command handling services
-            .AddSingleton(_commandService)
-            .AddSingleton<ICommandHandler, CommandHandler>()
-
-            // Add providers for various bot activities
-            .AddSingleton<IGuildPreferencesManager, GuildPreferencesManager>()
-            .AddSingleton<ICurrencyManager, CurrencyManager>()
-            .AddSingleton<IGuildBankManager, GuildBankManager>()
-
-            // Add Lua command handler
-            .AddSingleton<Lua.ICustomCommandProvider, Lua.CustomCommandProvider>()
-
-            // Add logger service
-            .AddLogging(lb =>
+            .AddCommandService(serviceConfig =>
             {
-                lb.AddConsole();
+                serviceConfig.DefaultRunMode = RunMode.Sync;
+                serviceConfig.IgnoreExtraArgs = true;
             })
-            .AddSingleton<Services.ILogger, Logger>()
+            .AddCommandHandler()
+
+            // Add managers for various bot modules.
+            .AddBotManagers()
+            
+            // Add logger service
+            .AddLogging(lb => { lb.AddConsole(); })
 
             // Add configuration
-            .AddSingleton(_config)
+            .AddSingleton(config)
 
             // Build
             .BuildServiceProvider();
 
         public async Task RunAsync()
         {
-            var services = ConfigureServices();
+            var config = BuildConfig();
+            var services = ConfigureServices(config);
 
-            // Enable logging
-            await services.GetService<Services.ILogger>().InstallLogger();
+            // Effectively start the bot.
+            // Initializes all of the necessary singleton services from the the IServiceProvider.
+            // There has to be a better way to do this, but this does the job well enough.
+            await services.GetService<CommandHandler>().StartAsync();
 
-            // Start bot
-            await _client.LoginAsync(TokenType.Bot, _config["DiscordApp:BotToken"]);
-            await _client.StartAsync();
-
-            // Install Command handler
-            await services.GetRequiredService<ICommandHandler>().InstallCommandsAsync();
-
-            // Lock main thread to run indefinitely
+            // Lock main thread to run indefinitely.
             await Task.Delay(-1);
         }
 

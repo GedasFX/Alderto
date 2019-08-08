@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Data.Models;
 
-namespace Alderto.Bot.Services
+namespace Alderto.Services
 {
     public interface IGuildBankManager
     {
