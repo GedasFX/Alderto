@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services
 {
@@ -106,14 +105,6 @@ namespace Alderto.Services
             {
                 await AddRecruitAsync(await GetGuildMemberAsync(user), recruiterId, DateTimeOffset.UtcNow);
             }
-        }
-
-        public IEnumerable<Guild> ListUserGuilds(ulong userId)
-        {
-            return _context.GuildMembers
-                .Include(gm => gm.Guild)
-                .Where(gm => gm.MemberId == userId)
-                .Select(m => m.Guild);
         }
     }
 }

@@ -52,8 +52,6 @@ namespace Alderto.Web
                     options.ClientId = Configuration["DiscordApp:ClientId"];
                     options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
                     options.SaveTokens = true;
-
-                    options.Scope.Add("guilds");
                 })
                 .AddJwtBearer(options =>
                 {

@@ -56,24 +56,22 @@ namespace Alderto.Web.Helpers
         {
             var request = await CreateRequestAsync(path, method, authHeader, jsonData);
 
-            WebResponse response;
             try
             {
-                response = await request.GetResponseAsync();
+                using (var response = await request.GetResponseAsync())
+                {
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    using (var stream = new StreamReader(response.GetResponseStream()))
+                    {
+                        return JsonConvert.DeserializeObject<T>(await stream.ReadToEndAsync());
+                    }
+                }
+                
             }
             catch (Exception)
             {
                 return default;
             }
-
-            string output;
-            // ReSharper disable once AssignNullToNotNullAttribute
-            using (var stream = new StreamReader(response.GetResponseStream()))
-            {
-                output = await stream.ReadToEndAsync();
-            }
-
-            return JsonConvert.DeserializeObject<T>(output);
         }
 
         /// <summary>

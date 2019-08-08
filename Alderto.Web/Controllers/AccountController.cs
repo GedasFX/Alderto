@@ -27,7 +27,7 @@ namespace Alderto.Web.Controllers
             _configuration = configuration;
         }
 
-        [Route("login")]
+        [HttpGet, Route("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Login()
         {
@@ -40,7 +40,6 @@ namespace Alderto.Web.Controllers
 
             // Add claims to the JWT.
             var userClaims = authResult.Principal.Claims.ToList();
-            userClaims.Add(new Claim(ClaimTypes.Role, "User"));
             userClaims.Add(new Claim("discord", authResult.Properties.Items[".Token.access_token"]));
 
             // Create the token.

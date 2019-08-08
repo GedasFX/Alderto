@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app.routing';
-import { AppComponent, AccountComponent, LoginComponent, ServerSelectComponent } from './layout';
+import { AppComponent, AccountComponent, ServerSelectComponent } from './layout';
 
 import { AppHeaderModule, AppSidebarModule, AppFooterModule, AppBreadcrumbModule } from '@coreui/angular';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
@@ -15,7 +15,6 @@ import { P404Component } from './views/error/404.component';
     AppComponent,
     AccountComponent,
     P404Component,
-    LoginComponent,
     ServerSelectComponent
   ],
   imports: [
