@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Bot.Services
 {
-    public class CommandHandler : ICommandHandler
+    public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
@@ -27,9 +27,11 @@ namespace Alderto.Bot.Services
             _commands = commands;
             _services = services;
             _guildPreferences = guildPreferences;
+
+            _ = InstallCommandsAsync();
         }
 
-        public async Task InstallCommandsAsync()
+        private async Task InstallCommandsAsync()
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;

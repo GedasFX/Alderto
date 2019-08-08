@@ -5,7 +5,6 @@ using Alderto.Bot.Services;
 using Alderto.Data;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,25 +20,22 @@ namespace Alderto.Bot
                 builder.UseSqlServer(config["DbConnectionString"]))
 
             // Add discord socket client
-            .AddDiscordClient(LogSeverity.Debug)
+            .AddDiscordSocketClient(config["DiscordApp:BotToken"],
+                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; })
 
             // Add command handling services
-            .AddCommandService(RunMode.Sync, ignoreExtraArgs: true)
+            .AddCommandService(serviceConfig =>
+            {
+                serviceConfig.DefaultRunMode = RunMode.Sync;
+                serviceConfig.IgnoreExtraArgs = true;
+            })
             .AddCommandHandler()
 
             // Add managers for various bot modules.
             .AddBotManagers()
-
-            // Add Lua command provider.
-            // TODO: Decide if the bot should enable this.
-            .AddLuaCommandHandler()
-
+            
             // Add logger service
-            .AddLogging(lb =>
-            {
-                lb.AddConsole();
-            })
-            .AddSingleton<Services.ILogger, Logger>()
+            .AddLogging(lb => { lb.AddConsole(); })
 
             // Add configuration
             .AddSingleton(config)
@@ -52,19 +48,12 @@ namespace Alderto.Bot
             var config = BuildConfig();
             var services = ConfigureServices(config);
 
-            // Enable logging
-            await services.GetService<Services.ILogger>().InstallLogger();
+            // Effectively start the bot.
+            // Initializes all of the necessary singleton services from the the IServiceProvider.
+            // There has to be a better way to do this, but this does the job well enough.
+            services.GetService<CommandHandler>();
 
-            var client = services.GetService<DiscordSocketClient>();
-
-            // Start bot
-            await client.LoginAsync(TokenType.Bot, config["DiscordApp:BotToken"]);
-            await client.StartAsync();
-
-            // Install Command handler
-            await services.GetRequiredService<ICommandHandler>().InstallCommandsAsync();
-
-            // Lock main thread to run indefinitely
+            // Lock main thread to run indefinitely.
             await Task.Delay(-1);
         }
 
