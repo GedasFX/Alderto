@@ -12,13 +12,20 @@ export class ServerSelectComponent implements OnInit {
   public currentServerIcon = "/assets/img/unknown.svg";
   public currentServerName = "Please select a server";
 
-  public serverList: IGuild[] = [];
+  public userGuilds: IGuild[];
+  public mutualGuilds: IGuild[];
 
-  constructor(private readonly http: HttpClient, private readonly discord: DiscordService) { }
+  constructor(
+    private readonly http: HttpClient,
+    private readonly discord: DiscordService) { }
 
   public ngOnInit() {
-    this.http.get<IGuild[]>('/api/user/mutual-guilds').subscribe((guilds: IGuild[]) => {
-      this.serverList = guilds;
+    this.discord.fetchGuilds().subscribe((guilds: IGuild[]) => {
+      this.userGuilds = guilds;
+
+      this.http.post<IGuild[]>('/api/user/guilds', guilds).subscribe((mutualGuilds: IGuild[]) => {
+        this.mutualGuilds = mutualGuilds;
+      });
     });
   }
 
