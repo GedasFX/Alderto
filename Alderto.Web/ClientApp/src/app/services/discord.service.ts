@@ -10,7 +10,10 @@ export class DiscordService {
 
   constructor(private readonly http: HttpClient) { }
 
-  public getUser(): Observable<IUser> {
-    return this.http.get<IUser>(`https://discordapp.com/api/users/@me`);
+  public fetchUser(userId?: number): Observable<IUser> {
+    if (userId == null) {
+      return this.http.get<IUser>('https://discordapp.com/api/users/@me');
+    }
+    this.http.get<IUser>(`https://discordapp.com/api/users/${userId}`);
   }
 }

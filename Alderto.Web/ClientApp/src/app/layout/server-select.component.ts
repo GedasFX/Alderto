@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IGuild } from '../models/guild';
 import { HttpClient } from '@angular/common/http';
+import { DiscordService } from '../services/discord.service';
 
 @Component({
   selector: '.app-server-select',
@@ -13,7 +14,7 @@ export class ServerSelectComponent implements OnInit {
 
   public serverList: IGuild[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient, private readonly discord: DiscordService) { }
 
   public ngOnInit() {
     this.http.get<IGuild[]>('/api/user/mutual-guilds').subscribe((guilds: IGuild[]) => {
