@@ -19,17 +19,7 @@
   <app-account class="nav navbar-nav ml-auto"></app-account>
 </app-header>
 <div class="app-body">
-  <app-sidebar [fixed]="true" [display]="'lg'">
-    <app-sidebar-nav [navItems]="navItems"></app-sidebar-nav>
-    <app-sidebar-minimizer></app-sidebar-minimizer>
-  </app-sidebar>
-
-  <main class="main">
-    <cui-breadcrumb></cui-breadcrumb>
-    <div class="container-fluid">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
+  <router-outlet></router-outlet>
 </div>
 <app-footer>
   <span><a href="/">Alderto</a> &copy; 2019 GedasFX</span>

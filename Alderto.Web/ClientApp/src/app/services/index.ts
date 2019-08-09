@@ -1,2 +1,2 @@
 export * from './account.service';
-export * from './discord.service';
+export * from './discordapi.service';

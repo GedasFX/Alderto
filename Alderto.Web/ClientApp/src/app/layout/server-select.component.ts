@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IGuild } from '../models/guild';
 import { HttpClient } from '@angular/common/http';
-import { DiscordService } from '../services/discord.service';
+import { DiscordApiService } from '../services';
 
 @Component({
   selector: '.app-server-select',
@@ -17,7 +17,7 @@ export class ServerSelectComponent implements OnInit {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly discord: DiscordService) { }
+    private readonly discord: DiscordApiService) { }
 
   public ngOnInit() {
     this.discord.fetchGuilds().subscribe((guilds: IGuild[]) => {

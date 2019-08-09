@@ -32,13 +32,39 @@ export interface INavData {
 export const navItems: INavData[] = [
   {
     name: 'Guild Bank',
-    url: '/bank',
+    url: '/guild/:id/bank',
     icon: 'fa fa-bank',
     children: [
       {
         name: 'Overview',
-        url: '/bank/overview',
-        icon: 'fa fa-bar-chart'
+        url: '/guild/:id/bank/overview',
+        icon: 'fa fa-bar-chart',
+        children: [
+          {
+            name: 'Overview',
+            url: '/guild/:id/bank/overview',
+            icon: 'fa fa-bar-chart',
+            children: [
+              {
+                name: 'Overview',
+                url: '/guild/:id/bank/overview',
+                icon: 'fa fa-bar-chart'
+              }
+            ]
+          },
+          {
+            name: 'Overview',
+            url: '/guild/:id/bank/overview',
+            icon: 'fa fa-bar-chart',
+            children: [
+              {
+                name: 'Overview',
+                url: '/guild/:id/bank/overview',
+                icon: 'fa fa-bar-chart'
+              }
+            ]
+          }
+        ]
       }
     ]
   }

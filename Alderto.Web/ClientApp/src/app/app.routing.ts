@@ -7,20 +7,19 @@ import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
   {
+    // Index.
     path: '',
     pathMatch: 'full',
-    redirectTo: '666666/bank',
-    //canActivate: [AuthGuard]
+    redirectTo: 'home'
   },
   {
-    path: ':id',
-    pathMatch: 'full',
-    redirectTo: ':id/bank'
+    path: 'home',
+    loadChildren: () => import('./views/home/home.module').then(m => m.HomeModule)
   },
   {
-    path: ':id/bank',
-    loadChildren: () => import('./views/bank/bank.module').then(m => m.BankModule),
-    //canActivate: [AuthGuard]
+    path: 'guild/:id',
+    loadChildren: () => import('./views/guild/guild.module').then(m => m.GuildModule),
+    data: { title: 'Guild' }
   },
   {
     path: '**',

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AccountService, DiscordService } from '../services';
+import { AccountService, DiscordApiService } from '../services';
 import { IUser } from '../models/user';
 
 @Component({
@@ -17,7 +17,7 @@ export class AccountComponent implements OnInit {
   
   constructor(
     private readonly account: AccountService,
-    private readonly discordService: DiscordService) { }
+    private readonly discordService: DiscordApiService) { }
 
   public ngOnInit() {
     this.loggedIn = this.account.isLoggedIn();
