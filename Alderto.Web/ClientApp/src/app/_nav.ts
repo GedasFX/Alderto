@@ -38,7 +38,6 @@ export const homeNav: INavData[] = [
 ];
 
 export const guildNav: INavData[] = [
-
   {
     name: 'Overview',
     url: '/guild/:id/overview',
@@ -46,7 +45,6 @@ export const guildNav: INavData[] = [
   },
   {
     name: 'Bank',
-    url: '/guild/:id/bank',
     icon: 'fa fa-bank',
     children: [
       {

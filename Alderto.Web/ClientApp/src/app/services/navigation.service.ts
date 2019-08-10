@@ -3,26 +3,25 @@ import { Router, Event, NavigationEnd } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { INavData, homeNav, guildNav } from '../_nav';
-import { IGuild } from '../models/guild';
 
 @Injectable({
   providedIn: 'root'
 })
-export class NavigationProviderService {
+export class NavigationService {
   public readonly currentRoute$: Observable<string[]>;
 
   private readonly navItemsSubject$: BehaviorSubject<INavData[]>;
   public readonly navItems$: Observable<INavData[]>;
 
-  private readonly currentGuildSubject$: BehaviorSubject<IGuild>;
-  public readonly currentGuild$: Observable<IGuild>;
+  private readonly currentGuildIdSubject$: BehaviorSubject<number>;
+  public readonly currentGuildId$: Observable<number>;
 
   constructor(router: Router, ) {
     this.navItemsSubject$ = new BehaviorSubject<INavData[]>(homeNav);
     this.navItems$ = this.navItemsSubject$.asObservable();
 
-    this.currentGuildSubject$ = new BehaviorSubject<IGuild>(undefined);
-    this.currentGuild$ = this.currentGuildSubject$.asObservable();
+    this.currentGuildIdSubject$ = new BehaviorSubject<number>(undefined);
+    this.currentGuildId$ = this.currentGuildIdSubject$.asObservable();
 
     // Gets a NavigationEnd event and gets the route off of it.
     // There has to be a better way of doing this.
@@ -50,7 +49,6 @@ export class NavigationProviderService {
    */
   private onNavigatedToHome() {
     this.navItemsSubject$.next(homeNav);
-    this.currentGuildSubject$.next(undefined);
   }
 
   /**
@@ -61,6 +59,6 @@ export class NavigationProviderService {
     // Replace :id with actual guildId.
     const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId as any)) as INavData[];
     this.navItemsSubject$.next(nav);
-    this.currentGuildSubject$.next({ id: guildId, icon: null, name: null, owner: null, permissions: null });
+    this.currentGuildIdSubject$.next(guildId);
   }
 }

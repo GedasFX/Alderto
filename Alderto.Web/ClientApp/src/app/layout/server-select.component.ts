@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IGuild } from '../models/guild';
-import { HttpClient } from '@angular/common/http';
-import { DiscordApiService, NavigationProviderService } from '../services';
+import { IGuild } from '../models';
+import { DiscordApiService, WebApiService, NavigationService } from '../services';
 
 @Component({
   selector: '.app-server-select',
@@ -16,20 +15,23 @@ export class ServerSelectComponent implements OnInit {
   public mutualGuilds: IGuild[];
 
   constructor(
-    private readonly http: HttpClient,
+    private readonly webApi: WebApiService,
     private readonly discord: DiscordApiService,
-    private readonly nav: NavigationProviderService) { }
+    private readonly nav: NavigationService) { }
 
   public ngOnInit() {
     this.discord.fetchGuilds().subscribe((guilds: IGuild[]) => {
       this.userGuilds = guilds;
 
-      this.http.post<IGuild[]>('/api/user/guilds', guilds).subscribe((mutualGuilds: IGuild[]) => {
+      this.webApi.getMutualGuilds(guilds).subscribe((mutualGuilds: IGuild[]) => {
         this.mutualGuilds = mutualGuilds;
-      });
 
-      this.nav.currentGuild$.subscribe((guild: IGuild) => { this.currentServerName = guild.name });
+        this.nav.currentGuildId$.subscribe(guildId => {
+          var guild = mutualGuilds.find(g => g.id === guildId);
+          if (guild !== undefined)
+            this.currentServerName = mutualGuilds.find(g => g.id === guildId).name;
+        });
+      });
     });
   }
-
 }

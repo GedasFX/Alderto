@@ -9,6 +9,9 @@
     <li class="nav-item px-3">
       <a class="nav-link" routerLink="/">Home</a>
     </li>
+    <li *ngIf="nav.currentGuildId$ | async as guildId" class="nav-item px-3">
+      <a class="nav-link" [routerLink]="['/guild', guildId]">Guild</a>
+    </li>
     <li class="nav-item px-3">
       <a class="nav-link" routerLink="/documentation">Documentation</a>
     </li>
@@ -20,7 +23,7 @@
 </app-header>
 <div class="app-body">
   <app-sidebar [fixed]="true" [display]="'lg'">
-    <app-sidebar-nav [navItems]="navItems$ | async"></app-sidebar-nav>
+    <app-sidebar-nav [navItems]="nav.navItems$ | async"></app-sidebar-nav>
     <app-sidebar-minimizer></app-sidebar-minimizer>
   </app-sidebar>
 
