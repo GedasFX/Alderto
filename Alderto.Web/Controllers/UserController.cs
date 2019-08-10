@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using Alderto.Web.Models.Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Authorization;
@@ -19,17 +18,16 @@ namespace Alderto.Web.Controllers
             _bot = bot;
         }
 
-        [HttpGet, Route("mutual-guilds")]
-        public IActionResult MutualGuilds()
+        [HttpPost, Route("guilds")]
+        public IActionResult FilterMutualGuilds(IEnumerable<DiscordGuild> guilds)
         {
-            var user = _bot.GetUser(Convert.ToUInt64(User.FindFirst(ClaimTypes.NameIdentifier).Value));
-            var mutualGuilds = user.MutualGuilds.Select(g => new DiscordGuild
-            {
-                Id = g.Id,
-                Name = g.Name,
-                Icon = g.IconId
-            });
-            
+            // Json parser sometimes has trouble passing Lists.
+            var userGuilds = guilds as ICollection<DiscordGuild> ?? guilds.ToArray();
+            if (userGuilds.Count > 100)
+                return BadRequest("Guild count cannot exceed 100.");
+
+            // _bot.GetGuild(ulong id) returns null if bot is currently not connected to that guild.
+            var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuild(userGuild.Id) != null);
             return Content(JsonConvert.SerializeObject(mutualGuilds));
         }
     }

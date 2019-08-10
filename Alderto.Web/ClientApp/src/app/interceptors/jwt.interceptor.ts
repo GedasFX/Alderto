@@ -6,7 +6,7 @@ import { AccountService } from '../services';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private accountService: AccountService) { }
+  constructor(private readonly accountService: AccountService) { }
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const currentUser = this.accountService.getUser();

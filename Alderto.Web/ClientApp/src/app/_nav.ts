@@ -29,15 +29,27 @@ export interface INavData {
   wrapper?: INavWrapper;
 }
 
-export const navItems: INavData[] = [
+export const homeNav: INavData[] = [
   {
-    name: 'Guild Bank',
-    url: '/bank',
+    name: 'News',
+    url: '/home/news',
+    icon: 'fa fa-newspaper-o'
+  }
+];
+
+export const guildNav: INavData[] = [
+  {
+    name: 'Overview',
+    url: '/guild/:id/overview',
+    icon: 'fa fa-hashtag'
+  },
+  {
+    name: 'Bank',
     icon: 'fa fa-bank',
     children: [
       {
         name: 'Overview',
-        url: '/bank/overview',
+        url: '/guild/:id/bank/overview',
         icon: 'fa fa-bar-chart'
       }
     ]

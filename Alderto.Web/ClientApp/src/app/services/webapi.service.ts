@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IUser } from '../models/user';
+import { IGuild } from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DiscordService {
-
+export class WebApiService {
   constructor(private readonly http: HttpClient) { }
 
-  public getUser(): Observable<IUser> {
-    return this.http.get<IUser>(`https://discordapp.com/api/users/@me`);
+  public getMutualGuilds(guilds: IGuild[]): Observable<IGuild[]> {
+    return this.http.post<IGuild[]>('/api/user/guilds', guilds);
   }
 }

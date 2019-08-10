@@ -3,6 +3,6 @@
     {{ currentServerName }} <span class="caret"></span>
   </a>
   <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-    <li *ngFor="let server of serverList" role="menuitem"><a class="dropdown-item" [routerLink]="['/', server.id]">{{ server.name }}</a></li>
+    <li *ngFor="let guild of mutualGuilds" role="menuitem"><a class="dropdown-item" [routerLink]="['/guild', guild.id]">{{ guild.name }}</a></li>
   </ul>
 </div>
