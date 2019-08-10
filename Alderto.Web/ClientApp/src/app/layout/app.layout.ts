@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationProviderService } from '../services/navigation-provider.service';
+import { NavigationProviderService } from '../services';
 import { Observable } from 'rxjs';
 import { INavData } from '../_nav';
 
@@ -9,6 +9,7 @@ import { INavData } from '../_nav';
 })
 export class AppComponent implements OnInit {
   public navItems$: Observable<INavData[]>;
+  public navItems: INavData[];
 
   constructor(public readonly nav: NavigationProviderService) { }
 

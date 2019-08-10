@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IGuild } from '../models/guild';
 import { HttpClient } from '@angular/common/http';
-import { DiscordApiService } from '../services';
+import { DiscordApiService, NavigationProviderService } from '../services';
 
 @Component({
   selector: '.app-server-select',
@@ -17,7 +17,8 @@ export class ServerSelectComponent implements OnInit {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly discord: DiscordApiService) { }
+    private readonly discord: DiscordApiService,
+    private readonly nav: NavigationProviderService) { }
 
   public ngOnInit() {
     this.discord.fetchGuilds().subscribe((guilds: IGuild[]) => {
@@ -26,6 +27,8 @@ export class ServerSelectComponent implements OnInit {
       this.http.post<IGuild[]>('/api/user/guilds', guilds).subscribe((mutualGuilds: IGuild[]) => {
         this.mutualGuilds = mutualGuilds;
       });
+
+      this.nav.currentGuild$.subscribe((guild: IGuild) => { this.currentServerName = guild.name });
     });
   }
 
