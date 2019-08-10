@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { OverviewComponent } from './overview.component';
-import { GuildLayoutComponent } from './guild-layout.component';
+import { GuildLayoutComponent } from './guild.layout';
 
 const routes: Routes = [
   {

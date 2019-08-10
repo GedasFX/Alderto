@@ -29,42 +29,30 @@ export interface INavData {
   wrapper?: INavWrapper;
 }
 
-export const navItems: INavData[] = [
+export const homeNav: INavData[] = [
   {
-    name: 'Guild Bank',
+    name: 'News',
+    url: '/home/news',
+    icon: 'fa fa-newspaper-o'
+  }
+];
+
+export const guildNav: INavData[] = [
+
+  {
+    name: 'Overview',
+    url: '/guild/:id/overview',
+    icon: 'fa fa-hashtag'
+  },
+  {
+    name: 'Bank',
     url: '/guild/:id/bank',
     icon: 'fa fa-bank',
     children: [
       {
         name: 'Overview',
         url: '/guild/:id/bank/overview',
-        icon: 'fa fa-bar-chart',
-        children: [
-          {
-            name: 'Overview',
-            url: '/guild/:id/bank/overview',
-            icon: 'fa fa-bar-chart',
-            children: [
-              {
-                name: 'Overview',
-                url: '/guild/:id/bank/overview',
-                icon: 'fa fa-bar-chart'
-              }
-            ]
-          },
-          {
-            name: 'Overview',
-            url: '/guild/:id/bank/overview',
-            icon: 'fa fa-bar-chart',
-            children: [
-              {
-                name: 'Overview',
-                url: '/guild/:id/bank/overview',
-                icon: 'fa fa-bar-chart'
-              }
-            ]
-          }
-        ]
+        icon: 'fa fa-bar-chart'
       }
     ]
   }
