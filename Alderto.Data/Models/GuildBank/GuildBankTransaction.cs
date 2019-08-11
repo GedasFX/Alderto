@@ -24,9 +24,14 @@ namespace Alderto.Data.Models.GuildBank
         public string Comment { get; set; }
 
         /// <summary>
+        /// Amount of items/currency was changed during the transaction.
+        /// </summary>
+        public double Amount { get; set; }
+
+        /// <summary>
         /// Foreign key to the <see cref="GuildBankItem"/> which was modified.
         /// </summary>
-        public int ItemId { get; set; }
+        public int? ItemId { get; set; }
 
         /// <summary>
         /// Foreign key to the <see cref="GuildBank"/>, in which the transaction happened.
@@ -37,6 +42,11 @@ namespace Alderto.Data.Models.GuildBank
         /// Foreign key to the <see cref="Models.Member"/>, who has initiated the transaction.
         /// </summary>
         public ulong MemberId { get; set; }
+
+        /// <summary>
+        /// Foreign key to the <see cref="Models.Member"/>, who has administrated the transaction.
+        /// </summary>
+        public ulong AdminId { get; set; }
 
         /// <summary>
         /// <see cref="GuildBankItem"/>, which was modified.
@@ -55,5 +65,11 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [ForeignKey(nameof(MemberId))]
         public virtual Member Member { get; set; }
+
+        /// <summary>
+        /// <see cref="Models.Member"/>, who has administrated the transaction.
+        /// </summary>
+        [ForeignKey(nameof(AdminId))]
+        public virtual Member Admin { get; set; }
     }
 }

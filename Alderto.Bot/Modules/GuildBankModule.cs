@@ -1,83 +1,117 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Bot.Preconditions;
-using Alderto.Services;
+using Alderto.Data.Models.GuildBank;
+using Alderto.Services.GuildBankManagers;
 using Discord;
 using Discord.Commands;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
     [Group, Alias("GuildBank", "GB")]
     public class GuildBankModule : ModuleBase<SocketCommandContext>
     {
-        [Group("Donations"), Alias("Donation")]
-        public class DonationsModule : ModuleBase<SocketCommandContext>
+
+        private readonly IGuildBankManager _guildBankManager;
+
+        public GuildBankModule(IGuildBankManager guildBankManager)
         {
-            private readonly IGuildBankManager _guildBankManager;
-            private readonly IGuildMemberManager _memberManager;
+            _guildBankManager = guildBankManager.Configure(Context.Guild.Id, Context.User.Id);
+        }
 
-            public DonationsModule(IGuildBankManager guildBankManager, IGuildMemberManager memberManager)
+        [Command("Transactions"), Alias("Log")]
+        public async Task Transactions(IGuildUser user = null, string bankName = null)
+        {
+            if (user == null)
+                user = (IGuildUser)Context.User;
+
+            var gbTrans = bankName != null
+                ? _guildBankManager.GetAllTransactions(user.Id, gb => gb.Where(b => b.Name == bankName))
+                : _guildBankManager.GetAllTransactions(user.Id);
+            var transactions = gbTrans as ICollection<GuildBankTransaction> ?? gbTrans.ToArray();
+
+            if (transactions.Count == 0)
+                await this.ReplyErrorEmbedAsync($"{user.Mention} has not made any transactions.");
+            else
+                await this.ReplySuccessEmbedAsync($"{user.Mention} has made the following transactions:", builder =>
+                {
+                    foreach (var transaction in transactions)
+                    {
+                        builder.AddField($"{transaction.Id}: {transaction.TransactionDate}", $"**{transaction.Comment}**");
+                    }
+                });
+        }
+
+        [Command("Give"), Alias("Add")]
+        public async Task Give(IGuildUser transactor, string bankName, string itemName, double quantity)
+        {
+            if (itemName == "$")
             {
-                _guildBankManager = guildBankManager;
-                _memberManager = memberManager;
+                // Special case - currency donation.
+                await _guildBankManager.ModifyCurrencyCountAsync(bankName, transactor.Id, quantity);
+            }
+            else
+            {
+                await _guildBankManager.ModifyItemCountAsync(bankName, transactor.Id, itemName, quantity);
+            }
+        }
+
+        [Command("Take"), Alias("Remove")]
+        public async Task Take(IGuildUser transactor, string bankName, string itemName, double quantity)
+        {
+            if (itemName == "$")
+            {
+                // Special case - currency donation.
+                await _guildBankManager.ModifyCurrencyCountAsync(bankName, transactor.Id, -quantity);
+            }
+            else
+            {
+                await _guildBankManager.ModifyItemCountAsync(bankName, transactor.Id, itemName, -quantity);
+            }
+        }
+
+        [Command("Items"), Alias("List")]
+        public async Task Items(string bankName)
+        {
+            var bank = await _guildBankManager.GetGuildBankAsync(bankName, b => b
+                    .Include(g => g.GuildBankContents)
+                    .ThenInclude(g => g.GuildBankItem));
+
+            var res = bank.GuildBankContents.Aggregate(seed: "", (current, item) => current + $"{item.GuildBankItem.Name} {item.GuildBankItem.Description}\n");
+            await this.ReplySuccessEmbedAsync(res);
+        }
+
+        [Group("Items")]
+        public class GuildItemsModule : ModuleBase<SocketCommandContext>
+        {
+            private readonly IGuildBankItemManager _itemManager;
+
+            public GuildItemsModule(IGuildBankItemManager itemManager)
+            {
+                _itemManager = itemManager;
             }
 
-            [Command]
-            [Summary("Checks the user's donations.")]
-            public async Task List(
-                [Summary("User to check donations of.")] IGuildUser donor = null)
+            public async Task Add(string itemName, string itemDescription = null)
             {
-                //if (donor == null)
-                //    donor = (IGuildUser)Context.Message.Author;
-
-                //var user = await _memberManager.GetGuildMemberAsync(donor);
-
-                //var donations = (await _guildBankManager.GetDonationsAsync(user)).ToArray();
-                //if (donations.Length == 0)
-                //    await this.ReplyErrorEmbedAsync($"{donor.Mention} has not made any donations.");
-                //else
-                //    await this.ReplySuccessEmbedAsync($"{donor.Mention} has made the following donations:", builder =>
-                //    {
-                //        foreach (var donation in donations)
-                //        {
-                //            builder.AddField($"{donation.Id}: {donation.TransactionDate}", $"**{donation.Donation}**");
-                //        }
-                //    });
+                await _itemManager.CreateAsync(((IGuildUser)Context.User).GuildId, new GuildBankItem { Name = itemName, Description = itemDescription });
             }
 
-            [Command("Add")]
-            [Summary("Registers a donation to the guild.")]
-            [RequireRole("Admin")]
-            public async Task Add(
-                [Summary("User who has given a donation.")] IGuildUser donor,
-                [Summary("The donation given.")] [Remainder] [MaxLength(100)] string donation)
+            public async Task Remove(string itemName)
             {
-                if (string.IsNullOrWhiteSpace(donation) || donation.Length > 100)
-                    return;
-
-                var user = await _memberManager.GetGuildMemberAsync(donor);
-                await _guildBankManager.AddDonationAsync(user, donation);
-
-                await this.ReplySuccessEmbedAsync($"{donor.Mention}'s donation of **{donation}** has been registered.");
+                await _itemManager.RemoveAsync(((IGuildUser)Context.User).GuildId, itemName);
             }
 
-            [Command("Remove")]
-            public async Task Remove(int id)
+            public async Task Rename(string itemName, string newName)
             {
-                //var donation = await _guildBankManager.GetDonationAsync(id);
-                //if (donation?.GuildId != Context.Guild.Id)
-                //{
-                //    await this.ReplyErrorEmbedAsync($"No donation with the id of **{id}** was found.");
-                //    return;
-                //}
+                await _itemManager.UpdateAsync(((IGuildUser)Context.User).GuildId, itemName, i => i.Name = newName);
+            }
 
-                //// Donation exists and it is from the current guild. Remove.
-                //await _guildBankManager.RemoveDonationAsync(donation);
-
-                //await this.ReplySuccessEmbedAsync(
-                //    $"Successfully removed <@{donation.MemberId}>'s donation of **{donation.Donation}**.");
+            public async Task Description(string itemName, string newDescription = null)
+            {
+                if (newDescription != null)
+                    await _itemManager.UpdateAsync(((IGuildUser)Context.User).GuildId, itemName, item => item.Description = newDescription);
             }
         }
     }

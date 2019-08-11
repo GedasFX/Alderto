@@ -11,6 +11,11 @@ namespace Alderto.Data.Models.GuildBank
         public int Id { get; set; }
 
         /// <summary>
+        /// Id of guild, which has created the item.
+        /// </summary>
+        public ulong GuildId { get; set; }
+
+        /// <summary>
         /// Name of the item.
         /// </summary>
         [MaxLength(70)]
@@ -21,5 +26,15 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [MaxLength(280)]
         public string Description { get; set; }
+
+        /// <summary>
+        /// Monetary value per unit.
+        /// </summary>
+        public double Value { get; set; }
+
+        /// <summary>
+        /// Guild, which has created the item.
+        /// </summary>
+        public virtual Guild Guild { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Alderto.Data.Models.GuildBank
 {
-    public class GuildBankContent
+    public class GuildBankBankItem
     {
         /// <summary>
         /// Key. Guild Bank Id.

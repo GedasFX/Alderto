@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Alderto.Services.GuildBankManagers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Services
 {
@@ -18,7 +19,11 @@ namespace Alderto.Services
                 // Add providers for various bot activities
                 .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
                 .AddScoped<ICurrencyManager, CurrencyManager>()
-                .AddScoped<IGuildBankManager, GuildBankManager>();
+
+                // Add Guild bank managers
+                .AddScoped<IGuildBankManager, GuildBankManager>()
+                .AddScoped<IGuildBankItemManager, GuildBankItemManager>()
+                .AddScoped<IGuildBankTransactionsManager, GuildBankTransactionsManager>();
 
             return services;
         }

@@ -26,7 +26,7 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// Amount of currency the bank has.
         /// </summary>
-        public int CurrencyCount { get; set; }
+        public double CurrencyCount { get; set; }
         
         /// <summary>
         /// Guild, referenced by <see cref="GuildId"/>.
@@ -37,12 +37,12 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// A collection of transactions the bank has completed.
         /// </summary>
-        public virtual IEnumerable<GuildBankTransaction> Transactions { get; set; }
+        public virtual ICollection<GuildBankTransaction> Transactions { get; set; }
 
         /// <summary>
         /// A collection of items in the bank.
         /// </summary>
-        public virtual IEnumerable<GuildBankContent> GuildBankContents { get; set; }
+        public virtual ICollection<GuildBankBankItem> GuildBankContents { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
