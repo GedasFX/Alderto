@@ -97,23 +97,23 @@ namespace Alderto.Bot.Modules
 
             public async Task Add(string itemName, string itemDescription = null)
             {
-                await _itemManager.CreateAsync(((IGuildUser)Context.User).GuildId, new GuildBankItem { Name = itemName, Description = itemDescription });
+                await _itemManager.CreateItemAsync(((IGuildUser)Context.User).GuildId, itemName, itemDescription);
             }
 
             public async Task Remove(string itemName)
             {
-                await _itemManager.RemoveAsync(((IGuildUser)Context.User).GuildId, itemName);
+                await _itemManager.RemoveItemAsync(((IGuildUser)Context.User).GuildId, itemName);
             }
 
             public async Task Rename(string itemName, string newName)
             {
-                await _itemManager.UpdateAsync(((IGuildUser)Context.User).GuildId, itemName, i => i.Name = newName);
+                await _itemManager.UpdateItemAsync(((IGuildUser)Context.User).GuildId, itemName, i => i.Name = newName);
             }
 
             public async Task Description(string itemName, string newDescription = null)
             {
                 if (newDescription != null)
-                    await _itemManager.UpdateAsync(((IGuildUser)Context.User).GuildId, itemName, item => item.Description = newDescription);
+                    await _itemManager.UpdateItemAsync(((IGuildUser)Context.User).GuildId, itemName, item => item.Description = newDescription);
             }
         }
     }

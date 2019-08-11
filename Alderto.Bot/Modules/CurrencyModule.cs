@@ -14,7 +14,7 @@ namespace Alderto.Bot.Modules
         private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
 
-        public CurrencyModule(IGuildMemberManager guildMemberManager, 
+        public CurrencyModule(IGuildMemberManager guildMemberManager,
             IGuildPreferencesProvider guildPreferences,
             ICurrencyManager currencyManager)
         {

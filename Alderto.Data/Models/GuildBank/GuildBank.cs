@@ -20,7 +20,7 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// Name of the bank.
         /// </summary>
-        [MaxLength(32)]
+        [MaxLength(32), Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -53,9 +53,11 @@ namespace Alderto.Data.Models.GuildBank
         /// Initializes a new instance of <see cref="GuildBank"/>, with <see cref="GuildId"/>) property set.
         /// </summary>
         /// <param name="guildId">Id of the guild, which owns the guild.</param>
-        public GuildBank(ulong guildId)
+        /// <param name="name">Name of the bank.</param>
+        public GuildBank(ulong guildId, string name)
         {
             GuildId = guildId;
+            Name = name;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Alderto.Data.Models.GuildBank
 {
@@ -31,10 +32,5 @@ namespace Alderto.Data.Models.GuildBank
         /// Monetary value per unit.
         /// </summary>
         public double Value { get; set; }
-
-        /// <summary>
-        /// Guild, which has created the item.
-        /// </summary>
-        public virtual Guild Guild { get; set; }
     }
 }

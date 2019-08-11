@@ -65,11 +65,5 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [ForeignKey(nameof(MemberId))]
         public virtual Member Member { get; set; }
-
-        /// <summary>
-        /// <see cref="Models.Member"/>, who has administrated the transaction.
-        /// </summary>
-        [ForeignKey(nameof(AdminId))]
-        public virtual Member Admin { get; set; }
     }
 }

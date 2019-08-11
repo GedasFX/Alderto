@@ -57,10 +57,19 @@ namespace Alderto.Services.GuildBankManagers
         public async Task ModifyItemCountAsync(string bankName, ulong transactorId, string itemName, double quantity, string comment = null)
         {
             var bank = await GetGuildBankAsync(bankName);
-            var item = _items.GetBankItem(bank, itemName);
-            item.Quantity += quantity;
+            if (bank == null)
+                throw new NotImplementedException();
 
-            await _transactions.LogAsync(bank.Id, AdminUserId, transactorId, quantity, item.GuildBankItemId, comment);
+            var item = await _items.GetItemAsync(GuildId, itemName);
+            if (item == null)
+                throw new NotImplementedException();
+
+            var bankItem = await _items.GetBankItemAsync(bank.Id, item.Id) ??
+                           await _items.CreateBankItemAsync(bank.Id, item.Id);
+
+            bankItem.Quantity += quantity;
+
+            await _transactions.LogAsync(bank.Id, AdminUserId, transactorId, quantity, bankItem.GuildBankItemId, comment);
             await _context.SaveChangesAsync();
         }
 
@@ -70,6 +79,28 @@ namespace Alderto.Services.GuildBankManagers
             AdminUserId = adminUserId;
 
             return this;
+        }
+
+        public async Task<GuildBank> CreateGuildBankAsync(string name)
+        {
+            var bank = new GuildBank(GuildId, name);
+            await _context.AddAsync(bank);
+            await _context.SaveChangesAsync();
+
+            return bank;
+        }
+
+        public async Task RemoveGuildBankAsync(string name)
+        {
+            _context.GuildBanks.Remove(await GetGuildBankAsync(name));
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateGuildBankAsync(string name, Action<GuildBank> changes)
+        {
+            var gb = await GetGuildBankAsync(name);
+            changes(gb);
+            await _context.SaveChangesAsync();
         }
     }
 }

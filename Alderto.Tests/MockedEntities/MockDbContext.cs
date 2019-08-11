@@ -20,8 +20,21 @@ namespace Alderto.Tests.MockedEntities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Guild>()
+                .HasOne(g => g.Configuration)
+                .WithOne(c => c.Guild)
+                .HasForeignKey<GuildConfiguration>(c => c.GuildId);
+
             modelBuilder.Entity<GuildMember>()
-                .HasKey(m => new { m.MemberId, m.GuildId });
+                .HasKey(g => new { g.GuildId, g.MemberId });
+
+            modelBuilder.Entity<GuildBank>()
+                .HasIndex(b => new { b.GuildId, b.Name })
+                .IsUnique();
+
+            modelBuilder.Entity<GuildBankBankItem>()
+                .HasKey(b => new { b.GuildBankId, b.GuildBankItemId });
+
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 

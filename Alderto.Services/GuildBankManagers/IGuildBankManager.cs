@@ -60,5 +60,24 @@ namespace Alderto.Services.GuildBankManagers
         /// <param name="guildId">Id of guild the command was executed in.</param>
         /// <param name="adminUserId">Id of user, who is accessing the bank.</param>
         IGuildBankManager Configure(ulong guildId, ulong adminUserId);
+
+        /// <summary>
+        /// Adds a Guild Bank to the database.
+        /// </summary>
+        /// <param name="name">Name of bank to add to be added to the database.</param>
+        Task<GuildBank> CreateGuildBankAsync(string name);
+        
+        /// <summary>
+        /// Removes a guild bank of a given name.
+        /// </summary>
+        /// <param name="name">Name of guild bank to remove.</param>
+        Task RemoveGuildBankAsync(string name);
+
+        /// <summary>
+        /// Updates the guild bank as described in <see cref="changes"/>
+        /// </summary>
+        /// <param name="name">Name of bank to update.</param>
+        /// <param name="changes">Changes to apply.</param>
+        Task UpdateGuildBankAsync(string name, Action<GuildBank> changes);
     }
 }
