@@ -8,11 +8,11 @@ namespace Alderto.Data.Models
     public class Guild
     {
         /// <summary>
-        /// Discord guild identifier.
+        /// Key. Discord guild identifier.
         /// </summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong Id { get; set; }
-        
+
         /// <summary>
         /// Time when guild premium status runs out. Returns null if is not premium.
         /// </summary>
@@ -24,24 +24,27 @@ namespace Alderto.Data.Models
         public virtual GuildConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// A collection of members the guild contains.
+        /// A collection of members of the guild.
         /// </summary>
         public virtual IEnumerable<GuildMember> GuildMembers { get; set; }
 
         /// <summary>
-        /// A collection of all custom commands registered to the guild.
+        /// A collection of custom commands registered to the guild.
         /// </summary>
         public virtual IEnumerable<CustomCommand> CustomCommands { get; set; }
 
         /// <summary>
-        /// Initializes a new empty instance of <see cref="Guild"/>.
+        /// A collection of guild managed banks.
         /// </summary>
-        public Guild()
-        {
-        }
+        public virtual IEnumerable<GuildBank.GuildBank> GuildBanks { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Guild"/>, with primary key (<see cref="Id"/> set.
+        /// Initializes a new empty instance of <see cref="Guild"/>.
+        /// </summary>
+        public Guild() { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Guild"/>, with primary key <see cref="Id"/> set.
         /// </summary>
         /// <param name="id"><see cref="Id"/> property.</param>
         public Guild(ulong id)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Services
 {
@@ -17,33 +18,35 @@ namespace Alderto.Services
 
         public async Task AddDonationAsync(GuildMember member, string donation)
         {
-            _context.Attach(member);
+            //_context.Attach(member);
 
-            await _context.GuildMemberDonations.AddAsync(new GuildMemberDonation
-            {
-                MemberId = member.MemberId,
-                GuildId = member.GuildId,
-                DonationDate = DateTimeOffset.UtcNow,
-                Donation = donation
-            });
+            //await _context.GuildMemberTransactions.AddAsync(new GuildBankTransaction
+            //{
+            //    MemberId = member.MemberId,
+            //    GuildId = member.GuildId,
+            //    TransactionDate = DateTimeOffset.UtcNow,
+            //    Donation = donation
+            //});
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<GuildMemberDonation>> GetDonationsAsync(GuildMember member)
+        public async Task<IEnumerable<GuildBankTransaction>> GetDonationsAsync(GuildMember member)
         {
-            _context.Attach(member);
+            return null;
+            //_context.Attach(member);
 
-            await _context.Entry(member).Collection(m => m.Donations).LoadAsync();
-            return member.Donations;
+            //await _context.Entry(member).Collection(m => m.Donations).LoadAsync();
+            //return member.Donations;
         }
 
-        public Task<GuildMemberDonation> GetDonationAsync(int id)
+        public Task<GuildBankTransaction> GetDonationAsync(int id)
         {
-            return _context.GuildMemberDonations.FindAsync(id);
+            return null;
+            //return _context.GuildMemberDonations.FindAsync(id);
         }
 
-        public async Task RemoveDonationAsync(GuildMemberDonation donation)
+        public async Task RemoveDonationAsync(GuildBankTransaction donation)
         {
             _context.Remove(donation);
             await _context.SaveChangesAsync();

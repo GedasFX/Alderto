@@ -29,22 +29,22 @@ namespace Alderto.Bot.Modules
             public async Task List(
                 [Summary("User to check donations of.")] IGuildUser donor = null)
             {
-                if (donor == null)
-                    donor = (IGuildUser)Context.Message.Author;
+                //if (donor == null)
+                //    donor = (IGuildUser)Context.Message.Author;
 
-                var user = await _memberManager.GetGuildMemberAsync(donor);
+                //var user = await _memberManager.GetGuildMemberAsync(donor);
 
-                var donations = (await _guildBankManager.GetDonationsAsync(user)).ToArray();
-                if (donations.Length == 0)
-                    await this.ReplyErrorEmbedAsync($"{donor.Mention} has not made any donations.");
-                else
-                    await this.ReplySuccessEmbedAsync($"{donor.Mention} has made the following donations:", builder =>
-                    {
-                        foreach (var donation in donations)
-                        {
-                            builder.AddField($"{donation.Id}: {donation.DonationDate}", $"**{donation.Donation}**");
-                        }
-                    });
+                //var donations = (await _guildBankManager.GetDonationsAsync(user)).ToArray();
+                //if (donations.Length == 0)
+                //    await this.ReplyErrorEmbedAsync($"{donor.Mention} has not made any donations.");
+                //else
+                //    await this.ReplySuccessEmbedAsync($"{donor.Mention} has made the following donations:", builder =>
+                //    {
+                //        foreach (var donation in donations)
+                //        {
+                //            builder.AddField($"{donation.Id}: {donation.TransactionDate}", $"**{donation.Donation}**");
+                //        }
+                //    });
             }
 
             [Command("Add")]
@@ -66,18 +66,18 @@ namespace Alderto.Bot.Modules
             [Command("Remove")]
             public async Task Remove(int id)
             {
-                var donation = await _guildBankManager.GetDonationAsync(id);
-                if (donation?.GuildId != Context.Guild.Id)
-                {
-                    await this.ReplyErrorEmbedAsync($"No donation with the id of **{id}** was found.");
-                    return;
-                }
+                //var donation = await _guildBankManager.GetDonationAsync(id);
+                //if (donation?.GuildId != Context.Guild.Id)
+                //{
+                //    await this.ReplyErrorEmbedAsync($"No donation with the id of **{id}** was found.");
+                //    return;
+                //}
 
-                // Donation exists and it is from the current guild. Remove.
-                await _guildBankManager.RemoveDonationAsync(donation);
+                //// Donation exists and it is from the current guild. Remove.
+                //await _guildBankManager.RemoveDonationAsync(donation);
 
-                await this.ReplySuccessEmbedAsync(
-                    $"Successfully removed <@{donation.MemberId}>'s donation of **{donation.Donation}**.");
+                //await this.ReplySuccessEmbedAsync(
+                //    $"Successfully removed <@{donation.MemberId}>'s donation of **{donation.Donation}**.");
             }
         }
     }

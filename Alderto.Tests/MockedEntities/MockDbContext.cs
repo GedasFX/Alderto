@@ -1,6 +1,7 @@
 ﻿using System;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Tests.MockedEntities
@@ -12,7 +13,7 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<GuildConfiguration> GuildPreferences { get; set; }
-        public DbSet<GuildMemberDonation> GuildMemberDonations { get; set; }
+        public DbSet<GuildBankTransaction> GuildBankTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

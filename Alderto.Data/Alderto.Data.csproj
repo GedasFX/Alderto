@@ -42,6 +42,10 @@
     <Compile Remove="Migrations\20190723144035_pkchangeyetagain.Designer.cs" />
     <Compile Remove="Migrations\20190723150859_intolong.cs" />
     <Compile Remove="Migrations\20190723150859_intolong.Designer.cs" />
+    <Compile Remove="Migrations\20190811131718_guildbank.cs" />
+    <Compile Remove="Migrations\20190811131718_guildbank.Designer.cs" />
+    <Compile Remove="Migrations\20190811132744_guildbank.cs" />
+    <Compile Remove="Migrations\20190811132744_guildbank.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
