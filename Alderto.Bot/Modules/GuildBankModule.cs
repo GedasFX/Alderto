@@ -18,7 +18,9 @@ namespace Alderto.Bot.Modules
 
         public GuildBankModule(IGuildBankManager guildBankManager)
         {
-            _guildBankManager = guildBankManager.Configure(Context.Guild.Id, Context.User.Id);
+            _guildBankManager = guildBankManager;
+            if (Context != null)
+                _guildBankManager.Configure(Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Transactions"), Alias("Log")]

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="GuildBankManagersTests\" />
+  </ItemGroup>
+
 </Project>
