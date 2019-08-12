@@ -1,4 +1,4 @@
 export * from './account.service';
-export * from './discordapi.service';
+export * from './discord.service';
 export * from './navigation.service';
-export * from './webapi.service';
+export * from './web-api';

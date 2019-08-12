@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AccountService, DiscordApiService } from '../services';
+import { AccountService, DiscordService } from '../services';
 import { IUser } from '../models/user';
 
 @Component({
@@ -17,13 +17,13 @@ export class AccountComponent implements OnInit {
   
   constructor(
     private readonly account: AccountService,
-    private readonly discordService: DiscordApiService) { }
+    private readonly discord: DiscordService) { }
 
   public ngOnInit() {
     this.loggedIn = this.account.isLoggedIn();
 
     if (this.loggedIn) {
-      this.user = this.discordService.fetchUser();
+      this.user = this.discord.fetchUser();
       this.userImg = this.user.pipe(map((user: IUser) =>`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`));
     }
   }

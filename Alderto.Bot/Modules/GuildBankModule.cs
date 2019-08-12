@@ -78,10 +78,10 @@ namespace Alderto.Bot.Modules
         public async Task Items(string bankName)
         {
             var bank = await _guildBankManager.GetGuildBankAsync(bankName, b => b
-                    .Include(g => g.GuildBankContents)
+                    .Include(g => g.Contents)
                     .ThenInclude(g => g.GuildBankItem));
 
-            var res = bank.GuildBankContents.Aggregate(seed: "", (current, item) => current + $"{item.GuildBankItem.Name} {item.GuildBankItem.Description}\n");
+            var res = bank.Contents.Aggregate(seed: "", (current, item) => current + $"{item.GuildBankItem.Name} {item.GuildBankItem.Description}\n");
             await this.ReplySuccessEmbedAsync(res);
         }
 

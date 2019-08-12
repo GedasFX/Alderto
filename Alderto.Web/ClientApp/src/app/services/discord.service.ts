@@ -6,7 +6,7 @@ import { IUser, IGuild } from '../models';
 @Injectable({
   providedIn: 'root'
 })
-export class DiscordApiService {
+export class DiscordService {
 
   constructor(private readonly http: HttpClient) { }
 
