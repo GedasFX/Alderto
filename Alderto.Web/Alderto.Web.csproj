@@ -30,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create - Copy.component.scss">
+      <DependentUpon>bank-create.component.html</DependentUpon>
+    </None>
     <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create.component.scss">
       <DependentUpon>bank-create.component.html</DependentUpon>
     </None>

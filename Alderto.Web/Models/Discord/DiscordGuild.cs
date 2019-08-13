@@ -1,22 +1,11 @@
-﻿using Newtonsoft.Json;
-
-namespace Alderto.Web.Models.Discord
+﻿namespace Alderto.Web.Models.Discord
 {
     public class DiscordGuild
     {
-        [JsonProperty("owner")]
-        public bool Owner { get; set; }
-
-        [JsonProperty("permissions")]
-        public ulong Permissions { get; set; }
-
-        [JsonProperty("icon")]
-        public string Icon { get; set; }
-
-        [JsonProperty("id")]
-        public ulong Id { get; set; }
-
-        [JsonProperty("name")]
+        public string Id { get; set; }
         public string Name { get; set; }
+        public ulong Permissions { get; set; }
+        public bool Owner { get; set; }
+        public string Icon { get; set; }
     }
 }

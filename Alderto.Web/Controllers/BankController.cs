@@ -1,15 +1,15 @@
 ﻿using System.Threading.Tasks;
+using Alderto.Data.Exceptions;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, Authorize, Route("api/bank")]
+    [Authorize, Route("api/bank")]
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
@@ -36,8 +36,15 @@ namespace Alderto.Web.Controllers
 
             _bank.Configure(bank.GuildId, User.GetId());
 
-            var b = await _bank.CreateGuildBankAsync(bank.Name);
-            return Content(JsonConvert.SerializeObject(b));
+            try
+            {
+                var b = await _bank.CreateGuildBankAsync(bank.Name);
+                return Content(b);
+            }
+            catch (UniqueIndexViolationException)
+            {
+                return BadRequest("A bank with the given name already exists.");
+            }
         }
 
         [HttpPatch, Route("rename")]

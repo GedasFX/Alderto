@@ -1,0 +1,26 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form #form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+        <div class="modal-header">
+          <h4 class="modal-title">Create New Bank</h4>
+          <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>
+              Name:
+            </label>
+            <input class="form-control" type="text" formControlName="name" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Create New Bank</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

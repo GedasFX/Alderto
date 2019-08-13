@@ -101,19 +101,12 @@ namespace Alderto.Web
             // Start the bot.
             cmdHandler.StartAsync().ConfigureAwait(false);
 
-            // Set up jsonConverter
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
-            {
-
-            };
-
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                // app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
