@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { IGuildBank } from '../../../models/guild-bank';
-import { ModalDirective } from 'ngx-bootstrap/modal';
-import { GuildBankService } from '../../../services/web-api';
+import { Component, OnInit } from '@angular/core';
+import { IGuildBank } from 'src/app/models';
+import { GuildBankService } from 'src/app/services';
 
 @Component({
   templateUrl: 'overview.component.html'
