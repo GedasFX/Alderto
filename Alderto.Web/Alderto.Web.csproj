@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create.component.scss">
+      <DependentUpon>bank-create.component.html</DependentUpon>
+    </None>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

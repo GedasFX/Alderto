@@ -3,7 +3,6 @@ using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -11,7 +10,7 @@ using Newtonsoft.Json;
 namespace Alderto.Web.Controllers
 {
     [ApiController, Authorize, Route("api/bank")]
-    public class BankController : Controller
+    public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
 
@@ -26,18 +25,18 @@ namespace Alderto.Web.Controllers
             _bank.Configure(guildId, 0);
             var banks = _bank.GetAllGuildBanks(o => o.Include(b => b.Contents));
 
-            return Content(JsonConvert.SerializeObject(banks));
+            return Content(banks);
         }
 
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateBank(ulong guildId, string name)
+        public async Task<IActionResult> CreateBank([Bind(nameof(GuildBank.GuildId), nameof(GuildBank.Name))] GuildBank bank)
         {
-            if (!await User.IsDiscordAdminAsync(guildId))
+            if (!await User.IsDiscordAdminAsync(bank.GuildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
-            _bank.Configure(guildId, User.GetId());
+            _bank.Configure(bank.GuildId, User.GetId());
 
-            var b = await _bank.CreateGuildBankAsync(name);
+            var b = await _bank.CreateGuildBankAsync(bank.Name);
             return Content(JsonConvert.SerializeObject(b));
         }
 
@@ -64,15 +63,5 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-
-        private IActionResult Forbid(object data)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, data);
-        }
-
-        private static class ForbidReason
-        {
-            public const string NotDiscordAdmin = "Could not confirm if user is an admin of the specified server.";
-        }
     }
 }

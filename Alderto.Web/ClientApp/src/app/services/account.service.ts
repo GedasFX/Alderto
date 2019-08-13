@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import * as jwt_decode from 'jwt-decode';
-import { IGuild } from '../models/guild';
 
 export class User {
   public id: number;

@@ -6,7 +6,7 @@ import { AppRoutingModule } from './app.routing';
 import { AppComponent, AccountComponent, ServerSelectComponent } from './layout';
 
 import { AppHeaderModule, AppBreadcrumbModule, AppSidebarModule, AppFooterModule } from '@coreui/angular';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BsDropdownModule } from 'ngx-bootstrap';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { P404Component } from './views/error/404.component';
 

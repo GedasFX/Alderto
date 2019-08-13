@@ -9,7 +9,7 @@ import { IGuild } from '../../models';
 export class WebUserService {
   constructor(private readonly http: HttpClient) { }
 
-  public getMutualGuilds(guilds: IGuild[]): Observable<IGuild[]> {
+  public fetchMutualGuilds(guilds: IGuild[]): Observable<IGuild[]> {
     return this.http.post<IGuild[]>('/api/user/guilds', guilds);
   }
 }

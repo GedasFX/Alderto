@@ -1,28 +1,29 @@
 <div class="animated fadeIn">
   <div class="card card-default">
     <div class="card-header">
-      <i class="fa fa-plus"></i> <a class="cursor-pointer" (click)="on();">Create New Bank</a>
-      <div class="card-header-actions">
-        <a href="https://github.com/coreui/coreui-icons" class="card-header-action" target="_blank">Github</a>
-      </div>
+      <i class="fa fa-plus"></i> <a class="cursor-pointer" (click)="createBankModal.show();">Create New Bank</a>
     </div>
   </div>
 
-  <div *ngFor="let bank of guildBanks" class="card card-default">
-    <div class="card-header">
-      <i class="fa fa-picture-o"></i> CoreUI Icons <span class="badge badge-info">New</span>
-      <div class="card-header-actions">
-        <a href="https://github.com/coreui/coreui-icons" class="card-header-action" target="_blank">Github</a>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="row text-center">
-        <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-          <i class="cui-account-logout icons font-2xl d-block mt-4"></i>
-          <div>account-logout</div>
+  <div *ngFor="let bank of guildBanks">
+    <div class="card card-default">
+      <div class="card-header">
+        <i class="fa fa-bank"></i> {{ bank.name }}
+        <div class="card-header-actions">
+          <a class="card-header-action"><i class="fa fa-plus"></i> </a> 
+          <a class="card-header-action"><i class="fa fa-trash-o"></i> </a>
         </div>
       </div>
-      <!--/.row-->
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+            <i class="fa fa-plus icons font-4xl d-block"></i>
+            <div>account-logout</div>
+          </div>
+        </div>
+        <!--/.row-->
+      </div>
     </div>
   </div>
 </div>
+<app-bank-create #createBankModal></app-bank-create>

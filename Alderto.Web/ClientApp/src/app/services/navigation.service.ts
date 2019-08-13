@@ -16,7 +16,7 @@ export class NavigationService {
   private readonly currentGuildIdSubject$: BehaviorSubject<number>;
   public readonly currentGuildId$: Observable<number>;
 
-  constructor(router: Router, ) {
+  constructor(router: Router) {
     this.navItemsSubject$ = new BehaviorSubject<INavData[]>(homeNav);
     this.navItems$ = this.navItemsSubject$.asObservable();
 
@@ -60,5 +60,12 @@ export class NavigationService {
     const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId as any)) as INavData[];
     this.navItemsSubject$.next(nav);
     this.currentGuildIdSubject$.next(guildId);
+  }
+
+  /**
+   * Gets the current guild Id.
+   */
+  public getCurrentGuildId(): number {
+    return this.currentGuildIdSubject$.value;
   }
 }

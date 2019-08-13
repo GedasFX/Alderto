@@ -11,7 +11,7 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [Key]
         public int Id { get; set; }
-
+        
         /// <summary>
         /// Discord Guild Id.
         /// </summary>

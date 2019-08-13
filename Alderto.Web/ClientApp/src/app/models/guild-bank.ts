@@ -1,7 +1,17 @@
 export interface IGuildBank {
-  icon: string;
   id: number;
+  guildId: number;
   name: string;
-  owner: boolean;
-  permissions: number;
+  currencyCount: number;
+
+  contents: IGuildBankContents[];
+  transactions: IGuildBankTransaction[];
+}
+
+export interface IGuildBankContents {
+  
+}
+
+export interface IGuildBankTransaction {
+
 }

@@ -20,10 +20,10 @@ export class ServerSelectComponent implements OnInit {
     private readonly nav: NavigationService) { }
 
   public ngOnInit() {
-    this.discord.fetchGuilds().subscribe((guilds: IGuild[]) => {
+    this.discord.fetchGuilds().subscribe(guilds => {
       this.userGuilds = guilds;
 
-      this.webUser.getMutualGuilds(guilds).subscribe((mutualGuilds: IGuild[]) => {
+      this.webUser.fetchMutualGuilds(guilds).subscribe(mutualGuilds => {
         this.mutualGuilds = mutualGuilds;
 
         this.nav.currentGuildId$.subscribe(guildId => {

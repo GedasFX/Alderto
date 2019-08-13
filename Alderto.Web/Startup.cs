@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace Alderto.Web
 {
@@ -73,7 +74,9 @@ namespace Alderto.Web
                 });
 
             // Add Mvc
-            services.AddMvc();
+            services
+                .AddMvc()
+                .AddJsonOptions(options => { options.UseCamelCasing(true); });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
@@ -96,7 +99,13 @@ namespace Alderto.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
             // Start the bot.
-            _ = cmdHandler.StartAsync();
+            cmdHandler.StartAsync().ConfigureAwait(false);
+
+            // Set up jsonConverter
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+
+            };
 
             if (env.IsDevelopment())
             {
