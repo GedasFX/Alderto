@@ -19,8 +19,6 @@ namespace Alderto.Bot.Modules
         public GuildBankModule(IGuildBankManager guildBankManager)
         {
             _guildBankManager = guildBankManager;
-            if (Context != null)
-                _guildBankManager.Configure(Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Transactions"), Alias("Log")]
@@ -30,8 +28,8 @@ namespace Alderto.Bot.Modules
                 user = (IGuildUser)Context.User;
 
             var gbTrans = bankName != null
-                ? _guildBankManager.GetAllTransactions(user.Id, gb => gb.Where(b => b.Name == bankName))
-                : _guildBankManager.GetAllTransactions(user.Id);
+                ? _guildBankManager.GetAllTransactions(user.GuildId, user.Id, gb => gb.Where(b => b.Name == bankName))
+                : _guildBankManager.GetAllTransactions(user.GuildId, user.Id);
             var transactions = gbTrans as ICollection<GuildBankTransaction> ?? gbTrans.ToArray();
 
             if (transactions.Count == 0)
@@ -52,11 +50,11 @@ namespace Alderto.Bot.Modules
             if (itemName == "$")
             {
                 // Special case - currency donation.
-                await _guildBankManager.ModifyCurrencyCountAsync(bankName, transactor.Id, quantity);
+                await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, quantity);
             }
             else
             {
-                await _guildBankManager.ModifyItemCountAsync(bankName, transactor.Id, itemName, quantity);
+                await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, quantity);
             }
         }
 
@@ -66,18 +64,18 @@ namespace Alderto.Bot.Modules
             if (itemName == "$")
             {
                 // Special case - currency donation.
-                await _guildBankManager.ModifyCurrencyCountAsync(bankName, transactor.Id, -quantity);
+                await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, -quantity);
             }
             else
             {
-                await _guildBankManager.ModifyItemCountAsync(bankName, transactor.Id, itemName, -quantity);
+                await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, -quantity);
             }
         }
 
         [Command("Items"), Alias("List")]
         public async Task Items(string bankName)
         {
-            var bank = await _guildBankManager.GetGuildBankAsync(bankName, b => b
+            var bank = await _guildBankManager.GetGuildBankAsync(Context.Guild.Id, bankName, b => b
                     .Include(g => g.Contents)
                     .ThenInclude(g => g.GuildBankItem));
 

@@ -44,19 +44,18 @@ namespace Alderto.Tests
         [Fact]
         public async Task TestManager()
         {
-            _manager.Configure(1, 1);
-            var b = await _manager.CreateGuildBankAsync("main");
+            var b = await _manager.CreateGuildBankAsync(1, "main");
             Assert.NotEqual(0, b.Id);
             Assert.Equal(1u, b.GuildId);
 
             var item = await _items.CreateItemAsync(1, "bb", "cc");
-            await _manager.ModifyItemCountAsync("main", 2, "bb", 6666);
-            await _manager.ModifyItemCountAsync("main", 3, "bb", -2266.4);
+            await _manager.ModifyItemCountAsync(1, "main", 1, 2, "bb", 6666);
+            await _manager.ModifyItemCountAsync(1, "main", 1, 3, "bb", -2266.4);
 
             var bi = await _items.GetBankItemAsync(b.Id, item.Id);
             Assert.Equal(4399.6, bi.Quantity);
 
-            var log = _manager.GetAllTransactions(2).ToArray();
+            var log = _manager.GetAllTransactions(1, 2).ToArray();
 
             Assert.Single(log);
             Assert.Equal(1u, log[0].AdminId); 

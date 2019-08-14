@@ -21,8 +21,7 @@ namespace Alderto.Web.Controllers
         [HttpGet, Route("list")]
         public IActionResult ListBanks(ulong guildId)
         {
-            _bank.Configure(guildId, 0);
-            var banks = _bank.GetAllGuildBanks(o => o.Include(b => b.Contents));
+            var banks = _bank.GetAllGuildBanks(guildId, o => o.Include(b => b.Contents));
 
             return Content(banks);
         }
@@ -34,12 +33,10 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(bank.GuildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
-            _bank.Configure(bank.GuildId, User.GetId());
-
-            if (await _bank.GetGuildBankAsync(bank.Name) != null)
+            if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
                 return BadRequest("A bank with the given name already exists.");
 
-            var b = await _bank.CreateGuildBankAsync(bank.Name);
+            var b = await _bank.CreateGuildBankAsync(bank.GuildId, bank.Name);
 
             // Ensure guild is null to prevent serializer loop.
             b.Guild = null;
@@ -54,9 +51,7 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
-            _bank.Configure(guildId, User.GetId());
-
-            await _bank.UpdateGuildBankAsync(bankId, b => { b.Name = newName; });
+            await _bank.UpdateGuildBankAsync(guildId, bankId, b => { b.Name = newName; });
 
             return Ok();
         }
@@ -67,7 +62,7 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
-            await _bank.RemoveGuildBankAsync(bankId);
+            await _bank.RemoveGuildBankAsync(guildId, bankId);
             return Ok();
         }
 

@@ -9,107 +9,103 @@ namespace Alderto.Services.GuildBankManagers
     public interface IGuildBankManager
     {
         /// <summary>
-        /// Id of guild this manager is bound to.
-        /// </summary>
-        ulong GuildId { get; }
-
-        /// <summary>
-        /// Id of user, who is administering the guild, this manager is bound to.
-        /// </summary>
-        ulong AdminId { get; }
-
-        /// <summary>
         /// Gets the member's transactions from the given banks.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="memberId">Member Id.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>A collection of transactions made by the user in the given guild bank.</returns>
-        IEnumerable<GuildBankTransaction> GetAllTransactions(ulong memberId,
+        IEnumerable<GuildBankTransaction> GetAllTransactions(ulong guildId, ulong memberId,
             Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
         /// Gets the guild bank with the provided name.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of the bank.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>Guild bank with the given name.</returns>
-        Task<GuildBank> GetGuildBankAsync(string name,
+        Task<GuildBank> GetGuildBankAsync(ulong guildId, string name,
             Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
         /// Gets the guild bank with the provided name.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="id">Id of the bank.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>Guild bank with the given id.</returns>
-        Task<GuildBank> GetGuildBankAsync(int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
+        Task<GuildBank> GetGuildBankAsync(ulong guildId, int id, 
+            Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
         /// Gets all banks of the configured guild.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>A collection of guild banks belonging to the given guild.</returns>
-        IEnumerable<GuildBank> GetAllGuildBanks(Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
+        Task<List<GuildBank>> GetAllGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
         /// Modifies the amount of currency the guild has.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="bankName">Name of the bank the transaction has occured in.</param>
+        /// <param name="adminId">Id of person, who administered the transaction.</param>
         /// <param name="transactorId">Id of person, who has given/taken money from/to the guild.</param>
         /// <param name="quantity">Amount of currency transferred.</param>
         /// <param name="comment">Comment on the transaction.</param>
-        Task ModifyCurrencyCountAsync(string bankName, ulong transactorId, double quantity, string comment = null);
+        Task ModifyCurrencyCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, double quantity, string comment = null);
 
         /// <summary>
         /// Modifies the amount of a particular item the guild has.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="bankName">Name of the bank the transaction has occured in.</param>
+        /// <param name="adminId">Id of person, who administered the transaction.</param>
         /// <param name="transactorId">Id of person, who has given/taken items from/to the guild.</param>
         /// <param name="itemName">Name of the item that was transferred.</param>
         /// <param name="quantity">Amount of items transferred.</param>
         /// <param name="comment">Comment on the transaction.</param>
-        Task ModifyItemCountAsync(string bankName, ulong transactorId, string itemName, double quantity,
+        Task ModifyItemCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, string itemName, double quantity,
             string comment = null);
-
-        /// <summary>
-        /// Configures the <see cref="IGuildBankManager"/> environment.
-        /// </summary>
-        /// <param name="guildId">Id of guild the command was executed in.</param>
-        /// <param name="adminUserId">Id of user, who is accessing the bank.</param>
-        IGuildBankManager Configure(ulong guildId, ulong adminUserId);
 
         /// <summary>
         /// Adds a Guild Bank to the database.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of bank to add to be added to the database.</param>
-        Task<GuildBank> CreateGuildBankAsync(string name);
+        Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name);
 
         /// <summary>
         /// Removes a guild bank of a given name.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of guild bank to remove.</param>
-        Task RemoveGuildBankAsync(string name);
+        Task RemoveGuildBankAsync(ulong guildId, string name);
 
         /// <summary>
         /// Removes a guild bank of a given name.
-        /// Requires <see cref="Configure"/>.
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="id">Id of guild bank to remove.</param>
-        Task RemoveGuildBankAsync(int id);
+        Task RemoveGuildBankAsync(ulong guildId, int id);
 
         /// <summary>
         /// Updates the guild bank as described in <see cref="changes"/>
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of bank to update.</param>
         /// <param name="changes">Changes to apply.</param>
-        Task UpdateGuildBankAsync(string name, Action<GuildBank> changes);
+        Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes);
 
         /// <summary>
         /// Updates the guild bank as described in <see cref="changes"/>
         /// </summary>
+        /// <param name="guildId">Guild Id.</param>
         /// <param name="id">Id of bank to update.</param>
         /// <param name="changes">Changes to apply.</param>
-        Task UpdateGuildBankAsync(int id, Action<GuildBank> changes);
+        Task UpdateGuildBankAsync(ulong guildId, int id, Action<GuildBank> changes);
 
 
     }

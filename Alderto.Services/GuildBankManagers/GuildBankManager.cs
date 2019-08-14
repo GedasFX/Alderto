@@ -11,8 +11,6 @@ namespace Alderto.Services.GuildBankManagers
 {
     public class GuildBankManager : IGuildBankManager
     {
-        public ulong GuildId { get; set; }
-        public ulong AdminId { get; set; }
 
         private readonly IAldertoDbContext _context;
         private readonly IGuildBankTransactionsManager _transactions;
@@ -25,48 +23,54 @@ namespace Alderto.Services.GuildBankManagers
             _items = items;
         }
 
-        public IEnumerable<GuildBankTransaction> GetAllTransactions(ulong memberId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
-        {
-            var query = _context.GuildBanks.Include(b => b.Transactions) as IQueryable<GuildBank>;
-            if (options != null)
-                query = options(query);
-            return query.Where(g => g.GuildId == GuildId).SelectMany(g => g.Transactions.Where(t => t.MemberId == memberId));
-        }
-
-        public async Task<GuildBank> GetGuildBankAsync(string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
-        {
-            return await ((IQueryable<GuildBank>)GetAllGuildBanks(options)).SingleOrDefaultAsync(b => b.Name == name);
-        }
-
-        public async Task<GuildBank> GetGuildBankAsync(int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
-        {
-            return await ((IQueryable<GuildBank>)GetAllGuildBanks(options)).SingleOrDefaultAsync(b => b.Id == id);
-        }
-
-        public IEnumerable<GuildBank> GetAllGuildBanks(Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        private IQueryable<GuildBank> FetchGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             var query = _context.GuildBanks as IQueryable<GuildBank>;
             if (options != null)
                 query = options.Invoke(query);
-            return query.Where(b => b.GuildId == GuildId);
+            return query.Where(b => b.GuildId == guildId);
         }
 
-        public async Task ModifyCurrencyCountAsync(string bankName, ulong transactorId, double quantity, string comment = null)
+        public IEnumerable<GuildBankTransaction> GetAllTransactions(ulong guildId, ulong memberId,
+            Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
-            var bank = await GetGuildBankAsync(bankName);
+            var query = _context.GuildBanks.Include(b => b.Transactions) as IQueryable<GuildBank>;
+            if (options != null)
+                query = options(query);
+            return query.Where(g => g.GuildId == guildId).SelectMany(g => g.Transactions.Where(t => t.MemberId == memberId));
+        }
+
+        public Task<GuildBank> GetGuildBankAsync(ulong guildId, string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        {
+            return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
+        }
+
+        public Task<GuildBank> GetGuildBankAsync(ulong guildId, int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        {
+            return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Id == id);
+        }
+
+        public Task<List<GuildBank>> GetAllGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        {
+            return FetchGuildBanks(guildId, options).ToListAsync();
+        }
+
+        public async Task ModifyCurrencyCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, double quantity, string comment = null)
+        {
+            var bank = await GetGuildBankAsync(guildId, bankName);
             bank.CurrencyCount += quantity;
 
-            await _transactions.LogAsync(bank.Id, AdminId, transactorId, quantity, itemId: 0, comment);
+            await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, comment: comment);
             await _context.SaveChangesAsync();
         }
 
-        public async Task ModifyItemCountAsync(string bankName, ulong transactorId, string itemName, double quantity, string comment = null)
+        public async Task ModifyItemCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, string itemName, double quantity, string comment = null)
         {
-            var bank = await GetGuildBankAsync(bankName);
+            var bank = await GetGuildBankAsync(guildId, bankName);
             if (bank == null)
                 throw new NotImplementedException();
 
-            var item = await _items.GetItemAsync(GuildId, itemName);
+            var item = await _items.GetItemAsync(guildId, itemName);
             if (item == null)
                 throw new NotImplementedException();
 
@@ -75,34 +79,26 @@ namespace Alderto.Services.GuildBankManagers
 
             bankItem.Quantity += quantity;
 
-            await _transactions.LogAsync(bank.Id, AdminId, transactorId, quantity, bankItem.GuildBankItemId, comment);
+            await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, bankItem.GuildBankItemId, comment);
             await _context.SaveChangesAsync();
         }
 
-        public IGuildBankManager Configure(ulong guildId, ulong adminUserId)
-        {
-            GuildId = guildId;
-            AdminId = adminUserId;
-
-            return this;
-        }
-
-        public async Task<GuildBank> CreateGuildBankAsync(string name)
+        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name)
         {
             // If guild id is unspecified do nothing.
-            if (GuildId == 0)
+            if (guildId < 1)
                 return null;
 
             // Ensure foreign key constraint is not violated.
-            var guild = await _context.Guilds.FindAsync(GuildId);
+            var guild = await _context.Guilds.FindAsync(guildId);
             if (guild == null)
             {
-                guild = new Guild(GuildId);
+                guild = new Guild(guildId);
                 await _context.Guilds.AddAsync(guild);
             }
 
             // Add the bank
-            var bank = new GuildBank(GuildId, name);
+            var bank = new GuildBank(guildId, name);
             await _context.GuildBanks.AddAsync(bank);
 
             // Save changes
@@ -112,27 +108,27 @@ namespace Alderto.Services.GuildBankManagers
             return bank;
         }
 
-        public async Task RemoveGuildBankAsync(string name)
+        public async Task RemoveGuildBankAsync(ulong guildId, string name)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(name));
+            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, name));
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveGuildBankAsync(int id)
+        public async Task RemoveGuildBankAsync(ulong guildId, int id)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(id));
+            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, id));
         }
 
-        public async Task UpdateGuildBankAsync(string name, Action<GuildBank> changes)
+        public async Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes)
         {
-            var gb = await GetGuildBankAsync(name);
+            var gb = await GetGuildBankAsync(guildId, name);
             changes(gb);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateGuildBankAsync(int id, Action<GuildBank> changes)
+        public async Task UpdateGuildBankAsync(ulong guildId, int id, Action<GuildBank> changes)
         {
-            var gb = await GetGuildBankAsync(id);
+            var gb = await GetGuildBankAsync(guildId, id);
             changes(gb);
             await _context.SaveChangesAsync();
         }
