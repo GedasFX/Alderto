@@ -22,7 +22,7 @@ namespace Alderto.Services
         /// creates a guild in <see cref="IAldertoDbContext.Guilds"/> and a member in <see cref="IAldertoDbContext.Members"/>
         /// </summary>
         /// <param name="guildMember">New <see cref="GuildMember"/> to add.</param>
-        public async Task AddMemberAsync(GuildMember guildMember)
+        public async Task AddGuildMemberAsync(GuildMember guildMember)
         {
             var guild = await _context.Guilds.FindAsync(guildMember.GuildId);
 
@@ -43,6 +43,18 @@ namespace Alderto.Services
 
             await _context.GuildMembers.AddAsync(guildMember);
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddGuildAsync(Guild guild)
+        {
+            await _context.Guilds.AddAsync(guild);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddMemberAsync(Member member)
+        {
+            await _context.Members.AddAsync(member);
             await _context.SaveChangesAsync();
         }
 
@@ -68,7 +80,7 @@ namespace Alderto.Services
 
             // Member does not exist and addIfNotExistent flag was set. Add to database and return.
             member = new GuildMember(guildId, memberId);
-            await AddMemberAsync(member);
+            await AddGuildMemberAsync(member);
             return member;
         }
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Data.SqlClient;
-using System.Threading;
-using System.Threading.Tasks;
-using Alderto.Data.Exceptions;
-using Alderto.Data.Models;
+﻿using Alderto.Data.Models;
 using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,34 +58,6 @@ namespace Alderto.Data
                 "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
 #endif
             base.OnConfiguring(optionsBuilder);
-        }
-
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                return await base.SaveChangesAsync(cancellationToken);
-            }
-            catch (DbUpdateException e)
-            {
-                HandleDbUpdateException(e);
-                throw;
-            }
-        }
-
-
-        private static void HandleDbUpdateException(Exception e)
-        {
-            if (!(e.InnerException is SqlException innerEx))
-                return;
-
-            switch (innerEx.Number)
-            {
-                case 2601: // https://docs.microsoft.com/en-ie/sql/relational-databases/replication/mssql-eng002601
-                    throw new UniqueIndexViolationException(innerEx.Message, innerEx);
-                default:
-                    return;
-            }
         }
     }
 }

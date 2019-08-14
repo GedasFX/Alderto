@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
@@ -88,10 +89,26 @@ namespace Alderto.Services.GuildBankManagers
 
         public async Task<GuildBank> CreateGuildBankAsync(string name)
         {
+            // If guild id is unspecified do nothing.
+            if (GuildId == 0)
+                return null;
+
+            // Ensure foreign key constraint is not violated.
+            var guild = await _context.Guilds.FindAsync(GuildId);
+            if (guild == null)
+            {
+                guild = new Guild(GuildId);
+                await _context.Guilds.AddAsync(guild);
+            }
+
+            // Add the bank
             var bank = new GuildBank(GuildId, name);
-            await _context.AddAsync(bank);
+            await _context.GuildBanks.AddAsync(bank);
+
+            // Save changes
             await _context.SaveChangesAsync();
 
+            // Return the added bank
             return bank;
         }
 

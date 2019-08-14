@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Alderto.Data.Exceptions;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
@@ -31,21 +30,23 @@ namespace Alderto.Web.Controllers
         [HttpPost, Route("create")]
         public async Task<IActionResult> CreateBank([Bind(nameof(GuildBank.GuildId), nameof(GuildBank.Name))] GuildBank bank)
         {
+            // Ensure user has admin rights
             if (!await User.IsDiscordAdminAsync(bank.GuildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
             _bank.Configure(bank.GuildId, User.GetId());
 
-            try
-            {
-                var b = await _bank.CreateGuildBankAsync(bank.Name);
-                return Content(b);
-            }
-            catch (UniqueIndexViolationException)
-            {
+            if (await _bank.GetGuildBankAsync(bank.Name) != null)
                 return BadRequest("A bank with the given name already exists.");
-            }
+
+            var b = await _bank.CreateGuildBankAsync(bank.Name);
+
+            // Ensure guild is null to prevent serializer loop.
+            b.Guild = null;
+
+            return Content(b);
         }
+
 
         [HttpPatch, Route("rename")]
         public async Task<IActionResult> RenameBank(ulong guildId, int bankId, string newName)

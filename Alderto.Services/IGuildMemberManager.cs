@@ -14,7 +14,19 @@ namespace Alderto.Services
         /// creates a guild in <see cref="IAldertoDbContext.Guilds"/> and a member in <see cref="IAldertoDbContext.Members"/>
         /// </summary>
         /// <param name="guildMember">New <see cref="GuildMember"/> to add.</param>
-        Task AddMemberAsync(GuildMember guildMember);
+        Task AddGuildMemberAsync(GuildMember guildMember);
+
+        /// <summary>
+        /// Adds a guild to <see cref="IAldertoDbContext.Guilds"/>.
+        /// </summary>
+        /// <param name="guild">New <see cref="Guild"/> to add.</param>
+        Task AddGuildAsync(Guild guild);
+
+        /// <summary>
+        /// Adds a member to <see cref="IAldertoDbContext.Members"/>.
+        /// </summary>
+        /// <param name="member">New <see cref="Member"/> to add.</param>
+        Task AddMemberAsync(Member member);
 
         /// <summary>
         /// Gets the <see cref="GuildMember"/> from the database context. Can return null if member doesn't exist and <see cref="addIfNonExistent"/> is set to false.
