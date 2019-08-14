@@ -18,6 +18,11 @@ namespace Alderto.Data.Models.GuildBank
         public ulong GuildId { get; set; }
 
         /// <summary>
+        /// Id of channel to log changes to the bank to.
+        /// </summary>
+        public ulong? LogChannelId { get; set; }
+
+        /// <summary>
         /// Name of the bank.
         /// </summary>
         [MaxLength(32), Required]
@@ -35,14 +40,11 @@ namespace Alderto.Data.Models.GuildBank
         public virtual Guild Guild { get; set; }
 
         /// <summary>
-        /// A collection of transactions the bank has completed.
-        /// </summary>
-        public virtual ICollection<GuildBankTransaction> Transactions { get; set; }
-
-        /// <summary>
         /// A collection of items in the bank.
         /// </summary>
         public virtual ICollection<GuildBankBankItem> Contents { get; set; }
+
+        
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.

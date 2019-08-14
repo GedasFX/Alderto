@@ -16,7 +16,6 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<GuildBank> GuildBanks { get; set; }
         public DbSet<GuildBankItem> GuildBankItems { get; set; }
         public DbSet<GuildBankBankItem> GuildBankContents { get; set; }
-        public DbSet<GuildBankTransaction> GuildBankTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

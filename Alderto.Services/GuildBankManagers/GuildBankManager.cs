@@ -30,16 +30,7 @@ namespace Alderto.Services.GuildBankManagers
                 query = options.Invoke(query);
             return query.Where(b => b.GuildId == guildId);
         }
-
-        public IEnumerable<GuildBankTransaction> GetAllTransactions(ulong guildId, ulong memberId,
-            Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
-        {
-            var query = _context.GuildBanks.Include(b => b.Transactions) as IQueryable<GuildBank>;
-            if (options != null)
-                query = options(query);
-            return query.Where(g => g.GuildId == guildId).SelectMany(g => g.Transactions.Where(t => t.MemberId == memberId));
-        }
-
+        
         public Task<GuildBank> GetGuildBankAsync(ulong guildId, string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
@@ -60,7 +51,7 @@ namespace Alderto.Services.GuildBankManagers
             var bank = await GetGuildBankAsync(guildId, bankName);
             bank.CurrencyCount += quantity;
 
-            await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, comment: comment);
+            await _transactions.LogCurrencyChangeAsync(bank, adminId, transactorId, bank.CurrencyCount - quantity, bank.CurrencyCount, comment);
             await _context.SaveChangesAsync();
         }
 
@@ -79,7 +70,7 @@ namespace Alderto.Services.GuildBankManagers
 
             bankItem.Quantity += quantity;
 
-            await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, bankItem.GuildBankItemId, comment);
+            //await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, bankItem.GuildBankItemId, comment);
             await _context.SaveChangesAsync();
         }
 

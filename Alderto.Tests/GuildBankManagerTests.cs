@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Tests.MockedEntities;
 using Xunit;
@@ -16,7 +15,7 @@ namespace Alderto.Tests
         {
             var context = new MockDbContext();
             _items = new GuildBankItemManager(context);
-            _manager = new GuildBankManager(context, new GuildBankTransactionsManager(context), _items);
+            _manager = new GuildBankManager(context, new GuildBankTransactionsManager(new Discord.WebSocket.DiscordSocketClient()), _items);
         }
 
         [Fact]
@@ -54,11 +53,6 @@ namespace Alderto.Tests
 
             var bi = await _items.GetBankItemAsync(b.Id, item.Id);
             Assert.Equal(4399.6, bi.Quantity);
-
-            var log = _manager.GetAllTransactions(1, 2).ToArray();
-
-            Assert.Single(log);
-            Assert.Equal(1u, log[0].AdminId); 
         }
     }
 }

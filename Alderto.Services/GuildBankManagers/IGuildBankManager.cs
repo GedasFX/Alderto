@@ -9,16 +9,6 @@ namespace Alderto.Services.GuildBankManagers
     public interface IGuildBankManager
     {
         /// <summary>
-        /// Gets the member's transactions from the given banks.
-        /// </summary>
-        /// <param name="guildId">Guild Id.</param>
-        /// <param name="memberId">Member Id.</param>
-        /// <param name="options">Additional includes.</param>
-        /// <returns>A collection of transactions made by the user in the given guild bank.</returns>
-        IEnumerable<GuildBankTransaction> GetAllTransactions(ulong guildId, ulong memberId,
-            Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
-
-        /// <summary>
         /// Gets the guild bank with the provided name.
         /// </summary>
         /// <param name="guildId">Guild Id.</param>

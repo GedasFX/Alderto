@@ -51,7 +51,6 @@ namespace Alderto.Data
         DbSet<GuildBank> GuildBanks { get; }
         DbSet<GuildBankItem> GuildBankItems { get; }
         DbSet<GuildBankBankItem> GuildBankContents { get; }
-        DbSet<GuildBankTransaction> GuildBankTransactions { get; }
 
 
         /// <summary>

@@ -21,29 +21,6 @@ namespace Alderto.Bot.Modules
             _guildBankManager = guildBankManager;
         }
 
-        [Command("Transactions"), Alias("Log")]
-        public async Task Transactions(IGuildUser user = null, string bankName = null)
-        {
-            if (user == null)
-                user = (IGuildUser)Context.User;
-
-            var gbTrans = bankName != null
-                ? _guildBankManager.GetAllTransactions(user.GuildId, user.Id, gb => gb.Where(b => b.Name == bankName))
-                : _guildBankManager.GetAllTransactions(user.GuildId, user.Id);
-            var transactions = gbTrans as ICollection<GuildBankTransaction> ?? gbTrans.ToArray();
-
-            if (transactions.Count == 0)
-                await this.ReplyErrorEmbedAsync($"{user.Mention} has not made any transactions.");
-            else
-                await this.ReplySuccessEmbedAsync($"{user.Mention} has made the following transactions:", builder =>
-                {
-                    foreach (var transaction in transactions)
-                    {
-                        builder.AddField($"{transaction.Id}: {transaction.TransactionDate}", $"**{transaction.Comment}**");
-                    }
-                });
-        }
-
         [Command("Give"), Alias("Add")]
         public async Task Give(IGuildUser transactor, string bankName, string itemName, double quantity)
         {
