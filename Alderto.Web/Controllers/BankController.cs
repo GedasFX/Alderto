@@ -2,13 +2,12 @@
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers
 {
-    [Authorize, Route("api/bank")]
+    [Route("api/bank")]
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
@@ -27,12 +26,14 @@ namespace Alderto.Web.Controllers
         }
 
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateBank([Bind(nameof(GuildBank.GuildId), nameof(GuildBank.Name))] GuildBank bank)
+        public async Task<IActionResult> CreateBank(
+            [Bind(nameof(GuildBank.GuildId), nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
+            GuildBank bank)
         {
             // Ensure user has admin rights
             if (!await User.IsDiscordAdminAsync(bank.GuildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
-
+            
             if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
                 return BadRequest("A bank with the given name already exists.");
 

@@ -5,13 +5,8 @@ export interface IGuildBank {
   currencyCount: number;
 
   contents: IGuildBankContents[];
-  transactions: IGuildBankTransaction[];
 }
 
 export interface IGuildBankContents {
-  
-}
-
-export interface IGuildBankTransaction {
 
 }

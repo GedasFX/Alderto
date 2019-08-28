@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 namespace Alderto.Web.Controllers
 {
     [Route("api/account")]
-    [ApiController]
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> _logger;

@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController]
+    [ApiController, Authorize]
     public abstract class ApiControllerBase : ControllerBase
     {
         protected IActionResult Forbid(string message)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new
             {
-                StatusCode = StatusCodes.Status403Forbidden,
                 Message = message
             });
         }
@@ -19,7 +19,6 @@ namespace Alderto.Web.Controllers
         {
             return StatusCode(StatusCodes.Status400BadRequest, new
             {
-                StatusCode = StatusCodes.Status400BadRequest,
                 Message = message
             });
         }

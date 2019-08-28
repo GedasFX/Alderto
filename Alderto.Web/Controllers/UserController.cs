@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Alderto.Web.Models.Discord;
 using Discord.WebSocket;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [Authorize, Route("api/user")]
+    [Route("api/user")]
     public class UserController : ApiControllerBase
     {
         private readonly DiscordSocketClient _bot;

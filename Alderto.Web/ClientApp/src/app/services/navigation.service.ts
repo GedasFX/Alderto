@@ -56,7 +56,7 @@ export class NavigationService {
    */
   private onNavigatedToGuild(guildId: string) {
     // Replace :id with actual guildId.
-    const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId as any)) as INavData[];
+    const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId)) as INavData[];
     this.navItemsSubject$.next(nav);
     this.currentGuildIdSubject$.next(guildId);
   }
