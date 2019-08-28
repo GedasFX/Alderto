@@ -17,10 +17,10 @@ namespace Alderto.Web.Controllers
             _bank = bank;
         }
 
-        [HttpGet, Route("list")]
-        public IActionResult ListBanks(ulong guildId)
+        [HttpGet, Route("list/{guildId}")]
+        public async Task<IActionResult> ListBanks(ulong guildId)
         {
-            var banks = _bank.GetAllGuildBanks(guildId, o => o.Include(b => b.Contents));
+            var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
 
             return Content(banks);
         }

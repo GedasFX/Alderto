@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IGuild } from '../../models';
+import { IGuild } from 'src/app/models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebUserService {
+export class AldertoWebUserApi {
   constructor(private readonly http: HttpClient) { }
 
   public fetchMutualGuilds(guilds: IGuild[]): Observable<IGuild[]> {

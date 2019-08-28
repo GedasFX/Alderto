@@ -34,7 +34,7 @@ namespace Alderto.Services.GuildBankManagers
         /// <param name="guildId">Guild Id.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>A collection of guild banks belonging to the given guild.</returns>
-        Task<List<GuildBank>> GetAllGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
+        Task<List<GuildBank>> GetAllGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
         /// Modifies the amount of currency the guild has.

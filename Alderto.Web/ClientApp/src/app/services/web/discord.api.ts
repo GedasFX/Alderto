@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IUser, IGuild } from '../models';
+import { IUser, IGuild } from 'src/app/models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DiscordService {
+export class DiscordWebApi {
 
   constructor(private readonly http: HttpClient) { }
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IGuildBank } from 'src/app/models';
-import { GuildBankService } from 'src/app/services';
+import { AldertoWebBankApi, NavigationService } from 'src/app/services';
 
 @Component({
   templateUrl: 'overview.component.html'
@@ -8,9 +8,11 @@ import { GuildBankService } from 'src/app/services';
 export class OverviewComponent implements OnInit {
   public guildBanks: IGuildBank[] = [];
 
-  constructor(private readonly gb: GuildBankService) { }
+  constructor(
+    private readonly bankApi: AldertoWebBankApi,
+    private readonly nav: NavigationService) { }
 
   public ngOnInit(): void {
-    this.gb.fetchBanks().subscribe(b => this.guildBanks = b);
+    this.bankApi.fetchBanks(this.nav.getCurrentGuildId()).subscribe(b => this.guildBanks = b);
   }
 }

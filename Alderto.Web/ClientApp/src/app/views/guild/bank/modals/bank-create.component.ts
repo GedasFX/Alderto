@@ -2,7 +2,7 @@ import { Component, ViewChild, Input } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { GuildBankService } from 'src/app/services';
+import { AldertoWebBankApi, NavigationService } from 'src/app/services';
 import { IGuildBank } from 'src/app/models';
 
 @Component({
@@ -22,7 +22,8 @@ export class BankCreateComponent {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly bank: GuildBankService) {
+    private readonly bankApi: AldertoWebBankApi,
+    private readonly nav: NavigationService) {
   }
 
   public show() {
@@ -30,7 +31,7 @@ export class BankCreateComponent {
   }
 
   public onSubmit() {
-    this.bank.createNewBank(this.formGroup.value.name).subscribe(r => {
+    this.bankApi.createNewBank(this.nav.getCurrentGuildId(), this.formGroup.value.name).subscribe(r => {
       this.banks.push(r);
       this.modal.hide();
     });

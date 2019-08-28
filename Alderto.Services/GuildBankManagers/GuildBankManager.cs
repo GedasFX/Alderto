@@ -41,7 +41,7 @@ namespace Alderto.Services.GuildBankManagers
             return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Id == id);
         }
 
-        public Task<List<GuildBank>> GetAllGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        public Task<List<GuildBank>> GetAllGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             return FetchGuildBanks(guildId, options).ToListAsync();
         }

@@ -5,6 +5,8 @@ export interface IGuild {
   owner: boolean;
   permissions: number;
 
+  mutual: boolean;
+
   channels: IGuildChannel[];
 }
 
