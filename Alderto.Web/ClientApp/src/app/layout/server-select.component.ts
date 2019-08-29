@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IGuild } from '../models';
-import { GuildService, NavigationService } from 'src/app/services';
+import { GuildService } from 'src/app/services';
 
 @Component({
   selector: '.app-server-select',
@@ -12,17 +11,12 @@ export class ServerSelectComponent implements OnInit {
   public currentServerName = "Please select a server";
 
   constructor(
-    private readonly guilds: GuildService,
-    private readonly nav: NavigationService) { }
+    private readonly guilds: GuildService) { }
 
   public ngOnInit() {
-    this.guilds.updateGuilds();
-
-
-    //this.nav.currentGuildId$.subscribe(guildId => {
-    //  var guild = mutualGuilds.find(g => g.id === guildId);
-    //  if (guild !== undefined)
-    //    this.currentServerName = mutualGuilds.find(g => g.id === guildId).name;
-    //});
+    this.guilds.currentGuild$.subscribe(g => {
+      if (g !== undefined)
+        this.currentServerName = g.name;
+    });
   }
 }

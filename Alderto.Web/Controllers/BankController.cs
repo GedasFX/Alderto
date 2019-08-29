@@ -37,7 +37,7 @@ namespace Alderto.Web.Controllers
             if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
                 return BadRequest("A bank with the given name already exists.");
 
-            var b = await _bank.CreateGuildBankAsync(bank.GuildId, bank.Name);
+            var b = await _bank.CreateGuildBankAsync(bank.GuildId, bank.Name, bank.LogChannelId);
 
             // Ensure guild is null to prevent serializer loop.
             b.Guild = null;

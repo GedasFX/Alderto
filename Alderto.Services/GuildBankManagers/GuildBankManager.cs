@@ -30,7 +30,7 @@ namespace Alderto.Services.GuildBankManagers
                 query = options.Invoke(query);
             return query.Where(b => b.GuildId == guildId);
         }
-        
+
         public Task<GuildBank> GetGuildBankAsync(ulong guildId, string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
@@ -74,10 +74,10 @@ namespace Alderto.Services.GuildBankManagers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name)
+        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name, ulong? logChannelId = null)
         {
             // If guild id is unspecified do nothing.
-            if (guildId < 1)
+            if (guildId == 0)
                 return null;
 
             // Ensure foreign key constraint is not violated.
@@ -89,7 +89,7 @@ namespace Alderto.Services.GuildBankManagers
             }
 
             // Add the bank
-            var bank = new GuildBank(guildId, name);
+            var bank = new GuildBank(guildId, name) { LogChannelId = logChannelId };
             await _context.GuildBanks.AddAsync(bank);
 
             // Save changes

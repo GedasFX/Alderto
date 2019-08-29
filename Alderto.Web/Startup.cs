@@ -3,6 +3,7 @@ using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Services;
+using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace Alderto.Web
 {
@@ -76,7 +76,11 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvc()
-                .AddJsonOptions(options => { options.UseCamelCasing(true); });
+                .AddJsonOptions(options =>
+                {
+                    options.UseCamelCasing(true);
+                    options.SerializerSettings.Converters.Add(new SnowflakeConverter());
+                });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
@@ -94,7 +98,7 @@ namespace Alderto.Web
             });
             services.AddCommandHandler();
         }
-
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {

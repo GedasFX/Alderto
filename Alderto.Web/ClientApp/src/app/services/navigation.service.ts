@@ -10,18 +10,12 @@ import { INavData, homeNav, guildNav } from '../_nav';
 export class NavigationService {
   public readonly currentRoute$: Observable<string>;
 
-  private readonly navItemsSubject$: BehaviorSubject<INavData[]>;
-  public readonly navItems$: Observable<INavData[]>;
-
-  private readonly currentGuildIdSubject$: BehaviorSubject<string>;
-  public readonly currentGuildId$: Observable<string>;
+  public readonly navItems$: BehaviorSubject<INavData[]>;
+  public readonly currentGuildId$: BehaviorSubject<string>;
 
   constructor(router: Router) {
-    this.navItemsSubject$ = new BehaviorSubject<INavData[]>(homeNav);
-    this.navItems$ = this.navItemsSubject$.asObservable();
-
-    this.currentGuildIdSubject$ = new BehaviorSubject<string>(undefined);
-    this.currentGuildId$ = this.currentGuildIdSubject$.asObservable();
+    this.navItems$ = new BehaviorSubject<INavData[]>(homeNav);
+    this.currentGuildId$ = new BehaviorSubject<string>(undefined);
 
     // Gets a NavigationEnd event and gets the route off of it.
     // There has to be a better way of doing this.
@@ -47,7 +41,7 @@ export class NavigationService {
    * Updates nav items to use the home layout.
    */
   private onNavigatedToHome() {
-    this.navItemsSubject$.next(homeNav);
+    this.navItems$.next(homeNav);
   }
 
   /**
@@ -57,14 +51,14 @@ export class NavigationService {
   private onNavigatedToGuild(guildId: string) {
     // Replace :id with actual guildId.
     const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId)) as INavData[];
-    this.navItemsSubject$.next(nav);
-    this.currentGuildIdSubject$.next(guildId);
+    this.navItems$.next(nav);
+    this.currentGuildId$.next(guildId);
   }
 
   /**
    * Gets the current guild Id.
    */
   public getCurrentGuildId(): string {
-    return this.currentGuildIdSubject$.value;
+    return this.currentGuildId$.value;
   }
 }

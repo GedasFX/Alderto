@@ -22,7 +22,7 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(id))
                 return Forbid(ForbidReason.NotDiscordAdmin);
 
-            return Content(_client.GetGuild(id).Channels.Select(c => new { c.Id, c.Name }));
+            return Content(_client.GetGuild(id).TextChannels.Select(c => new { c.Id, c.Name }));
         }
     }
 }

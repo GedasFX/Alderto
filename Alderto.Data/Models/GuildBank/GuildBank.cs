@@ -44,8 +44,6 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         public virtual ICollection<GuildBankBankItem> Contents { get; set; }
 
-        
-
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
         /// </summary>

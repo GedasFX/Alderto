@@ -3,6 +3,7 @@ export interface IGuildBank {
   guildId: number;
   name: string;
   currencyCount: number;
+  logChannelId: string;
 
   contents: IGuildBankContents[];
 }

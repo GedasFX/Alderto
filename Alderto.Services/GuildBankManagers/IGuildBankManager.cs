@@ -65,7 +65,8 @@ namespace Alderto.Services.GuildBankManagers
         /// </summary>
         /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of bank to add to be added to the database.</param>
-        Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name);
+        /// <param name="logChannelId">Id of channel to log info to.</param>
+        Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name, ulong? logChannelId = null);
 
         /// <summary>
         /// Removes a guild bank of a given name.
