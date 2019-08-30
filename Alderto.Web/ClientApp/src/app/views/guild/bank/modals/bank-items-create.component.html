@@ -1,0 +1,32 @@
+<div class="modal-content">
+  <form #form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+    <div class="modal-header">
+      <h4 class="modal-title">Create New Bank Item</h4>
+      <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Name:</label>
+        <input class="form-control" type="text" formControlName="name" required maxlength="70" />
+      </div>
+      <div class="form-group">
+        <label>Description:</label>
+        <input class="form-control" type="text" formControlName="description" maxlength="140" />
+      </div>
+      <div class="form-group">
+        <label>Value:</label>
+        <input class="form-control" type="number" formControlName="value" required value="0" min="0" max="1000000000000000000" />
+      </div>
+      <div class="form-group">
+        <label>Image URL:</label>
+        <input class="form-control" type="url" formControlName="imageUrl" maxlength="140" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Create New Bank Item</button>
+    </div>
+  </form>
+</div>

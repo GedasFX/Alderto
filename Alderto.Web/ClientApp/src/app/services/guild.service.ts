@@ -49,4 +49,8 @@ export class GuildService {
       });
     });
   }
+
+  public getCurrentGuildId(): string {
+    return this.currentGuild$.value.id;
+  }
 }

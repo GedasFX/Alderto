@@ -1,6 +1,6 @@
 export interface IGuildBank {
   id: number;
-  guildId: number;
+  guildId: string;
   name: string;
   currencyCount: number;
   logChannelId: string;
@@ -10,4 +10,13 @@ export interface IGuildBank {
 
 export interface IGuildBankContents {
 
+}
+
+export interface IGuildBankItem {
+  id: number;
+  guildId: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  value: number;
 }

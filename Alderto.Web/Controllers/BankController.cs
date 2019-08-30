@@ -11,10 +11,12 @@ namespace Alderto.Web.Controllers
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
+        private readonly IGuildBankItemManager _bankItems;
 
-        public BankController(IGuildBankManager bank)
+        public BankController(IGuildBankManager bank, IGuildBankItemManager bankItems)
         {
             _bank = bank;
+            _bankItems = bankItems;
         }
 
         [HttpGet]
@@ -75,6 +77,20 @@ namespace Alderto.Web.Controllers
 
             await _bank.RemoveGuildBankAsync(guildId, bankId);
             return Ok();
+        }
+
+        [HttpPost("items")]
+        public async Task<IActionResult> CreateItem(ulong guildId,
+            [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
+                nameof(GuildBankItem.ImageUrl))]
+            GuildBankItem item)
+        {
+            if (!await User.IsDiscordAdminAsync(guildId))
+                return Forbid(ErrorMessages.NotDiscordAdmin);
+
+            var i = await _bankItems.CreateItemAsync(guildId, item.Name, item.Description, item.Value, item.ImageUrl);
+
+            return Content(i);
         }
     }
 }

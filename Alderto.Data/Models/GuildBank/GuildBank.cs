@@ -29,6 +29,16 @@ namespace Alderto.Data.Models.GuildBank
         public string Name { get; set; }
 
         /// <summary>
+        /// Id of role, which allows to modify contents of the bank.
+        /// </summary>
+        public ulong ModeratorRoleId { get; set; }
+
+        /// <summary>
+        /// Id of role, which allows to view contents of the bank. Null value means the bank is open to public.
+        /// </summary>
+        public ulong? ViewerRoleId { get; set; }
+
+        /// <summary>
         /// Guild, referenced by <see cref="GuildId"/>.
         /// </summary>
         [ForeignKey(nameof(GuildId))]

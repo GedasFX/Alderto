@@ -7,7 +7,7 @@ namespace Alderto.Services.GuildBankManagers
 {
     public interface IGuildBankItemManager
     {
-        Task<GuildBankItem> CreateItemAsync(ulong guildId, string name, string description = null, double value = 0);
+        Task<GuildBankItem> CreateItemAsync(ulong guildId, string name, string description = null, double value = 0, string imageUrl = null);
         Task UpdateItemAsync(ulong guildId, string itemName, Action<GuildBankItem> changes);
         Task RemoveItemAsync(ulong guildId, string itemName);
         Task<GuildBankItem> GetItemAsync(ulong guildId, string itemName);

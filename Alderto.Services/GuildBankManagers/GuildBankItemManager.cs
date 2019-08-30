@@ -17,14 +17,15 @@ namespace Alderto.Services.GuildBankManagers
             _context = context;
         }
         
-        public async Task<GuildBankItem> CreateItemAsync(ulong guildId, string name, string description = null, double value = 0)
+        public async Task<GuildBankItem> CreateItemAsync(ulong guildId, string name, string description = null, double value = 0, string imageUrl = null)
         {
             var item = new GuildBankItem
             {
                 GuildId = guildId,
                 Name = name,
                 Description = description,
-                Value = value
+                Value = value,
+                ImageUrl = imageUrl
             };
 
             _context.GuildBankItems.Add(item);

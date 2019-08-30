@@ -29,6 +29,12 @@ namespace Alderto.Data.Models.GuildBank
         public string Description { get; set; }
 
         /// <summary>
+        /// Path to the image to be displayed in the bank.
+        /// </summary>
+        [MaxLength(140)]
+        public string ImageUrl { get; set; }
+
+        /// <summary>
         /// Monetary value per unit.
         /// </summary>
         public double Value { get; set; }

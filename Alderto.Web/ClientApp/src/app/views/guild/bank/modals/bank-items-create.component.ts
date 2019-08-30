@@ -6,20 +6,19 @@ import { ToastrService } from 'ngx-toastr';
 import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
 import { IGuildBank } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IGuildBankItem } from 'src/app/models/guild-bank';
 
 @Component({
-  templateUrl: 'bank-create.component.html'
+  templateUrl: 'bank-items-create.component.html'
 })
-export class BankCreateComponent implements OnInit {
-  // Reference for output purposes
-  public banks: IGuildBank[];
-
-  // List of channels in dropdown.
-  public channelSelect: any[];
+export class BankItemsCreateComponent implements OnInit {
+  public bank: IGuildBank;
 
   public formGroup = this.fb.group({
-    name: [null, Validators.required],
-    logChannelId: []
+    name: [null, Validators.required, Validators.maxLength(70)],
+    description: [null, Validators.maxLength(280)],
+    value: [null, Validators.required, Validators.min(0), Validators.max(1000000000000000000)],
+    imageUrl: [null, Validators.maxLength(140)]
   });
 
   constructor(
@@ -32,25 +31,22 @@ export class BankCreateComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.guild.currentGuild$.subscribe(g => {
-      if (g !== undefined)
-        if (g.channels !== undefined)
-          this.channelSelect = g.channels;
-        else
-          this.guild.updateChannels(g.id)
-            .then(channels => this.channelSelect = channels);
-    });
   }
 
   public onSubmit() {
-    this.bankApi.createNewBank(this.guild.getCurrentGuildId(),
+    if (!this.formGroup.valid)
+      return;
+
+    this.bankApi.createNewBankItem(this.guild.getCurrentGuildId(),
       {
         name: this.formGroup.value.name,
-        logChannelId: this.formGroup.value.logChannelId
-      } as IGuildBank).subscribe(
-        bank => {
-          this.banks.push(bank);
-          this.toastr.success(`Successfully created bank <b>${bank.name}</b>`, null, { enableHtml: true });
+        description: this.formGroup.value.description,
+        value: this.formGroup.value.value,
+        imageUrl: this.formGroup.value.imageUrl
+      } as IGuildBankItem).subscribe(
+        item => {
+          this.bank.contents.push(item);
+          this.toastr.success(`Successfully created bank item <b>${bank.name}</b>`, null, { enableHtml: true });
         },
         (err: HttpErrorResponse) => {
           this.toastr.error(err.error.message, 'Could not create the bank');

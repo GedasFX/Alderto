@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IGuildBank } from 'src/app/models';
+import { IGuildBank, IGuildBankItem } from 'src/app/models';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,8 @@ export class AldertoWebBankApi {
     return this.http.get<IGuildBank[]>(`/api/guilds/${guildId}/banks`);
   }
 
-  public createNewBank(guildId: string, name: string, logChannelId: string): Observable<IGuildBank> {
-    return this.http.post<IGuildBank>(`/api/guilds/${guildId}/banks`, { name, logChannelId });
+  public createNewBank(guildId: string, bank: IGuildBank): Observable<IGuildBank> {
+    return this.http.post<IGuildBank>(`/api/guilds/${guildId}/banks`, bank);
   }
 
   public editBank(guildId: number, bankId: number, name: string, logChannelId: string) {
@@ -23,5 +23,9 @@ export class AldertoWebBankApi {
 
   public removeBank(guildId: string, bankId: number) {
     return this.http.delete(`/api/guilds/${guildId}/banks/${bankId}`);
+  }
+
+  public createNewBankItem(guildId: string, item: IGuildBankItem) {
+    return this.http.post(`/api/guilds/${guildId}/banks/items`, item);
   }
 }
