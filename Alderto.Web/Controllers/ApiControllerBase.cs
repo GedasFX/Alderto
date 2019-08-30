@@ -7,20 +7,14 @@ namespace Alderto.Web.Controllers
     [ApiController, Authorize]
     public abstract class ApiControllerBase : ControllerBase
     {
-        protected IActionResult Forbid(string message)
+        protected IActionResult Forbid(ErrorMessage message)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new
-            {
-                Message = message
-            });
+            return StatusCode(StatusCodes.Status403Forbidden, message);
         }
 
-        protected IActionResult BadRequest(string message)
+        protected IActionResult BadRequest(ErrorMessage message)
         {
-            return StatusCode(StatusCodes.Status400BadRequest, new
-            {
-                Message = message
-            });
+            return StatusCode(StatusCodes.Status400BadRequest, message);
         }
 
         protected IActionResult Content(object data)
@@ -28,9 +22,25 @@ namespace Alderto.Web.Controllers
             return StatusCode(StatusCodes.Status200OK, data);
         }
 
-        protected static class ForbidReason
+        protected class ErrorMessage
         {
-            public const string NotDiscordAdmin = "Could not confirm if user is an admin of the specified server.";
+            public int Code { get; set; }
+            public string Message { get; set; }
+
+            public ErrorMessage(int code, string message)
+            {
+                Code = code;
+                Message = message;
+            }
+        }
+
+        protected static class ErrorMessages
+        {
+            public static ErrorMessage NotDiscordAdmin { get; } =
+                new ErrorMessage(100, "Could not confirm if user is an admin of the specified server.");
+
+            public static ErrorMessage BankNameAlreadyExists { get; } =
+                new ErrorMessage(200, "A bank with the given name already exists.");
         }
     }
 }

@@ -9,6 +9,7 @@ import { OverviewComponent } from './overview.component';
 
 import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
+import { BankEditComponent } from './modals/bank-edit.component';
 
 @NgModule({
   imports: [
@@ -21,10 +22,12 @@ import { BankRemoveComponent } from './modals/bank-remove.component';
   declarations: [
     OverviewComponent,
     BankCreateComponent,
+    BankEditComponent,
     BankRemoveComponent
   ],
   entryComponents: [
     BankCreateComponent,
+    BankEditComponent,
     BankRemoveComponent
   ],
   exports: [ModalModule]

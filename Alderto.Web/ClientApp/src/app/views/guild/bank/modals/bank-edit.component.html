@@ -1,7 +1,7 @@
 <div class="modal-content">
   <form #form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
     <div class="modal-header">
-      <h4 class="modal-title">Create New Bank</h4>
+      <h4 class="modal-title">Editing Bank {{ bank.name }}</h4>
       <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -18,7 +18,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
-      <button type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Create New Bank</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Edit Bank</button>
     </div>
   </form>
 </div>

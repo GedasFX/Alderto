@@ -66,7 +66,6 @@ namespace Alderto.Web.Helpers
                         return JsonConvert.DeserializeObject<T>(await stream.ReadToEndAsync());
                     }
                 }
-                
             }
             catch (Exception)
             {
@@ -83,7 +82,7 @@ namespace Alderto.Web.Helpers
         public static async Task<bool> VerifyAdminAsync(ulong guildId, string authHeader)
         {
             var data = await FetchAsync<DiscordGuild[]>($"/users/@me/guilds?after={guildId - 1}&limit=1", authHeader: authHeader);
-            
+
             try
             {
                 // This should only work if there is 1 and only 1 guild. Do not confirm admin rights on 0 or many guilds. Possible attack.
@@ -97,7 +96,6 @@ namespace Alderto.Web.Helpers
 
                 // Check if is owner of has Administrator permissions.
                 const int administratorBit = 2;
-                Console.Out.WriteLine($"{guild.Owner || (permissions & (1 << administratorBit)) != 0}");
                 return guild.Owner || (permissions & (1 << administratorBit)) != 0;
             }
             catch (InvalidOperationException)

@@ -32,10 +32,10 @@ namespace Alderto.Web.Controllers
         {
             // Ensure user has admin rights
             if (!await User.IsDiscordAdminAsync(bank.GuildId))
-                return Forbid(ForbidReason.NotDiscordAdmin);
+                return Forbid(ErrorMessages.NotDiscordAdmin);
 
             if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
-                return BadRequest("A bank with the given name already exists.");
+                return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
             var b = await _bank.CreateGuildBankAsync(bank.GuildId, bank.Name, bank.LogChannelId);
 
@@ -45,14 +45,17 @@ namespace Alderto.Web.Controllers
             return Content(b);
         }
 
-
-        [HttpPatch, Route("rename")]
-        public async Task<IActionResult> RenameBank(ulong guildId, int bankId, string newName)
+        [HttpPatch, Route("edit/{guildId}/{bankId}")]
+        public async Task<IActionResult> EditBank(ulong guildId, int bankId, [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))] GuildBank bank)
         {
             if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ForbidReason.NotDiscordAdmin);
+                return Forbid(ErrorMessages.NotDiscordAdmin);
 
-            await _bank.UpdateGuildBankAsync(guildId, bankId, b => { b.Name = newName; });
+            await _bank.UpdateGuildBankAsync(guildId, bankId, b =>
+            {
+                b.Name = bank.Name;
+                b.LogChannelId = bank.LogChannelId;
+            });
 
             return Ok();
         }
@@ -61,11 +64,10 @@ namespace Alderto.Web.Controllers
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
             if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ForbidReason.NotDiscordAdmin);
+                return Forbid(ErrorMessages.NotDiscordAdmin);
 
             await _bank.RemoveGuildBankAsync(guildId, bankId);
             return Ok();
         }
-
     }
 }

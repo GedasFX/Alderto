@@ -1,34 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { FormBuilder, Validators } from '@angular/forms';
+import { AldertoWebBankApi, GuildService } from 'src/app/services';
+import { IGuildBank } from 'src/app/models';
+import { ToastrService } from 'ngx-toastr';
 
-import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
-import { IGuildBank, IGuildChannel } from 'src/app/models';
 
 @Component({
   selector: 'app-bank-create',
   templateUrl: 'bank-remove.component.html'
 })
-export class BankRemoveComponent implements OnInit {
+export class BankRemoveComponent {
   // Reference for output purposes
   public banks: IGuildBank[];
 
   public bank: IGuildBank;
-  public id: number;
 
   constructor(
     private readonly bankApi: AldertoWebBankApi,
     private readonly guild: GuildService,
-    private readonly modal: BsModalRef) {
-  }
-
-  public ngOnInit() {
-    this.bank = this.banks.find(b => b.id === this.id);
+    private readonly modal: BsModalRef,
+    private readonly toastr: ToastrService) {
   }
 
   public onDeleteConfirmed() {
-    this.bankApi.removeBank(this.guild.currentGuild$.getValue().id, this.id).subscribe(r => {
+    this.bankApi.removeBank(this.guild.currentGuild$.getValue().id, this.bank.id).subscribe(r => {
       this.banks.splice(this.banks.indexOf(this.bank), 1);
+      this.toastr.success(`Successfully removed bank <b>${this.bank.name}</b>`, null, { enableHtml: true });
+    },
+    (err: HttpErrorResponse) => {
+      this.toastr.error(err.error.message, 'Could not remove the bank');
+    },
+    () => {
       this.modal.hide();
     });
   }

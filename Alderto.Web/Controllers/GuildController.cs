@@ -20,7 +20,7 @@ namespace Alderto.Web.Controllers
         public async Task<IActionResult> Channels(ulong id)
         {
             if (!await User.IsDiscordAdminAsync(id))
-                return Forbid(ForbidReason.NotDiscordAdmin);
+                return Forbid(ErrorMessages.NotDiscordAdmin);
 
             return Content(_client.GetGuild(id).TextChannels.Select(c => new { c.Id, c.Name }));
         }

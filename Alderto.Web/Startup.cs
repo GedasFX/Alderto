@@ -79,7 +79,8 @@ namespace Alderto.Web
                 .AddJsonOptions(options =>
                 {
                     options.UseCamelCasing(true);
-                    options.SerializerSettings.Converters.Add(new SnowflakeConverter());
+                    options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong>());
+                    options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong?>());
                 });
 
             // In production, the Angular files will be served from this directory
