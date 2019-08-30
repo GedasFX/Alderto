@@ -18,8 +18,8 @@ export class BankCreateComponent implements OnInit {
   public channelSelect: any[];
 
   public formGroup = this.fb.group({
-    name: ['', Validators.required],
-    logChannelId: ['']
+    name: [null, Validators.required],
+    logChannelId: []
   });
 
   constructor(

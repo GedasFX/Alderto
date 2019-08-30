@@ -14,7 +14,7 @@ export class AldertoWebBankApi {
   }
 
   public createNewBank(guildId: string, name: string, logChannelId: string): Observable<IGuildBank> {
-    return this.http.post<IGuildBank>('/api/bank/create', { guildId, name, logChannelId });
+    return this.http.post<IGuildBank>(`/api/bank/create/${guildId}`, { name, logChannelId });
   }
 
   public editBank(guildId: number, bankId: number, name: string, logChannelId: string) {

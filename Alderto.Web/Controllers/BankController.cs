@@ -25,19 +25,19 @@ namespace Alderto.Web.Controllers
             return Content(banks);
         }
 
-        [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateBank(
-            [Bind(nameof(GuildBank.GuildId), nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
+        [HttpPost, Route("create/{guildId}")]
+        public async Task<IActionResult> CreateBank(ulong guildId,
+            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
             GuildBank bank)
         {
             // Ensure user has admin rights
-            if (!await User.IsDiscordAdminAsync(bank.GuildId))
+            if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.NotDiscordAdmin);
 
-            if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
+            if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            var b = await _bank.CreateGuildBankAsync(bank.GuildId, bank.Name, bank.LogChannelId);
+            var b = await _bank.CreateGuildBankAsync(guildId, bank.Name, bank.LogChannelId);
 
             // Ensure guild is null to prevent serializer loop.
             b.Guild = null;
@@ -46,10 +46,17 @@ namespace Alderto.Web.Controllers
         }
 
         [HttpPatch, Route("edit/{guildId}/{bankId}")]
-        public async Task<IActionResult> EditBank(ulong guildId, int bankId, [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))] GuildBank bank)
+        public async Task<IActionResult> EditBank(ulong guildId, int bankId,
+            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
+            GuildBank bank)
         {
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.NotDiscordAdmin);
+
+            // If not renaming this would always return itself. Check for id difference instead.
+            var dbBank = await _bank.GetGuildBankAsync(guildId, bank.Name);
+            if (dbBank != null && dbBank.Id != bankId)
+                return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
             await _bank.UpdateGuildBankAsync(guildId, bankId, b =>
             {
