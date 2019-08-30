@@ -21,33 +21,33 @@ namespace Alderto.Bot.Modules
             _guildBankManager = guildBankManager;
         }
 
-        [Command("Give"), Alias("Add")]
-        public async Task Give(IGuildUser transactor, string bankName, string itemName, double quantity)
-        {
-            if (itemName == "$")
-            {
-                // Special case - currency donation.
-                await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, quantity);
-            }
-            else
-            {
-                await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, quantity);
-            }
-        }
+        //[Command("Give"), Alias("Add")]
+        //public async Task Give(IGuildUser transactor, string bankName, string itemName, double quantity)
+        //{
+        //    if (itemName == "$")
+        //    {
+        //        // Special case - currency donation.
+        //        await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, quantity);
+        //    }
+        //    else
+        //    {
+        //        await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, quantity);
+        //    }
+        //}
 
-        [Command("Take"), Alias("Remove")]
-        public async Task Take(IGuildUser transactor, string bankName, string itemName, double quantity)
-        {
-            if (itemName == "$")
-            {
-                // Special case - currency donation.
-                await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, -quantity);
-            }
-            else
-            {
-                await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, -quantity);
-            }
-        }
+        //[Command("Take"), Alias("Remove")]
+        //public async Task Take(IGuildUser transactor, string bankName, string itemName, double quantity)
+        //{
+        //    if (itemName == "$")
+        //    {
+        //        // Special case - currency donation.
+        //        await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, -quantity);
+        //    }
+        //    else
+        //    {
+        //        await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, -quantity);
+        //    }
+        //}
 
         [Command("Items"), Alias("List")]
         public async Task Items(string bankName)

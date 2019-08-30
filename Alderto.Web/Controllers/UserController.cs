@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/user")]
+    [Route("api/users")]
     public class UserController : ApiControllerBase
     {
         private readonly DiscordSocketClient _bot;
@@ -16,7 +16,7 @@ namespace Alderto.Web.Controllers
             _bot = bot;
         }
 
-        [HttpPost, Route("guilds")]
+        [HttpPost("@me/mutual-guilds")]
         public IActionResult FilterMutualGuilds(IEnumerable<DiscordGuild> guilds)
         {
             // Json parser sometimes has trouble passing Lists.

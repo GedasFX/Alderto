@@ -10,6 +10,6 @@ export class AldertoWebGuildApi {
   constructor(private readonly http: HttpClient) { }
 
   public fetchChannels(id: string): Observable<IGuildChannel[]> {
-    return this.http.get<IGuildChannel[]>(`/api/guild/${id}/channels`);
+    return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/channels`);
   }
 }

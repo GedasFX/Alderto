@@ -36,6 +36,6 @@ export class OverviewComponent implements OnInit {
 
 
   public openAddNewItemModal(bank: IGuildBank): void {
-    this.modal.show(BankConetentsAddComponent, { initialState: bank });
+    //this.modal.show(BankConetentsAddComponent, { initialState: bank });
   }
 }

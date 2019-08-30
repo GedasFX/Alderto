@@ -45,16 +45,7 @@ namespace Alderto.Services.GuildBankManagers
         {
             return FetchGuildBanks(guildId, options).ToListAsync();
         }
-
-        public async Task ModifyCurrencyCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, double quantity, string comment = null)
-        {
-            var bank = await GetGuildBankAsync(guildId, bankName);
-            bank.CurrencyCount += quantity;
-
-            await _transactions.LogCurrencyChangeAsync(bank, adminId, transactorId, bank.CurrencyCount - quantity, bank.CurrencyCount, comment);
-            await _context.SaveChangesAsync();
-        }
-
+        
         public async Task ModifyItemCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, string itemName, double quantity, string comment = null)
         {
             var bank = await GetGuildBankAsync(guildId, bankName);

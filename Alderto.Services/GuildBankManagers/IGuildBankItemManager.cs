@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 
@@ -15,5 +16,8 @@ namespace Alderto.Services.GuildBankManagers
         Task UpdateBankItemAsync(int bankId, int itemId, Action<GuildBankBankItem> changes);
         Task RemoveBankItemAsync(int bankId, int itemId);
         Task<GuildBankBankItem> GetBankItemAsync(int bankId, int itemId);
+
+        Task<List<GuildBankItem>> GetGuildItems(ulong guildId);
+        Task<List<GuildBankBankItem>> GetGuildBankItems(int bankId);
     }
 }

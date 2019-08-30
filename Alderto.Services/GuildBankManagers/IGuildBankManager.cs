@@ -37,17 +37,6 @@ namespace Alderto.Services.GuildBankManagers
         Task<List<GuildBank>> GetAllGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null);
 
         /// <summary>
-        /// Modifies the amount of currency the guild has.
-        /// </summary>
-        /// <param name="guildId">Guild Id.</param>
-        /// <param name="bankName">Name of the bank the transaction has occured in.</param>
-        /// <param name="adminId">Id of person, who administered the transaction.</param>
-        /// <param name="transactorId">Id of person, who has given/taken money from/to the guild.</param>
-        /// <param name="quantity">Amount of currency transferred.</param>
-        /// <param name="comment">Comment on the transaction.</param>
-        Task ModifyCurrencyCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, double quantity, string comment = null);
-
-        /// <summary>
         /// Modifies the amount of a particular item the guild has.
         /// </summary>
         /// <param name="guildId">Guild Id.</param>

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/guild")]
+    [Route("api/guilds/{guildId}")]
     public class GuildController : ApiControllerBase
     {
         private readonly DiscordSocketClient _client;
@@ -16,13 +16,13 @@ namespace Alderto.Web.Controllers
             _client = client;
         }
 
-        [Route("{id}/channels")]
-        public async Task<IActionResult> Channels(ulong id)
+        [HttpGet("channels")]
+        public async Task<IActionResult> Channels(ulong guildId)
         {
-            if (!await User.IsDiscordAdminAsync(id))
+            if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.NotDiscordAdmin);
 
-            return Content(_client.GetGuild(id).TextChannels.Select(c => new { c.Id, c.Name }));
+            return Content(_client.GetGuild(guildId).TextChannels.Select(c => new { c.Id, c.Name }));
         }
     }
 }

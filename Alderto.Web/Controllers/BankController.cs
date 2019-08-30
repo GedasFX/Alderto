@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/bank")]
+    [Route("api/guilds/{guildId}/banks")]
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
@@ -17,7 +17,7 @@ namespace Alderto.Web.Controllers
             _bank = bank;
         }
 
-        [HttpGet, Route("list/{guildId}")]
+        [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
             var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
@@ -25,7 +25,7 @@ namespace Alderto.Web.Controllers
             return Content(banks);
         }
 
-        [HttpPost, Route("create/{guildId}")]
+        [HttpPost]
         public async Task<IActionResult> CreateBank(ulong guildId,
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
             GuildBank bank)
@@ -45,7 +45,7 @@ namespace Alderto.Web.Controllers
             return Content(b);
         }
 
-        [HttpPatch, Route("edit/{guildId}/{bankId}")]
+        [HttpPatch("{bankId}")]
         public async Task<IActionResult> EditBank(ulong guildId, int bankId,
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
             GuildBank bank)
@@ -67,7 +67,7 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-        [HttpDelete, Route("remove/{guildId}/{bankId}")]
+        [HttpDelete("{bankId}")]
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
             if (!await User.IsDiscordAdminAsync(guildId))

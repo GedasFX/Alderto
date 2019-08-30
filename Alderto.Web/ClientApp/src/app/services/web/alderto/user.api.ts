@@ -10,6 +10,6 @@ export class AldertoWebUserApi {
   constructor(private readonly http: HttpClient) { }
 
   public fetchMutualGuilds(guilds: IGuild[]): Observable<IGuild[]> {
-    return this.http.post<IGuild[]>('/api/user/guilds', guilds);
+    return this.http.post<IGuild[]>('/api/users/@me/mutual-guilds', guilds);
   }
 }

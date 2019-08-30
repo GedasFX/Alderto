@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
@@ -77,6 +79,16 @@ namespace Alderto.Services.GuildBankManagers
         public Task<GuildBankBankItem> GetBankItemAsync(int bankId, int itemId)
         {
             return _context.GuildBankContents.FindAsync(bankId, itemId);
+        }
+
+        public Task<List<GuildBankItem>> GetGuildItems(ulong guildId)
+        {
+            return _context.GuildBankItems.Where(u => u.GuildId == guildId).ToListAsync();
+        }
+
+        public Task<List<GuildBankBankItem>> GetGuildBankItems(int bankId)
+        {
+            return _context.GuildBankContents.Where(u => u.GuildBankId == bankId).ToListAsync();
         }
     }
 }
