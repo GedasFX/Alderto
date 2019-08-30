@@ -33,4 +33,9 @@ export class OverviewComponent implements OnInit {
   public openRemoveBankModal(bank: IGuildBank): void {
     this.modal.show(BankRemoveComponent, { initialState: { banks: this.guildBanks, bank } });
   }
+
+
+  public openAddNewItemModal(bank: IGuildBank): void {
+    this.modal.show(BankConetentsAddComponent, { initialState: bank });
+  }
 }

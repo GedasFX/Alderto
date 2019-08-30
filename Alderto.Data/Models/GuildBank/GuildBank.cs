@@ -29,11 +29,6 @@ namespace Alderto.Data.Models.GuildBank
         public string Name { get; set; }
 
         /// <summary>
-        /// Amount of currency the bank has.
-        /// </summary>
-        public double CurrencyCount { get; set; }
-        
-        /// <summary>
         /// Guild, referenced by <see cref="GuildId"/>.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
