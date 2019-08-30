@@ -22,6 +22,7 @@ export class GuildService {
     private readonly nav: NavigationService
   ) {
     this.updateGuilds();
+    this.currentGuild$.subscribe(g => console.log(g));
   }
 
   public updateGuilds(): void {

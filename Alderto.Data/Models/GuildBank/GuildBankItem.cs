@@ -12,9 +12,9 @@ namespace Alderto.Data.Models.GuildBank
         public int Id { get; set; }
 
         /// <summary>
-        /// Id of guild, which has created the item.
+        /// Guild Bank Id.
         /// </summary>
-        public ulong GuildId { get; set; }
+        public int GuildBankId { get; set; }
 
         /// <summary>
         /// Name of the item.
@@ -38,5 +38,16 @@ namespace Alderto.Data.Models.GuildBank
         /// Monetary value per unit.
         /// </summary>
         public double Value { get; set; }
+
+        /// <summary>
+        /// Quantity of the item in the bank.
+        /// </summary>
+        public double Quantity { get; set; }
+
+        /// <summary>
+        /// Guild bank object.
+        /// </summary>
+        [ForeignKey(nameof(GuildBankId))]
+        public virtual GuildBank GuildBank { get; set; }
     }
 }

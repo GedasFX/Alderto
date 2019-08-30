@@ -39,8 +39,12 @@ namespace Alderto.Web.Controllers
             public static ErrorMessage NotDiscordAdmin { get; } =
                 new ErrorMessage(100, "Could not confirm if user is an admin of the specified server.");
 
+            public static ErrorMessage BankDoesNotExist { get; } =
+                new ErrorMessage(200, "The given bank was not found.");
+
             public static ErrorMessage BankNameAlreadyExists { get; } =
-                new ErrorMessage(200, "A bank with the given name already exists.");
+                new ErrorMessage(201, "A bank with the given name already exists.");
+
         }
     }
 }

@@ -9,24 +9,28 @@
     <div class="modal-body">
       <div class="form-group">
         <label>Name:</label>
-        <input class="form-control" type="text" formControlName="name" required maxlength="70" />
+        <input class="form-control" type="text" formControlName="name" required maxlength="70" placeholder="Name of the item" />
       </div>
       <div class="form-group">
         <label>Description:</label>
-        <input class="form-control" type="text" formControlName="description" maxlength="140" />
+        <textarea class="form-control" rows="3" formControlName="description" maxlength="140" placeholder="Short description"></textarea>
       </div>
       <div class="form-group">
         <label>Value:</label>
-        <input class="form-control" type="number" formControlName="value" required value="0" min="0" max="1000000000000000000" />
+        <input class="form-control" type="number" formControlName="value" required min="-1000000000000000000" max="1000000000000000000" placeholder="Monetary value" />
+      </div>
+      <div class="form-group">
+        <label>Quantity:</label>
+        <input class="form-control" type="number" formControlName="quantity" required min="-1000000000000000000" max="1000000000000000000" placeholder="Amount of item in this bank" />
       </div>
       <div class="form-group">
         <label>Image URL:</label>
-        <input class="form-control" type="url" formControlName="imageUrl" maxlength="140" />
+        <input class="form-control" type="url" formControlName="imageUrl" maxlength="140" placeholder="Image URL of the item" />
       </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
-      <button type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Create New Bank Item</button>
+      <button type="submit" class="btn btn-primary">Create New Bank Item</button>
     </div>
   </form>
 </div>

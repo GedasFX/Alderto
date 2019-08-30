@@ -16,80 +16,42 @@ namespace Alderto.Services.GuildBankManagers
         {
             _context = context;
         }
-        
-        public async Task<GuildBankItem> CreateItemAsync(ulong guildId, string name, string description = null, double value = 0, string imageUrl = null)
+
+        public Task<GuildBankItem> GetBankItemAsync(int itemId)
         {
-            var item = new GuildBankItem
-            {
-                GuildId = guildId,
-                Name = name,
-                Description = description,
-                Value = value,
-                ImageUrl = imageUrl
-            };
+            return _context.GuildBankItems.FindAsync(itemId);
+        }
+
+        public Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName)
+        {
+            return _context.GuildBankItems.SingleOrDefaultAsync(i => i.GuildBankId == bankId && i.Name == itemName);
+        }
+
+        public Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId)
+        {
+            return _context.GuildBankItems.Where(u => u.GuildBankId == bankId).ToListAsync();
+        }
+
+        public async Task<GuildBankItem> CreateBankItemAsync(int bankId, GuildBankItem item)
+        {
+            item.GuildBankId = bankId;
 
             _context.GuildBankItems.Add(item);
             await _context.SaveChangesAsync();
             return item;
         }
 
-        public async Task UpdateItemAsync(ulong guildId, string itemName, Action<GuildBankItem> changes)
+        public async Task UpdateBankItemAsync(int itemId, Action<GuildBankItem> changes)
         {
-            var item = await GetItemAsync(guildId, itemName);
-
+            var item = await GetBankItemAsync(itemId);
             changes(item);
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveItemAsync(ulong guildId, string itemName)
+        public async Task RemoveBankItemAsync(int itemId)
         {
-            var item = await GetItemAsync(guildId, itemName);
-            _context.Remove(item);
+            _context.Remove(await GetBankItemAsync(itemId));
             await _context.SaveChangesAsync();
-        }
-
-        public Task<GuildBankItem> GetItemAsync(ulong guildId, string itemName)
-        {
-            return _context.GuildBankItems.SingleOrDefaultAsync(i => i.GuildId == guildId && i.Name == itemName);
-        }
-
-        public async Task<GuildBankBankItem> CreateBankItemAsync(int bankId, int itemId)
-        {
-            var gbItem = new GuildBankBankItem
-            {
-                GuildBankId = bankId,
-                GuildBankItemId = itemId
-            };
-            await _context.GuildBankContents.AddAsync(gbItem);
-            return gbItem;
-        }
-
-        public async Task UpdateBankItemAsync(int bankId, int itemId, Action<GuildBankBankItem> changes)
-        {
-            var item = await GetBankItemAsync(bankId, itemId);
-            changes(item);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task RemoveBankItemAsync(int bankId, int itemId)
-        {
-            _context.Remove(await GetBankItemAsync(bankId, itemId));
-            await _context.SaveChangesAsync();
-        }
-
-        public Task<GuildBankBankItem> GetBankItemAsync(int bankId, int itemId)
-        {
-            return _context.GuildBankContents.FindAsync(bankId, itemId);
-        }
-
-        public Task<List<GuildBankItem>> GetGuildItems(ulong guildId)
-        {
-            return _context.GuildBankItems.Where(u => u.GuildId == guildId).ToListAsync();
-        }
-
-        public Task<List<GuildBankBankItem>> GetGuildBankItems(int bankId)
-        {
-            return _context.GuildBankContents.Where(u => u.GuildBankId == bankId).ToListAsync();
         }
     }
 }

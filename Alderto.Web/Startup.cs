@@ -79,6 +79,7 @@ namespace Alderto.Web
                 .AddJsonOptions(options =>
                 {
                     options.UseCamelCasing(true);
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong>());
                     options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong?>());
                 });

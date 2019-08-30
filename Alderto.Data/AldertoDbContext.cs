@@ -16,7 +16,6 @@ namespace Alderto.Data
 
         public DbSet<GuildBank> GuildBanks { get; set; }
         public DbSet<GuildBankItem> GuildBankItems { get; set; }
-        public DbSet<GuildBankBankItem> GuildBankContents { get; set; }
 
         public AldertoDbContext(DbContextOptions options) : base(options)
         {
@@ -39,10 +38,7 @@ namespace Alderto.Data
             modelBuilder.Entity<GuildBank>()
                 .HasIndex(b => new { b.GuildId, b.Name })
                 .IsUnique();
-
-            modelBuilder.Entity<GuildBankBankItem>()
-                .HasKey(b => new { b.GuildBankId, b.GuildBankItemId });
-
+            
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Tests.MockedEntities;
 using Xunit;
@@ -21,22 +22,22 @@ namespace Alderto.Tests
         [Fact]
         public async Task TestItemManagerCrud()
         {
-            var item = await _items.GetItemAsync(1, "item");
+            var item = await _items.GetBankItemAsync(1, "item");
             Assert.Null(item);
 
-            await _items.CreateItemAsync(1, "item", "d", -0.3);
+            var i = await _items.CreateBankItemAsync(1, new GuildBankItem { Name = "item", Description = "d", Value = -0.3, Quantity = -1.6 });
 
-            item = await _items.GetItemAsync(1, "item");
+            item = await _items.GetBankItemAsync(i.Id);
             Assert.Equal("d", item.Description);
 
-            await _items.UpdateItemAsync(1, "item", bankItem => bankItem.Description = "t");
+            await _items.UpdateBankItemAsync(i.Id, bankItem => bankItem.Description = "t");
             Assert.Equal("t", item.Description);
 
-            item = await _items.GetItemAsync(1, "item");
+            item = await _items.GetBankItemAsync(1, "item");
             Assert.Equal("t", item.Description);
 
-            await _items.RemoveItemAsync(1, "item");
-            item = await _items.GetItemAsync(1, "item");
+            await _items.RemoveBankItemAsync(i.Id);
+            item = await _items.GetBankItemAsync(1, "item");
             Assert.Null(item);
         }
 
@@ -47,11 +48,11 @@ namespace Alderto.Tests
             Assert.NotEqual(0, b.Id);
             Assert.Equal(1u, b.GuildId);
 
-            var item = await _items.CreateItemAsync(1, "bb", "cc");
+            var item = await _items.CreateBankItemAsync(1, new GuildBankItem { Name = "bb", Description = "cc" });
             await _manager.ModifyItemCountAsync(1, "main", 1, 2, "bb", 6666);
             await _manager.ModifyItemCountAsync(1, "main", 1, 3, "bb", -2266.4);
 
-            var bi = await _items.GetBankItemAsync(b.Id, item.Id);
+            var bi = await _items.GetBankItemAsync(item.Id);
             Assert.Equal(4399.6, bi.Quantity);
         }
     }

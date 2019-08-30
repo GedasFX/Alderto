@@ -10,6 +10,7 @@ import { OverviewComponent } from './overview.component';
 import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
 import { BankEditComponent } from './modals/bank-edit.component';
+import { BankItemsCreateComponent } from './modals/bank-items-create.component';
 
 @NgModule({
   imports: [
@@ -23,12 +24,14 @@ import { BankEditComponent } from './modals/bank-edit.component';
     OverviewComponent,
     BankCreateComponent,
     BankEditComponent,
-    BankRemoveComponent
+    BankRemoveComponent,
+    BankItemsCreateComponent
   ],
   entryComponents: [
     BankCreateComponent,
     BankEditComponent,
-    BankRemoveComponent
+    BankRemoveComponent,
+    BankItemsCreateComponent
   ],
   exports: [ModalModule]
 })

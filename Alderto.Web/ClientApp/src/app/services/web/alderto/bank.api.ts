@@ -17,7 +17,7 @@ export class AldertoWebBankApi {
     return this.http.post<IGuildBank>(`/api/guilds/${guildId}/banks`, bank);
   }
 
-  public editBank(guildId: number, bankId: number, name: string, logChannelId: string) {
+  public editBank(guildId: string, bankId: number, name: string, logChannelId: string) {
     return this.http.patch(`/api/guilds/${guildId}/banks/${bankId}`, { name, logChannelId });
   }
 
@@ -25,7 +25,7 @@ export class AldertoWebBankApi {
     return this.http.delete(`/api/guilds/${guildId}/banks/${bankId}`);
   }
 
-  public createNewBankItem(guildId: string, item: IGuildBankItem) {
-    return this.http.post(`/api/guilds/${guildId}/banks/items`, item);
+  public createNewBankItem(guildId: string, bankId: number, item: IGuildBankItem) {
+    return this.http.post<IGuildBankItem>(`/api/guilds/${guildId}/banks/${bankId}/items`, item);
   }
 }

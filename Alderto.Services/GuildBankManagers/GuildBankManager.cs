@@ -52,16 +52,12 @@ namespace Alderto.Services.GuildBankManagers
             if (bank == null)
                 throw new NotImplementedException();
 
-            var item = await _items.GetItemAsync(guildId, itemName);
+            var item = await _items.GetBankItemAsync(bank.Id, itemName);
             if (item == null)
                 throw new NotImplementedException();
 
-            var bankItem = await _items.GetBankItemAsync(bank.Id, item.Id) ??
-                           await _items.CreateBankItemAsync(bank.Id, item.Id);
+            item.Quantity += quantity;
 
-            bankItem.Quantity += quantity;
-
-            //await _transactions.LogAsync(bank.Id, adminId, transactorId, quantity, bankItem.GuildBankItemId, comment);
             await _context.SaveChangesAsync();
         }
 

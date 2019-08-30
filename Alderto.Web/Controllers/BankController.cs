@@ -40,10 +40,7 @@ namespace Alderto.Web.Controllers
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
             var b = await _bank.CreateGuildBankAsync(guildId, bank.Name, bank.LogChannelId);
-
-            // Ensure guild is null to prevent serializer loop.
-            b.Guild = null;
-
+            
             return Content(b);
         }
 
@@ -77,20 +74,6 @@ namespace Alderto.Web.Controllers
 
             await _bank.RemoveGuildBankAsync(guildId, bankId);
             return Ok();
-        }
-
-        [HttpPost("items")]
-        public async Task<IActionResult> CreateItem(ulong guildId,
-            [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
-                nameof(GuildBankItem.ImageUrl))]
-            GuildBankItem item)
-        {
-            if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ErrorMessages.NotDiscordAdmin);
-
-            var i = await _bankItems.CreateItemAsync(guildId, item.Name, item.Description, item.Value, item.ImageUrl);
-
-            return Content(i);
         }
     }
 }

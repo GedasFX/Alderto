@@ -19,4 +19,5 @@ export interface IGuildBankItem {
   description: string;
   imageUrl: string;
   value: number;
+  quantity: number;
 }
