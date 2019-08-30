@@ -1,0 +1,16 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title">Remove {{ bank.name }}</h4>
+    <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you wish to remove this bank?</p>
+    <p>This operation cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.hide();">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="onDeleteConfirmed()">Remove</button>
+  </div>
+</div>

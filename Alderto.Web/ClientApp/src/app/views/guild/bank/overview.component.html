@@ -11,7 +11,7 @@
         <i class="fa fa-bank"></i> {{ bank.name }}
         <div class="card-header-actions">
           <a class="card-header-action"><i class="fa fa-plus"></i> </a>
-          <a class="card-header-action"><i class="fa fa-trash-o"></i> </a>
+          <a class="card-header-action" (click)="openRemoveBankModal(bank.id)"><i class="fa fa-trash-o"></i> </a>
         </div>
       </div>
       <div class="card-body">

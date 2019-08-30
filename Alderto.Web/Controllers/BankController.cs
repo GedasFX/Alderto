@@ -33,7 +33,7 @@ namespace Alderto.Web.Controllers
             // Ensure user has admin rights
             if (!await User.IsDiscordAdminAsync(bank.GuildId))
                 return Forbid(ForbidReason.NotDiscordAdmin);
-            
+
             if (await _bank.GetGuildBankAsync(bank.GuildId, bank.Name) != null)
                 return BadRequest("A bank with the given name already exists.");
 
@@ -57,7 +57,7 @@ namespace Alderto.Web.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+        [HttpDelete, Route("remove/{guildId}/{bankId}")]
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
             if (!await User.IsDiscordAdminAsync(guildId))

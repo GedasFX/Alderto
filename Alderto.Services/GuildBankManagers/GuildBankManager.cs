@@ -108,6 +108,7 @@ namespace Alderto.Services.GuildBankManagers
         public async Task RemoveGuildBankAsync(ulong guildId, int id)
         {
             _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, id));
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes)

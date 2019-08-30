@@ -8,6 +8,7 @@ import { BankRoutingModule } from './bank.routing';
 import { OverviewComponent } from './overview.component';
 
 import { BankCreateComponent } from './modals/bank-create.component';
+import { BankRemoveComponent } from './modals/bank-remove.component';
 
 @NgModule({
   imports: [
@@ -19,10 +20,12 @@ import { BankCreateComponent } from './modals/bank-create.component';
   ],
   declarations: [
     OverviewComponent,
-    BankCreateComponent
+    BankCreateComponent,
+    BankRemoveComponent
   ],
   entryComponents: [
-    BankCreateComponent
+    BankCreateComponent,
+    BankRemoveComponent
   ],
   exports: [ModalModule]
 })

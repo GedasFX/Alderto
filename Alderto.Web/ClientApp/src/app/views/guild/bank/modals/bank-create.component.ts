@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
-import { IGuildBank, IGuildChannel } from 'src/app/models';
+import { IGuildBank } from 'src/app/models';
 
 @Component({
-  selector: 'app-bank-create',
   templateUrl: 'bank-create.component.html'
 })
 export class BankCreateComponent implements OnInit {
@@ -26,7 +26,8 @@ export class BankCreateComponent implements OnInit {
     private readonly bankApi: AldertoWebBankApi,
     private readonly guild: GuildService,
     private readonly nav: NavigationService,
-    private readonly modal: BsModalRef) {
+    private readonly modal: BsModalRef,
+    private readonly toastr: ToastrService) {
   }
 
   public ngOnInit() {
@@ -40,9 +41,11 @@ export class BankCreateComponent implements OnInit {
   }
 
   public onSubmit() {
-    this.bankApi.createNewBank(this.nav.getCurrentGuildId(), this.formGroup.value.name, this.formGroup.value.logChannelId).subscribe(r => {
-      this.banks.push(r);
-      this.modal.hide();
-    });
+    this.bankApi.createNewBank(this.nav.getCurrentGuildId(), this.formGroup.value.name, this.formGroup.value.logChannelId).subscribe(
+      r => {
+        this.banks.push(r);
+        this.toastr.success(`Successfully created bank ${r.name}`);
+        this.modal.hide();
+      });
   }
 }

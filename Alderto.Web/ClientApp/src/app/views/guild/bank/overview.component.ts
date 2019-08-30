@@ -3,6 +3,7 @@ import { IGuildBank } from 'src/app/models';
 import { AldertoWebBankApi, NavigationService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BankCreateComponent } from './modals/bank-create.component';
+import { BankRemoveComponent } from './modals/bank-remove.component';
 
 @Component({
   templateUrl: 'overview.component.html'
@@ -22,5 +23,9 @@ export class OverviewComponent implements OnInit {
 
   public openCreateBankModal(): void {
     this.modal.show(BankCreateComponent, { initialState: { banks: this.guildBanks } });
+  }
+
+  public openRemoveBankModal(id: number): void {
+    this.modal.show(BankRemoveComponent, { initialState: { banks: this.guildBanks, id } });
   }
 }
