@@ -28,7 +28,7 @@ namespace Alderto.Web.Extensions
         }
 
         /// <summary>
-        /// Gets the discord id claim of the user.
+        /// Gets the Discord id claim of the user.
         /// </summary>
         /// <param name="user">Claims Principal.</param>
         /// <returns>Discord user id.</returns>

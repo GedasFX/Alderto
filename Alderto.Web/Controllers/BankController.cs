@@ -11,12 +11,10 @@ namespace Alderto.Web.Controllers
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
-        private readonly IGuildBankItemManager _bankItems;
 
-        public BankController(IGuildBankManager bank, IGuildBankItemManager bankItems)
+        public BankController(IGuildBankManager bank)
         {
             _bank = bank;
-            _bankItems = bankItems;
         }
 
         [HttpGet]
@@ -34,7 +32,7 @@ namespace Alderto.Web.Controllers
         {
             // Ensure user has admin rights
             if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ErrorMessages.NotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
@@ -50,7 +48,7 @@ namespace Alderto.Web.Controllers
             GuildBank bank)
         {
             if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ErrorMessages.NotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             // If not renaming this would always return itself. Check for id difference instead.
             var dbBank = await _bank.GetGuildBankAsync(guildId, bank.Name);
@@ -70,7 +68,7 @@ namespace Alderto.Web.Controllers
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
             if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ErrorMessages.NotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             await _bank.RemoveGuildBankAsync(guildId, bankId);
             return Ok();

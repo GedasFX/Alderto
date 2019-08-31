@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
@@ -20,23 +21,37 @@ namespace Alderto.Web.Controllers
             _bank = bank;
             _client = client;
         }
-        
+
         [HttpPost("items")]
         public async Task<IActionResult> CreateItem(ulong guildId, int bankId,
             [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
             GuildBankItem item)
         {
-            if (!await User.IsDiscordAdminAsync(guildId))
-                return Forbid(ErrorMessages.NotDiscordAdmin);
-
-            var bank = _bank.GetGuildBankAsync(guildId, bankId);
+            // First get the bank.
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
             if (bank == null)
-                return BadRequest(ErrorMessages.BankDoesNotExist);
+                return NotFound(ErrorMessages.BankNotFound);
 
-            var i = await _contents.CreateBankItemAsync(bankId, item);
+            var userId = User.GetId();
 
-            return Content(i);
+            // Get the guild and check if it is present.
+            var guild = _client.GetGuild(guildId);
+            if (guild == null)
+                return NotFound(ErrorMessages.GuildNotFound);
+
+            // Check if user even exists in the guild.
+            var user = guild.GetUser(userId);
+            if (user == null)
+                return NotFound(ErrorMessages.UserNotFound);
+
+            // Check if user has write access to the bank.
+            if (!(user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator))
+                return Forbid(ErrorMessages.UserNotBankModerator);
+
+            var createdBank = await _contents.CreateBankItemAsync(bankId, item);
+
+            return Content(createdBank);
         }
     }
 }

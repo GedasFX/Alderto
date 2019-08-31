@@ -18,8 +18,9 @@
       <div class="card-body">
         <div class="row text-center">
           <div *ngFor="let item of bank.contents" class="col-6 col-sm-4 col-md-3 col-lg-2">
-            <i class="fa fa-plus fa-lg icons font-4xl"></i>
-            <div> {{ item }} </div>
+            <img *ngIf="item.imageUrl" style="height: 1em; width: auto;" class="fa-2x" [src]="item.imageUrl" alt="" (error)="item.imageUrl = null" />
+            <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
+            <div> {{ item.name }} </div>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2">
             <a (click)="openCreateItemModal(bank)">

@@ -5,11 +5,7 @@ export interface IGuildBank {
   currencyCount: number;
   logChannelId: string;
 
-  contents: IGuildBankContents[];
-}
-
-export interface IGuildBankContents {
-
+  contents: IGuildBankItem[];
 }
 
 export interface IGuildBankItem {

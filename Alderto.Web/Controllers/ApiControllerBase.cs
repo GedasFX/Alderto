@@ -17,6 +17,11 @@ namespace Alderto.Web.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, message);
         }
 
+        protected IActionResult NotFound(ErrorMessage message)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, message);
+        }
+
         protected IActionResult Content(object data)
         {
             return StatusCode(StatusCodes.Status200OK, data);
@@ -36,15 +41,53 @@ namespace Alderto.Web.Controllers
 
         protected static class ErrorMessages
         {
-            public static ErrorMessage NotDiscordAdmin { get; } =
-                new ErrorMessage(100, "Could not confirm if user is an admin of the specified server.");
+            // === Forbid ===
+            
+            /// <summary>
+            /// Forbid reason. Used when unable to confirm admin status.
+            /// </summary>
+            public static ErrorMessage UserNotDiscordAdmin { get; } =
+                new ErrorMessage(1100, "Could not confirm if user is an admin of the specified guild.");
 
-            public static ErrorMessage BankDoesNotExist { get; } =
-                new ErrorMessage(200, "The given bank was not found.");
+            /// <summary>
+            /// Forbid reason. Used when unable to confirm bank moderator status.
+            /// </summary>
+            public static ErrorMessage UserNotBankModerator { get; } =
+                new ErrorMessage(1200, "Could not confirm if user has access to add or remove items form the specified bank.");
 
+            // === NotFound ===
+
+            /// <summary>
+            /// NotFound reason. Used when bot was unable to find the guild.
+            /// </summary>
+            public static ErrorMessage GuildNotFound { get; } =
+                new ErrorMessage(2100, "The specified guild was not found.");
+
+            /// <summary>
+            /// NotFound reason. Used when bot was unable to find the user.
+            /// </summary>
+            public static ErrorMessage UserNotFound { get; } =
+                new ErrorMessage(2101, "The specified user was not found.");
+
+            /// <summary>
+            /// NotFound reason. Used when bot was unable to find the bank.
+            /// </summary>
+            public static ErrorMessage BankNotFound { get; } =
+                new ErrorMessage(2200, "The specified bank was not found.");
+
+            // === BadRequest ===
+
+            /// <summary>
+            /// BadRequest reason. Used when received over 100 guilds in a request.
+            /// </summary>
+            public static ErrorMessage GuildCountOver100 { get; } =
+                new ErrorMessage(3100, "Guild count cannot exceed 100.");
+
+            /// <summary>
+            /// BadRequest reason. Used when bank with the given name already exists.
+            /// </summary>
             public static ErrorMessage BankNameAlreadyExists { get; } =
-                new ErrorMessage(201, "A bank with the given name already exists.");
-
+                new ErrorMessage(3200, "A bank with the given name already exists.");
         }
     }
 }
