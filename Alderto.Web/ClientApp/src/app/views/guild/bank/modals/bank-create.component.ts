@@ -3,7 +3,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
-import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
+import { AldertoWebBankApi, GuildService } from 'src/app/services';
 import { IGuildBank } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -26,7 +26,6 @@ export class BankCreateComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly bankApi: AldertoWebBankApi,
     private readonly guild: GuildService,
-    private readonly nav: NavigationService,
     private readonly modal: BsModalRef,
     private readonly toastr: ToastrService) {
   }
@@ -43,6 +42,9 @@ export class BankCreateComponent implements OnInit {
   }
 
   public onSubmit() {
+    if (!this.formGroup.valid)
+      return;
+
     this.bankApi.createNewBank(this.guild.getCurrentGuildId(),
       {
         name: this.formGroup.value.name,
@@ -59,4 +61,6 @@ export class BankCreateComponent implements OnInit {
           this.modal.hide();
         });
   }
+
+  public get name() { return this.formGroup.get('name'); }
 }
