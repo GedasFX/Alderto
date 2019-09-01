@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -6,18 +6,21 @@ import { ToastrService } from 'ngx-toastr';
 import { AldertoWebBankApi, GuildService } from 'src/app/services';
 import { IGuildBank, IGuildChannel } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 @Component({
   templateUrl: 'bank-edit.component.html'
 })
-export class BankEditComponent implements OnInit {
-  // List of channels in dropdown.
-  public channelSelect: IGuildChannel[];
-
+export class BankEditComponent implements OnInit, OnDestroy {
+  // Input
   public bank: IGuildBank;
 
+  public channelSelect: IGuildChannel[];
+
+  private subscriptions: Subscription[] = [];
+
   public formGroup: FormGroup;
-  
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly bankApi: AldertoWebBankApi,
@@ -32,14 +35,13 @@ export class BankEditComponent implements OnInit {
       logChannelId: [this.bank.logChannelId]
     });
 
-    this.guild.currentGuild$.subscribe(g => {
-      if (g !== undefined)
-        if (g.channels !== undefined)
-          this.channelSelect = g.channels;
-        else
-          this.guild.updateChannels(g.id)
-            .then(channels => this.channelSelect = channels);
-    });
+    this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
+      this.guild.getChannels(g).then(c => this.channelSelect = c);
+    }));
+  }
+
+  public ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   public onSubmit() {

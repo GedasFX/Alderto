@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription, Observable } from 'rxjs';
 import { IGuild, IGuildChannel } from 'src/app/models';
 import { DiscordWebApi, AldertoWebUserApi, AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
@@ -13,40 +13,36 @@ export class GuildService {
 
   public readonly currentGuild$ = new BehaviorSubject(undefined as IGuild);
 
-  private idSub: Subscription;
-
   constructor(
     private readonly discord: DiscordWebApi,
     private readonly userApi: AldertoWebUserApi,
     private readonly guildApi: AldertoWebGuildApi,
     private readonly nav: NavigationService
   ) {
-    this.updateGuilds();
-    this.currentGuild$.subscribe(g => console.log(g));
-  }
-
-  public updateGuilds(): void {
-    if (this.idSub !== undefined)
-      this.idSub.unsubscribe();
-
     this.discord.fetchGuilds().subscribe(g => {
       this.userGuilds$.next(g);
       this.userApi.fetchMutualGuilds(g).subscribe(mg => {
         this.mutualGuilds$.next(mg);
 
-        this.idSub = this.nav.currentGuildId$.subscribe(id => {
+        this.nav.currentGuildId$.subscribe(id => {
           this.currentGuild$.next(this.mutualGuilds$.getValue().find(g => g.id === id));
         });
       });
     });
   }
 
-  public updateChannels(guildId: string): Promise<IGuildChannel[]> {
-    return new Promise<IGuildChannel[]>((resolve) => {
-      const guild = this.mutualGuilds$.getValue().find(g => g.id === guildId);
-      this.guildApi.fetchChannels(guildId).subscribe(c => {
-        guild.channels = c;
-        resolve(c);
+  public getChannels(guild: IGuild): Promise<IGuildChannel[]> {
+    if (guild.channels != null)
+      return new Promise<IGuildChannel[]>(r => r(guild.channels));
+    else
+      return this.updateChannels(guild);
+  }
+
+  public updateChannels(guild: IGuild): Promise<IGuildChannel[]> {
+    return new Promise<IGuildChannel[]>(resolve => {
+      this.guildApi.fetchChannels(guild.id).subscribe(channels => {
+        guild.channels = channels;
+        resolve(channels);
       });
     });
   }

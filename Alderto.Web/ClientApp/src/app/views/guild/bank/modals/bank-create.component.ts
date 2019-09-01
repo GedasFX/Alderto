@@ -22,6 +22,8 @@ export class BankCreateComponent implements OnInit, OnDestroy {
     logChannelId: []
   });
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly bankApi: AldertoWebBankApi,
@@ -30,17 +32,10 @@ export class BankCreateComponent implements OnInit, OnDestroy {
     private readonly toastr: ToastrService) {
   }
 
-  private subscriptions: Subscription[] = [];
-
   public ngOnInit() {
     this.onBankCreated = new Subject();
     this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
-      if (g !== undefined)
-        if (g.channels !== undefined)
-          this.channelSelect = g.channels;
-        else
-          this.guild.updateChannels(g.id)
-            .then(channels => this.channelSelect = channels);
+      this.guild.getChannels(g).then(c => this.channelSelect = c);
     }));
   }
 

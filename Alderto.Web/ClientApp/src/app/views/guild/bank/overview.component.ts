@@ -23,12 +23,7 @@ export class OverviewComponent implements OnInit {
   }
 
   public updateValue(bank: IGuildBank) {
-    if (bank.contents.length === 0)
-      this.bankValues[bank.id] = 0;
-    else
-      this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
-
-    console.log(this.bankValues);
+    this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
   }
 
 
@@ -59,11 +54,14 @@ export class OverviewComponent implements OnInit {
   }
 
   public openRemoveBankModal(bank: IGuildBank): void {
-    this.modal.show(BankRemoveComponent,
+    const modal = this.modal.show(BankRemoveComponent,
       {
         initialState: { banks: this.guildBanks, bank },
         ignoreBackdropClick: true
       });
+    (modal.content.onBankDeleted as Subject<void>).subscribe(() => {
+      this.guildBanks.splice(this.guildBanks.indexOf(bank), 1);
+    });
   }
 
 
