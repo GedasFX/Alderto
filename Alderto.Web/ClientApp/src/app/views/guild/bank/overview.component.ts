@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { IGuildBank } from 'src/app/models';
+import { IGuildBank, IGuildBankItem } from 'src/app/models';
 import { AldertoWebBankApi, NavigationService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
 import { BankEditComponent } from './modals/bank-edit.component';
 import { BankItemsCreateComponent } from 'src/app/views/guild/bank/modals/bank-items-create.component';
+import { Subject } from 'rxjs';
 
 @Component({
   templateUrl: 'overview.component.html',
@@ -22,7 +23,12 @@ export class OverviewComponent implements OnInit {
   }
 
   public updateValue(bank: IGuildBank) {
-    this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
+    if (bank.contents.length === 0)
+      this.bankValues[bank.id] = 0;
+    else
+      this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
+
+    console.log(this.bankValues);
   }
 
 
@@ -34,11 +40,14 @@ export class OverviewComponent implements OnInit {
   }
 
   public openCreateBankModal(): void {
-    this.modal.show(BankCreateComponent,
+    const modal = this.modal.show(BankCreateComponent,
       {
-        initialState: { banks: this.guildBanks },
         ignoreBackdropClick: true
       });
+    (modal.content.onBankCreated as Subject<IGuildBank>).subscribe(b => {
+      this.guildBanks.push(b);
+      this.bankValues[b.id] = this.updateValue(b);
+    });
   }
 
   public openEditBankModal(bank: IGuildBank): void {
@@ -59,10 +68,15 @@ export class OverviewComponent implements OnInit {
 
 
   public openCreateItemModal(bank: IGuildBank): void {
-    this.modal.show(BankItemsCreateComponent,
+    const modal = this.modal.show(BankItemsCreateComponent,
       {
         initialState: { bank },
         ignoreBackdropClick: true
       });
+
+    (modal.content.onItemAdded as Subject<IGuildBankItem>).subscribe(item => {
+      bank.contents.push(item);
+      this.updateValue(bank);
+    });
   }
 }

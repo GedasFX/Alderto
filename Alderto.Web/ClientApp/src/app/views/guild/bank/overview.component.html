@@ -13,10 +13,11 @@
           <a class="card-header-action" (click)="openCreateItemModal(bank)"><i class="fa fa-plus"></i> </a>
           <a class="card-header-action" (click)="openEditBankModal(bank)"><i class="fa fa-pencil"></i> </a>
           <a class="card-header-action" (click)="openRemoveBankModal(bank)"><i class="fa fa-trash-o"></i> </a>
+          <a class="card-header-action" (click)="updateValue(bank)"><i class="fa fa-refresh"></i> </a>
         </div>
       </div>
       <div class="card-body">
-        <div class="row text-center">
+        <div class="row bank-item-row text-center">
           <div *ngFor="let item of bank.contents" class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item">
             <img *ngIf="item.imageUrl" style="height: 1em; width: auto;" class="fa-2x" [src]="item.imageUrl" alt="" (error)="item.imageUrl = null" />
             <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
@@ -30,7 +31,7 @@
           </div>
         </div>
       </div>
-      <div class="card-footer text-center">
+      <div *ngIf="bankValues[bank.id]" class="card-footer text-center">
         <span>Value: </span><i class="fa fa-dollar"></i><span>{{ bankValues[bank.id] }}</span>
       </div>
     </div>
