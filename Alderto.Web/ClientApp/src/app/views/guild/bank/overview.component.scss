@@ -1,0 +1,17 @@
+.bank-item {
+  margin-bottom: 1.5em;
+}
+
+@media (min-width: 1376px) {
+  .bank-item {
+    flex: 0 0 12.5%;
+    max-width: 12.5%;
+  }
+}
+
+@media (min-width: 1600px) {
+  .bank-item {
+    flex: 0 0 10%;
+    max-width: 10%;
+  }
+}

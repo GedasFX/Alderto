@@ -43,6 +43,9 @@ export class BankEditComponent implements OnInit {
   }
 
   public onSubmit() {
+    if (!this.formGroup.valid)
+      return;
+
     this.bankApi.editBank(this.bank.guildId, this.bank.id, this.formGroup.value.name, this.formGroup.value.logChannelId).subscribe(
       () => {
         this.bank.name = this.formGroup.value.name;
@@ -56,4 +59,6 @@ export class BankEditComponent implements OnInit {
         this.modal.hide();
       });
   }
+
+  public get name() { return this.formGroup.get('name'); }
 }

@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from "ngx-bootstrap/modal";
 import { NgSelectModule } from '@ng-select/ng-select';
 import { BankRoutingModule } from './bank.routing';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 import { OverviewComponent } from './overview.component';
 
@@ -18,7 +19,8 @@ import { BankItemsCreateComponent } from './modals/bank-items-create.component';
     ModalModule.forRoot(),
     NgSelectModule,
     ReactiveFormsModule,
-    BankRoutingModule
+    BankRoutingModule,
+    TooltipModule.forRoot()
   ],
   declarations: [
     OverviewComponent,

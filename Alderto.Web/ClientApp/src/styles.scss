@@ -7,18 +7,24 @@ a {
   cursor: pointer;
 }
 
-.ng-dirty.ng-touched.ng-valid {
+// For regular inputs
+.ng-valid.ng-dirty,
+.ng-valid.ng-touched {
   border-color: #4dbd74; /* green */
 }
 
-.ng-dirty.ng-touched.ng-valid > .ng-select-container {
-  border-color: #4dbd74; /* green */
-}
-
-.ng-dirty.ng-touched.ng-invalid {
+.ng-invalid.ng-dirty,
+.ng-invalid.ng-touched {
   border-color: #f86c6b; /* red */
 }
 
+// For dropdown selects.
+.ng-valid.ng-dirty > .ng-select-container,
+.ng-valid.ng-touched > .ng-select-container {
+  border-color: #4dbd74; /* green */
+}
+
+// Color unification
 .ng-select > .ng-select-container {
   border: 1px solid #e4e7ea;
 }

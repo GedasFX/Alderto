@@ -1,14 +1,14 @@
 <div class="animated fadeIn">
-  <div class="card card-default">
+  <div class="card">
     <div class="card-header">
-      <i class="fa fa-plus"></i> <a class="cursor-pointer" (click)="openCreateBankModal();">Create New Bank</a>
+      <i class="fa fa-plus"></i> <a (click)="openCreateBankModal();">Create New Bank</a>
     </div>
   </div>
 
   <div *ngFor="let bank of guildBanks">
-    <div class="card card-default">
+    <div class="card">
       <div class="card-header">
-        <i class="fa fa-bank"></i> {{ bank.name }}
+        <i class="fa fa-bank"></i><span>{{ bank.name }}</span>
         <div class="card-header-actions">
           <a class="card-header-action" (click)="openCreateItemModal(bank)"><i class="fa fa-plus"></i> </a>
           <a class="card-header-action" (click)="openEditBankModal(bank)"><i class="fa fa-pencil"></i> </a>
@@ -17,18 +17,21 @@
       </div>
       <div class="card-body">
         <div class="row text-center">
-          <div *ngFor="let item of bank.contents" class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <div *ngFor="let item of bank.contents" class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item">
             <img *ngIf="item.imageUrl" style="height: 1em; width: auto;" class="fa-2x" [src]="item.imageUrl" alt="" (error)="item.imageUrl = null" />
             <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
             <div> {{ item.name }} </div>
           </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item">
             <a (click)="openCreateItemModal(bank)">
               <i class="fa fa-plus fa-2x"></i>
               <div>Add new item</div>
             </a>
           </div>
         </div>
+      </div>
+      <div class="card-footer text-center">
+        <span>Value: </span><i class="fa fa-dollar"></i><span>{{ bankValues[bank.id] }}</span>
       </div>
     </div>
   </div>

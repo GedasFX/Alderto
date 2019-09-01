@@ -1,5 +1,5 @@
 <div class="modal-content">
-  <form #form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
     <div class="modal-header">
       <h4 class="modal-title">Editing Bank {{ bank.name }}</h4>
       <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
@@ -10,6 +10,11 @@
       <div class="form-group">
         <label>Name:</label>
         <input class="form-control" type="text" formControlName="name" required />
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-feedback">
+          <div *ngIf="name.errors.required">
+            Name is required.
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label>Log channel:</label>
