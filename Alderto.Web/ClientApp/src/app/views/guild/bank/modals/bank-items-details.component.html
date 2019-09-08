@@ -1,12 +1,12 @@
 <div class="modal-content">
-  <div class="modal-header">
-    <h4 class="modal-title">{{ item.name }}</h4>
-    <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+    <div class="modal-header">
+      <h4 class="modal-title">{{ item.name }}</h4>
+      <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
       <div class="form-group">
         <label for="name">Name:</label>
         <input id="name" class="form-control" type="text" formControlName="name" required maxlength="70" placeholder="Name of the item" />
@@ -30,11 +30,11 @@
       <div class="text-center">
         <img style="max-width: 100%;" [src]="formGroup.value.imageUrl" alt="" />
       </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-danger mr-auto" (click)="onClickDelete()">Delete</button>
-    <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
-    <button *ngIf="formGroup.dirty" type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Confirm Edit</button>
-  </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger mr-auto" (click)="onClickDelete()">Delete</button>
+      <button type="button" class="btn btn-secondary" (click)="modal.hide();">Close</button>
+      <button *ngIf="formGroup.dirty" type="submit" class="btn btn-primary" [disabled]="!formGroup.valid">Confirm Edit</button>
+    </div>
+  </form>
 </div>
