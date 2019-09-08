@@ -1,64 +1,50 @@
 ﻿using AspNet.Security.OAuth.Discord;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/account")]
+    [ApiController, Route("api/account")]
     public class AccountController : ControllerBase
     {
-        private readonly ILogger<AccountController> _logger;
-        private readonly IConfiguration _configuration;
-
-        public AccountController(ILogger<AccountController> logger, IConfiguration configuration)
-        {
-            _logger = logger;
-            _configuration = configuration;
-        }
-
-        [HttpGet, Route("login")]
+        [HttpGet("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Login()
         {
-            // Authorized using discord. Create JWT token.
+            // Authorized using discord.
 
             // Fetch the authentication result. It contains the access token to discord.
             var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            // Add claims to the JWT.
             var userClaims = authResult.Principal.Claims.ToList();
-            userClaims.Add(new Claim("discord", authResult.Properties.Items[".Token.access_token"]));
 
-            // Create the token.
-            var token = tokenHandler.CreateJwtSecurityToken(
-                subject: new ClaimsIdentity(userClaims),
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SigningSecret"])),
-                    SecurityAlgorithms.HmacSha256Signature),
-                expires: authResult.Properties.ExpiresUtc?.DateTime
-            );
+            var user = new
+            {
+                id = userClaims.Find(c => c.Type == ClaimTypes.NameIdentifier).Value,
+                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value,
+                token = authResult.Properties.Items[".Token.access_token"]
+            };
 
-            _logger.LogInformation($"User {User.Identity.Name} has logged in.");
-            await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(new[] {
+                new Claim(ClaimTypes.NameIdentifier, user.id),
+                new Claim("Discord", user.token)
+            }, CookieAuthenticationDefaults.AuthenticationScheme));
+
+            // Reload SignIn with new Cookie
+            await HttpContext.SignOutAsync();
+            await HttpContext.SignInAsync(principal);
 
             // Returns the token to the creator of the window. Faking a view.
-            return Content("<script>" +
-                            $"window.opener.postMessage('{tokenHandler.WriteToken(token)}', '{Request.Scheme}://{Request.Host}{Request.PathBase}');" +
-                             "window.close();" +
-                           "</script>",
-                "text/html");
+            return Content(
+                "<script>" +
+                    $"localStorage.setItem('user', '{ JsonConvert.SerializeObject(user) }');" +
+                     "window.location.href = '/'" +
+                "</script>", "text/html");
         }
     }
 }

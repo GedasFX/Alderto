@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subscription, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { IGuild, IGuildChannel } from 'src/app/models';
 import { DiscordWebApi, AldertoWebUserApi, AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
@@ -20,8 +20,11 @@ export class GuildService {
     private readonly nav: NavigationService
   ) {
     this.discord.fetchGuilds().subscribe(g => {
+      g.forEach(e => e.isAdmin = this.isAdmin(e));
       this.userGuilds$.next(g);
+
       this.userApi.fetchMutualGuilds(g).subscribe(mg => {
+        mg.forEach(e => e.isAdmin = this.isAdmin(e));
         this.mutualGuilds$.next(mg);
 
         this.nav.currentGuildId$.subscribe(id => {
@@ -49,5 +52,9 @@ export class GuildService {
 
   public getCurrentGuildId(): string {
     return this.currentGuild$.value.id;
+  }
+
+  public isAdmin(guild: IGuild): boolean {
+    return ((guild.permissions & 1 << 2) != 0);
   }
 }
