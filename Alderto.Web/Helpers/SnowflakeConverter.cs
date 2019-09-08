@@ -15,8 +15,7 @@ namespace Alderto.Web.Helpers
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            var jt = JToken.ReadFrom(reader);
-            return jt.Value<T>();
+            return JToken.ReadFrom(reader).Value<T>();
         }
     }
 }
