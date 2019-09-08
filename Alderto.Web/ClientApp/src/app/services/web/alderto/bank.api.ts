@@ -32,4 +32,8 @@ export class AldertoWebBankApi {
   public editBankItem(guildId: string, bankId: number, itemId: number, item: IGuildBankItem) {
     return this.http.patch(`/api/guilds/${guildId}/banks/${bankId}/items/${itemId}`, item);
   }
+
+  public removeBankItem(guildId: string, bankId: number, itemId: number) {
+    return this.http.delete(`/api/guilds/${guildId}/banks/${bankId}/items/${itemId}`);
+  }
 }

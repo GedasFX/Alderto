@@ -81,11 +81,14 @@ export class OverviewComponent implements OnInit {
     });
   }
 
-  public openItemDetailsModal(item: IGuildBankItem): void {
+  public openItemDetailsModal(bank: IGuildBank, item: IGuildBankItem): void {
     const modal = this.modal.show(BankItemsDetailsComponent,
       {
         initialState: { item },
         ignoreBackdropClick: true
       });
+    (modal.content.onItemDeleted as Subject<void>).subscribe(() => {
+      bank.contents.splice(bank.contents.indexOf(item), 1);
+    });
   }
 }

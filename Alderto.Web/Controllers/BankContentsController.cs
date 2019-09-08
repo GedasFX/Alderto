@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/guilds/{guildId}/banks/{bankId}")]
+    [Route("api/guilds/{guildId}/banks/{bankId}/items")]
     public class BankContentsController : ApiControllerBase
     {
         private readonly IGuildBankItemManager _contents;
@@ -22,7 +22,7 @@ namespace Alderto.Web.Controllers
             _client = client;
         }
 
-        [HttpPost("items")]
+        [HttpPost]
         public async Task<IActionResult> CreateItem(ulong guildId, int bankId,
             [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
@@ -37,7 +37,7 @@ namespace Alderto.Web.Controllers
             return Content(createdBank);
         }
 
-        [HttpPatch("items/{itemId}")]
+        [HttpPatch("{itemId}")]
         public async Task<IActionResult> EditItem(ulong guildId, int bankId, int itemId,
             [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
@@ -56,6 +56,17 @@ namespace Alderto.Web.Controllers
                 i.Quantity = item.Quantity;
             });
 
+            return Ok();
+        }
+
+        [HttpDelete("{itemId}")]
+        public async Task<IActionResult> RemoveItem(ulong guildId, int bankId, int itemId)
+        {
+            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            if (errorResult != null)
+                return errorResult;
+
+            await _contents.RemoveBankItemAsync(itemId);
             return Ok();
         }
 

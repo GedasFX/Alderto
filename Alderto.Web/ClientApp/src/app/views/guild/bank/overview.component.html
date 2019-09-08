@@ -19,7 +19,7 @@
         <div class="row bank-item-row text-center">
           <div *ngFor="let item of bank.contents" class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item"
                [tooltip]="(item.description == null ? '' : item.description) + ' (valued at ' + item.value + ')'">
-            <a (click)="openItemDetailsModal(item)">
+            <a (click)="openItemDetailsModal(bank, item)">
               <img *ngIf="item.imageUrl" class="fa-2x bank-item-img" [src]="item.imageUrl" (error)="item.imageUrl = null" />
               <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
               <div>{{ item.name }}</div>

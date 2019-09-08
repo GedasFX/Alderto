@@ -15,6 +15,7 @@ export class BankItemsDetailsComponent implements OnInit, OnDestroy {
   public item: IGuildBankItem;
 
   public onItemEdited: Subject<void>;
+  public onItemDeleted: Subject<void>;
 
   public formGroup: FormGroup;
 
@@ -36,16 +37,32 @@ export class BankItemsDetailsComponent implements OnInit, OnDestroy {
     });
 
     this.onItemEdited = new Subject();
+    this.onItemDeleted = new Subject();
   }
 
   public ngOnDestroy() {
     this.onItemEdited.complete();
+    this.onItemDeleted.complete();
+  }
+
+  public onClickDelete() {
+    if (confirm('Are you sure you wish to remove this item?')) {
+      this.bankApi.removeBankItem(this.guild.currentGuild$.getValue().id, this.item.guildBankId, this.item.id).subscribe(() => {
+        this.onItemDeleted.next();
+        this.toastr.success(`Successfully removed item <b>${this.item.name}</b>`, null, { enableHtml: true });
+      },
+        (err: HttpErrorResponse) => {
+          this.toastr.error(err.error.message, 'Could not remove the item');
+        },
+        () => {
+          this.modal.hide();
+        });
+    }
   }
 
   public onSubmit() {
     if (!this.formGroup.valid)
       return;
-    console.log(this.item);
     this.bankApi.editBankItem(this.guild.getCurrentGuildId(), this.item.guildBankId, this.item.id,
       {
         name: this.formGroup.value.name,
@@ -62,7 +79,7 @@ export class BankItemsDetailsComponent implements OnInit, OnDestroy {
           this.item.imageUrl = this.formGroup.value.imageUrl;
 
           this.onItemEdited.next();
-          this.toastr.success(`Successfully added a new item <b>${this.item.name}</b>`, null, { enableHtml: true });
+          this.toastr.success(`Successfully edited the item <b>${this.item.name}</b>`, null, { enableHtml: true });
         },
         (err: HttpErrorResponse) => {
           this.toastr.error(err.error.message, 'Could not edit the item');
