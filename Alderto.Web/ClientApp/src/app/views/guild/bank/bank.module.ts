@@ -12,6 +12,7 @@ import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
 import { BankEditComponent } from './modals/bank-edit.component';
 import { BankItemsCreateComponent } from './modals/bank-items-create.component';
+import { BankItemsDetailsComponent } from './modals/bank-items-details.component';
 
 @NgModule({
   imports: [
@@ -27,13 +28,15 @@ import { BankItemsCreateComponent } from './modals/bank-items-create.component';
     BankCreateComponent,
     BankEditComponent,
     BankRemoveComponent,
-    BankItemsCreateComponent
+    BankItemsCreateComponent,
+    BankItemsDetailsComponent
   ],
   entryComponents: [
     BankCreateComponent,
     BankEditComponent,
     BankRemoveComponent,
-    BankItemsCreateComponent
+    BankItemsCreateComponent,
+    BankItemsDetailsComponent
   ],
   exports: [ModalModule]
 })

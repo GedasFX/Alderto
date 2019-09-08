@@ -28,4 +28,8 @@ export class AldertoWebBankApi {
   public createNewBankItem(guildId: string, bankId: number, item: IGuildBankItem) {
     return this.http.post<IGuildBankItem>(`/api/guilds/${guildId}/banks/${bankId}/items`, item);
   }
+
+  public editBankItem(guildId: string, bankId: number, itemId: number, item: IGuildBankItem) {
+    return this.http.patch(`/api/guilds/${guildId}/banks/${bankId}/items/${itemId}`, item);
+  }
 }

@@ -1,5 +1,5 @@
 <div class="modal-content">
-  <form #form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit();">
     <div class="modal-header">
       <h4 class="modal-title">Add New Bank Item</h4>
       <button type="button" class="close" (click)="modal.hide();" aria-label="Close">

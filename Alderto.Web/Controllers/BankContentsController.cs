@@ -28,6 +28,45 @@ namespace Alderto.Web.Controllers
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
             GuildBankItem item)
         {
+            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            if (errorResult != null)
+                return errorResult;
+
+            var createdBank = await _contents.CreateBankItemAsync(bankId, item);
+
+            return Content(createdBank);
+        }
+
+        [HttpPatch("items/{itemId}")]
+        public async Task<IActionResult> EditItem(ulong guildId, int bankId, int itemId,
+            [Bind(nameof(GuildBankItem.Name), nameof(GuildBankItem.Description), nameof(GuildBankItem.Value),
+                nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
+            GuildBankItem item)
+        {
+            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            if (errorResult != null)
+                return errorResult;
+
+            await _contents.UpdateBankItemAsync(itemId, i =>
+            {
+                i.Name = item.Name;
+                i.Description = item.Description;
+                i.Value = item.Value;
+                i.ImageUrl = item.ImageUrl;
+                i.Quantity = item.Quantity;
+            });
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Validates if the user has access write access to the guild bank.
+        /// </summary>
+        /// <param name="guildId">Id of guild</param>
+        /// <param name="bankId">Id of bank</param>
+        /// <returns>Corresponding HTTP error result. null if user has write access.</returns>
+        private async Task<IActionResult> ValidateWriteAccess(ulong guildId, int bankId)
+        {
             // First get the bank.
             var bank = await _bank.GetGuildBankAsync(guildId, bankId);
             if (bank == null)
@@ -49,9 +88,8 @@ namespace Alderto.Web.Controllers
             if (!(user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator))
                 return Forbid(ErrorMessages.UserNotBankModerator);
 
-            var createdBank = await _contents.CreateBankItemAsync(bankId, item);
-
-            return Content(createdBank);
+            // User has write access to the guild. Continue.
+            return null;
         }
     }
 }

@@ -10,7 +10,7 @@ export interface IGuildBank {
 
 export interface IGuildBankItem {
   id: number;
-  guildId: string;
+  guildBankId: number;
   name: string;
   description: string;
   imageUrl: string;

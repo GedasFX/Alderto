@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { IGuildBank, IGuildBankItem } from 'src/app/models';
 import { AldertoWebBankApi, NavigationService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { Subject } from 'rxjs';
+
 import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
 import { BankEditComponent } from './modals/bank-edit.component';
-import { BankItemsCreateComponent } from 'src/app/views/guild/bank/modals/bank-items-create.component';
-import { Subject } from 'rxjs';
+import { BankItemsCreateComponent } from './modals/bank-items-create.component';
+import { BankItemsDetailsComponent } from './modals/bank-items-details.component';
 
 @Component({
   templateUrl: 'overview.component.html',
@@ -22,8 +24,9 @@ export class OverviewComponent implements OnInit {
     private readonly modal: BsModalService) {
   }
 
-  public updateValue(bank: IGuildBank) {
+  public updateValue(bank: IGuildBank): number {
     this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
+    return this.bankValues[bank.id];
   }
 
 
@@ -34,7 +37,7 @@ export class OverviewComponent implements OnInit {
     });
   }
 
-  public openCreateBankModal(): void {
+  public openBankCreateModal(): void {
     const modal = this.modal.show(BankCreateComponent,
       {
         ignoreBackdropClick: true
@@ -45,7 +48,7 @@ export class OverviewComponent implements OnInit {
     });
   }
 
-  public openEditBankModal(bank: IGuildBank): void {
+  public openBankEditModal(bank: IGuildBank): void {
     this.modal.show(BankEditComponent,
       {
         initialState: { bank },
@@ -53,7 +56,7 @@ export class OverviewComponent implements OnInit {
       });
   }
 
-  public openRemoveBankModal(bank: IGuildBank): void {
+  public openBankRemoveModal(bank: IGuildBank): void {
     const modal = this.modal.show(BankRemoveComponent,
       {
         initialState: { banks: this.guildBanks, bank },
@@ -65,7 +68,7 @@ export class OverviewComponent implements OnInit {
   }
 
 
-  public openCreateItemModal(bank: IGuildBank): void {
+  public openItemCreateModal(bank: IGuildBank): void {
     const modal = this.modal.show(BankItemsCreateComponent,
       {
         initialState: { bank },
@@ -76,5 +79,13 @@ export class OverviewComponent implements OnInit {
       bank.contents.push(item);
       this.updateValue(bank);
     });
+  }
+
+  public openItemDetailsModal(item: IGuildBankItem): void {
+    const modal = this.modal.show(BankItemsDetailsComponent,
+      {
+        initialState: { item },
+        ignoreBackdropClick: true
+      });
   }
 }
