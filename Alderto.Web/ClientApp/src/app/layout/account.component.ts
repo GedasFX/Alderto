@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AccountService, DiscordWebApi } from '../services';
-import { IUser } from '../models/user';
 
 @Component({
   selector: 'app-account',
@@ -10,10 +7,8 @@ import { IUser } from '../models/user';
   styleUrls: ['./account.component.scss']
 })
 export class AccountComponent implements OnInit {
-  private user: Observable<IUser>;
-
   public loggedIn: boolean;
-  public userImg: Observable<string>;
+  public userImg: string;
 
   constructor(
     private readonly account: AccountService,
@@ -23,12 +18,11 @@ export class AccountComponent implements OnInit {
     this.loggedIn = this.account.isLoggedIn();
 
     if (this.loggedIn) {
-      this.user = this.discord.fetchUser();
-      this.userImg = this.user.pipe(map((user: IUser) => {
-        if (user.avatar == null)
-          return this.getDefaultAvatar(user.discriminator);
-        return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`
-      }));
+      this.discord.fetchUser().subscribe(user => {
+        this.userImg = user.avatar == null
+          ? this.getDefaultAvatar(user.discriminator)
+          : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`
+      });
     }
   }
 
