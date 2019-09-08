@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>c53fe5d3-16e9-400d-a588-4859345371e5</UserSecretsId>
@@ -16,6 +15,7 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +27,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create - Copy %282%29.component.scss">
+      <DependentUpon>bank-create.component.html</DependentUpon>
+    </None>
+    <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create - Copy - Copy.component.scss">
+      <DependentUpon>bankContents-add.component.html</DependentUpon>
+    </None>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

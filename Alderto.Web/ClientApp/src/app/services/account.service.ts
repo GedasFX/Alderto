@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import * as jwt_decode from 'jwt-decode';
-import { IGuild } from '../models/guild';
+import { IGuild } from 'src/app/models';
 
 export class User {
   public id: number;
@@ -11,6 +11,8 @@ export class User {
 
   public username: string;
   public role: string;
+
+  public guilds: Map<string, IGuild>;
 
   constructor(id?: number, token?: string, discordToken?: string, username?: string, role?: string) {
     this.id = id;
@@ -32,7 +34,7 @@ export class AccountService {
     this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
     this.user = this.userSubject.asObservable();
   }
-  
+
   public loginDiscord(): Observable<User> {
     window.open('/api/account/login', null, 'width=600,height=800');
     window.addEventListener('message', this.loginDiscordCallback);
@@ -61,7 +63,6 @@ export class AccountService {
     window.removeEventListener('message', this.loginDiscordCallback);
   };
 
-  // TODO: More through logout. Roles change in-between changes?
   public logout() {
     localStorage.removeItem('user');
     this.userSubject.next(null);

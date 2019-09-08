@@ -66,7 +66,6 @@ namespace Alderto.Web.Helpers
                         return JsonConvert.DeserializeObject<T>(await stream.ReadToEndAsync());
                     }
                 }
-                
             }
             catch (Exception)
             {
@@ -84,17 +83,25 @@ namespace Alderto.Web.Helpers
         {
             var data = await FetchAsync<DiscordGuild[]>($"/users/@me/guilds?after={guildId - 1}&limit=1", authHeader: authHeader);
 
-            // This should only work if there is 1 and only 1 guild. Do not confirm admin rights on 0 or many guilds. Possible attack.
-            var guild = data?.SingleOrDefault();
-            if (guild == null)
+            try
+            {
+                // This should only work if there is 1 and only 1 guild. Do not confirm admin rights on 0 or many guilds. Possible attack.
+                var guild = data?.SingleOrDefault();
+                if (guild == null)
+                {
+                    return false;
+                }
+
+                var permissions = guild.Permissions;
+
+                // Check if is owner of has Administrator permissions.
+                const int administratorBit = 2;
+                return guild.Owner || (permissions & (1 << administratorBit)) != 0;
+            }
+            catch (InvalidOperationException)
             {
                 return false;
             }
-
-            var permissions = guild.Permissions;
-
-            const int administratorBit = 2;
-            return (permissions & (1 << administratorBit)) != 0;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Tests.MockedEntities
@@ -12,12 +13,23 @@ namespace Alderto.Tests.MockedEntities
         public DbSet<CustomCommand> CustomCommands { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<GuildConfiguration> GuildPreferences { get; set; }
-        public DbSet<GuildMemberDonation> GuildMemberDonations { get; set; }
+        public DbSet<GuildBank> GuildBanks { get; set; }
+        public DbSet<GuildBankItem> GuildBankItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Guild>()
+                .HasOne(g => g.Configuration)
+                .WithOne(c => c.Guild)
+                .HasForeignKey<GuildConfiguration>(c => c.GuildId);
+
             modelBuilder.Entity<GuildMember>()
-                .HasKey(m => new { m.MemberId, m.GuildId });
+                .HasKey(g => new { g.GuildId, g.MemberId });
+
+            modelBuilder.Entity<GuildBank>()
+                .HasIndex(b => new { b.GuildId, b.Name })
+                .IsUnique();
+
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 

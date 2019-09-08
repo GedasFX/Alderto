@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Data.Models
 {
@@ -56,16 +57,9 @@ namespace Alderto.Data.Models
         public virtual Member Member { get; set; }
         
         /// <summary>
-        /// A collection of donations the user has provided.
-        /// </summary>
-        public virtual IEnumerable<GuildMemberDonation> Donations { get; set; }
-
-        /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.
         /// </summary>
-        public GuildMember()
-        {
-        }
+        public GuildMember() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildMember"/>, with primary key (<see cref="MemberId"/> and <see cref="GuildId"/>) set.

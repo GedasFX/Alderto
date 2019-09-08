@@ -1,10 +1,10 @@
-﻿// Interface extracted from Microsoft.EntityFrameworkCore.DbContext
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data.Models;
+using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -14,11 +14,7 @@ namespace Alderto.Data
 {
     public interface IAldertoDbContext
     {
-        /// <summary>
-        /// Guild Members table. Primary key: [<see cref="GuildMember.MemberId"/>, <see cref="GuildMember.GuildId"/>]
-        /// Joint table of Guilds and Members.
-        /// </summary> 
-        DbSet<GuildMember> GuildMembers { get; }
+        // === 
 
         /// <summary>
         /// Guilds Table. Primary key: [<see cref="Guild.Id"/>]
@@ -26,24 +22,34 @@ namespace Alderto.Data
         DbSet<Guild> Guilds { get; }
 
         /// <summary>
-        /// Guild's custom commands table. Primary key: [<see cref="CustomCommand.TriggerKeyword"/>, <see cref="CustomCommand.GuildId"/>]
-        /// </summary>
-        DbSet<CustomCommand> CustomCommands { get; }
+        /// Guild Members table. Primary key: [<see cref="GuildMember.MemberId"/>, <see cref="GuildMember.GuildId"/>]
+        /// Joint table of Guilds and Members.
+        /// </summary> 
+        DbSet<GuildMember> GuildMembers { get; }
 
         /// <summary>
         /// Members table. Primary key: [<see cref="Member.Id"/>]
         /// </summary>
         DbSet<Member> Members { get; }
 
+        // ===
+
+        /// <summary>
+        /// Guild's custom commands table. Primary key: [<see cref="CustomCommand.TriggerKeyword"/>, <see cref="CustomCommand.GuildId"/>]
+        /// </summary>
+        DbSet<CustomCommand> CustomCommands { get; }
+
+        // ===
+
         /// <summary>
         /// Guild preferences. 1-to-0..1 relation with Guilds. Primary key: [<see cref="GuildConfiguration.GuildId"/>]
         /// </summary>
         DbSet<GuildConfiguration> GuildPreferences { get; }
 
-        /// <summary>
-        /// Guild preferences. 1-to-0..1 relation with Guilds. Primary key: [<see cref="GuildConfiguration.GuildId"/>]
-        /// </summary>
-        DbSet<GuildMemberDonation> GuildMemberDonations { get; }
+        // ===
+
+        DbSet<GuildBank> GuildBanks { get; }
+        DbSet<GuildBankItem> GuildBankItems { get; }
 
 
         /// <summary>
