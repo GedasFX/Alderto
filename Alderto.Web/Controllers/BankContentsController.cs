@@ -11,11 +11,11 @@ namespace Alderto.Web.Controllers
     [Route("api/guilds/{guildId}/banks/{bankId}/items")]
     public class BankContentsController : ApiControllerBase
     {
-        private readonly IGuildBankItemManager _contents;
+        private readonly IGuildBankContentsManager _contents;
         private readonly IGuildBankManager _bank;
         private readonly DiscordSocketClient _client;
 
-        public BankContentsController(IGuildBankItemManager contents, IGuildBankManager bank, DiscordSocketClient client)
+        public BankContentsController(IGuildBankContentsManager contents, IGuildBankManager bank, DiscordSocketClient client)
         {
             _contents = contents;
             _bank = bank;
@@ -28,11 +28,14 @@ namespace Alderto.Web.Controllers
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
             GuildBankItem item)
         {
-            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            var userId = User.GetId();
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+
+            var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            var createdBank = await _contents.CreateBankItemAsync(bankId, item);
+            var createdBank = await _contents.CreateBankItemAsync(bank, item, userId);
 
             return Content(createdBank);
         }
@@ -43,11 +46,13 @@ namespace Alderto.Web.Controllers
                 nameof(GuildBankItem.ImageUrl), nameof(GuildBankItem.Quantity))]
             GuildBankItem item)
         {
-            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            var userId = User.GetId();
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            await _contents.UpdateBankItemAsync(itemId, i =>
+            await _contents.UpdateBankItemAsync(itemId, userId, i =>
             {
                 i.Name = item.Name;
                 i.Description = item.Description;
@@ -62,31 +67,30 @@ namespace Alderto.Web.Controllers
         [HttpDelete("{itemId}")]
         public async Task<IActionResult> RemoveItem(ulong guildId, int bankId, int itemId)
         {
-            var errorResult = await ValidateWriteAccess(guildId, bankId);
+            var userId = User.GetId();
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            await _contents.RemoveBankItemAsync(itemId);
+            await _contents.RemoveBankItemAsync(itemId, userId);
             return Ok();
         }
 
         /// <summary>
         /// Validates if the user has access write access to the guild bank.
         /// </summary>
-        /// <param name="guildId">Id of guild</param>
-        /// <param name="bankId">Id of bank</param>
+        /// <param name="bank">Bank to check access of.</param>
+        /// <param name="userId">Id of user.</param>
         /// <returns>Corresponding HTTP error result. null if user has write access.</returns>
-        private async Task<IActionResult> ValidateWriteAccess(ulong guildId, int bankId)
+        private IActionResult ValidateWriteAccess(GuildBank bank, ulong userId)
         {
             // First get the bank.
-            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
             if (bank == null)
                 return NotFound(ErrorMessages.BankNotFound);
-
-            var userId = User.GetId();
-
+            
             // Get the guild and check if it is present.
-            var guild = _client.GetGuild(guildId);
+            var guild = _client.GetGuild(bank.GuildId);
             if (guild == null)
                 return NotFound(ErrorMessages.GuildNotFound);
 

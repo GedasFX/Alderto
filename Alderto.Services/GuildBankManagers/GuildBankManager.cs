@@ -11,16 +11,13 @@ namespace Alderto.Services.GuildBankManagers
 {
     public class GuildBankManager : IGuildBankManager
     {
-
         private readonly IAldertoDbContext _context;
-        private readonly IGuildBankTransactionsManager _transactions;
-        private readonly IGuildBankItemManager _items;
+        private readonly IGuildLogger _transactions;
 
-        public GuildBankManager(IAldertoDbContext context, IGuildBankTransactionsManager transactions, IGuildBankItemManager items)
+        public GuildBankManager(IAldertoDbContext context, IGuildLogger transactions)
         {
             _context = context;
             _transactions = transactions;
-            _items = items;
         }
 
         private IQueryable<GuildBank> FetchGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
@@ -35,49 +32,32 @@ namespace Alderto.Services.GuildBankManagers
         {
             return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
         }
-
         public Task<GuildBank> GetGuildBankAsync(ulong guildId, int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Id == id);
         }
 
-        public Task<List<GuildBank>> GetAllGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        public Task<List<GuildBank>> GetGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
         {
             return FetchGuildBanks(guildId, options).ToListAsync();
         }
-        
-        public async Task ModifyItemCountAsync(ulong guildId, string bankName, ulong adminId, ulong transactorId, string itemName, double quantity, string comment = null)
+
+        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string bankName, ulong? logChannelId = null)
         {
-            var bank = await GetGuildBankAsync(guildId, bankName);
-            if (bank == null)
-                throw new NotImplementedException();
-
-            var item = await _items.GetBankItemAsync(bank.Id, itemName);
-            if (item == null)
-                throw new NotImplementedException();
-
-            item.Quantity += quantity;
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, string name, ulong? logChannelId = null)
-        {
-            // If guild id is unspecified do nothing.
-            if (guildId == 0)
-                return null;
-
             // Ensure foreign key constraint is not violated.
             var guild = await _context.Guilds.FindAsync(guildId);
             if (guild == null)
             {
                 guild = new Guild(guildId);
-                await _context.Guilds.AddAsync(guild);
+                _context.Guilds.Add(guild);
             }
 
             // Add the bank
-            var bank = new GuildBank(guildId, name) { LogChannelId = logChannelId };
-            await _context.GuildBanks.AddAsync(bank);
+            var bank = new GuildBank(guildId, bankName) { LogChannelId = logChannelId };
+            _context.GuildBanks.Add(bank);
+
+            // Log the creation of the bank
+            await _transactions.LogBankCreateAsync(bank, adminId);
 
             // Save changes
             await _context.SaveChangesAsync();
@@ -86,29 +66,46 @@ namespace Alderto.Services.GuildBankManagers
             return bank;
         }
 
-        public async Task RemoveGuildBankAsync(ulong guildId, string name)
+        public async Task UpdateGuildBankAsync(ulong guildId, string name, ulong adminId, Action<GuildBank> changes)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, name));
+            await UpdateGuildBankAsync(await GetGuildBankAsync(guildId, name), adminId, changes);
+        }
+        public async Task UpdateGuildBankAsync(ulong guildId, int id, ulong adminId, Action<GuildBank> changes)
+        {
+            await UpdateGuildBankAsync(await GetGuildBankAsync(guildId, id), adminId, changes);
+        }
+
+        private async Task UpdateGuildBankAsync(GuildBank bank, ulong adminId, Action<GuildBank> changes)
+        {
+            // Take a snapshot of the bank pre changes.
+            var initialBank = bank.MemberwiseClone();
+            
+            // Apply the changes.
+            changes(bank);
+
+            // Ensure that core keys are intact.
+            bank.Id = initialBank.Id;
+            bank.GuildId = initialBank.GuildId;
+
+            // Log the modification of the bank
+            await _transactions.LogBankUpdateAsync(initialBank, bank, adminId);
+
+            // Save changes
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveGuildBankAsync(ulong guildId, int id)
+        public async Task RemoveGuildBankAsync(ulong guildId, string name, ulong adminId)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, id));
-            await _context.SaveChangesAsync();
+            await RemoveGuildBankAsync(await GetGuildBankAsync(guildId, name, b => b.Include(e => e.Contents)), adminId);
         }
-
-        public async Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes)
+        public async Task RemoveGuildBankAsync(ulong guildId, int id, ulong adminId)
         {
-            var gb = await GetGuildBankAsync(guildId, name);
-            changes(gb);
-            await _context.SaveChangesAsync();
+            await RemoveGuildBankAsync(await GetGuildBankAsync(guildId, id, b => b.Include(e => e.Contents)), adminId);
         }
-
-        public async Task UpdateGuildBankAsync(ulong guildId, int id, Action<GuildBank> changes)
+        private async Task RemoveGuildBankAsync(GuildBank bank, ulong adminId)
         {
-            var gb = await GetGuildBankAsync(guildId, id);
-            changes(gb);
+            _context.GuildBanks.Remove(bank);
+            await _transactions.LogBankDeleteAsync(bank, adminId);
             await _context.SaveChangesAsync();
         }
     }

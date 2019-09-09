@@ -48,7 +48,7 @@ namespace Alderto.Bot
                     return Task.CompletedTask;
                 };
 
-                _ = Run(config.Value.BotToken);
+                Run(config.Value.BotToken).ConfigureAwait(false);
             }
 
             private async Task Run(string token)

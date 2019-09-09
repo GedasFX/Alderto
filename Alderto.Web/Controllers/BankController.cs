@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Alderto.Web.Models.Bank;
+using Discord.Net;
 using Discord.WebSocket;
 
 namespace Alderto.Web.Controllers
@@ -29,7 +30,7 @@ namespace Alderto.Web.Controllers
             bool ValidateModifyAccess(GuildBank bank) =>
                 user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
 
-            var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
+            var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
             var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b) });
             return Content(outBanks);
         }
@@ -39,16 +40,22 @@ namespace Alderto.Web.Controllers
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
             GuildBank bank)
         {
-            // Ensure user has admin rights
+            // Ensure user has admin rights 
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            var b = await _bank.CreateGuildBankAsync(guildId, bank.Name, bank.LogChannelId);
-
-            return Content(new ApiGuildBank(b) { CanModify = true });
+            try
+            {
+                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.LogChannelId);
+                return Content(new ApiGuildBank(b) { CanModify = true });
+            }
+            catch (HttpException e)
+            {
+                return HandleHttpError(e);
+            }
         }
 
         [HttpPatch("{bankId}")]
@@ -64,13 +71,20 @@ namespace Alderto.Web.Controllers
             if (dbBank != null && dbBank.Id != bankId)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            await _bank.UpdateGuildBankAsync(guildId, bankId, b =>
+            try
             {
-                b.Name = bank.Name;
-                b.LogChannelId = bank.LogChannelId;
-            });
+                await _bank.UpdateGuildBankAsync(guildId, bankId, User.GetId(), b =>
+                {
+                    b.Name = bank.Name;
+                    b.LogChannelId = bank.LogChannelId;
+                });
+            }
+            catch (HttpException e)
+            {
+                return HandleHttpError(e);
+            }
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{bankId}")]
@@ -79,8 +93,32 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
-            await _bank.RemoveGuildBankAsync(guildId, bankId);
-            return Ok();
+            try
+            {
+                await _bank.RemoveGuildBankAsync(guildId, bankId, User.GetId());
+            }
+            catch (HttpException e)
+            {
+                return HandleHttpError(e);
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Handles MissingAccess and MissingPermissions discord error codes.
+        /// </summary>
+        private IActionResult HandleHttpError(HttpException e)
+        {
+            switch (e.DiscordCode)
+            {
+                case 50001:
+                    return BadRequest(ErrorMessages.MissingChannelAccess);
+                case 50013:
+                    return BadRequest(ErrorMessages.MissingWritePermissions);
+                default:
+                    throw e;
+            }
         }
     }
 }

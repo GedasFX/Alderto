@@ -9,9 +9,6 @@ namespace Alderto.Services
     {
         private readonly IAldertoDbContext _context;
 
-        // TODO: Decide if this is necessary.
-        private const bool AllowNegativePoints = true;
-
         public CurrencyManager(IAldertoDbContext context)
         {
             _context = context;
@@ -19,29 +16,7 @@ namespace Alderto.Services
 
         public async Task ModifyPointsAsync(GuildMember guildMember, int deltaPoints)
         {
-            var oldCurrencyCount = guildMember.CurrencyCount;
-
-            if (deltaPoints > 0 && oldCurrencyCount > 0 && oldCurrencyCount + deltaPoints < 0)
-            {
-                // overflow, set to max value instead.
-                guildMember.CurrencyCount = int.MaxValue;
-            }
-            else if (deltaPoints < 0 && oldCurrencyCount < 0 && oldCurrencyCount + deltaPoints > 0)
-            {
-                //underflow, set to min value instead
-                guildMember.CurrencyCount = int.MinValue;
-            }
-            else
-            {
-                // Add currency to the user
-                guildMember.CurrencyCount += deltaPoints;
-            }
-
-            if (!AllowNegativePoints && guildMember.CurrencyCount < 0)
-            {
-                guildMember.CurrencyCount = 0;
-            }
-
+            guildMember.CurrencyCount += deltaPoints;
             await _context.SaveChangesAsync();
         }
 
