@@ -14,6 +14,12 @@ export class ErrorInterceptor implements HttpInterceptor {
       if (err.status === 401) {
         // Auto logout if 401 response returned from api
         this.accountService.logout();
+        // Request a new token.
+        this.accountService.loginDiscord().subscribe((u: any) => {
+          if (u !== null) {
+            location.reload(true);
+          }
+        });
       }
 
       return throwError(err);

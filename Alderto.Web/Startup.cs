@@ -1,3 +1,4 @@
+using System;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
@@ -6,11 +7,13 @@ using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web
 {
@@ -39,7 +42,12 @@ namespace Alderto.Web
             // === <Web> ===
             // Use discord as authentication service.
             services
-                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordApp:ClientId"];
@@ -47,6 +55,18 @@ namespace Alderto.Web
                     options.SaveTokens = true;
 
                     options.Scope.Add("guilds");
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
+                    };
                 })
                 .AddCookie(options =>
                 {
