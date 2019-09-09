@@ -49,5 +49,10 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [ForeignKey(nameof(GuildBankId))]
         public virtual GuildBank GuildBank { get; set; }
+
+        public new GuildBankItem MemberwiseClone()
+        {
+            return (GuildBankItem) base.MemberwiseClone();
+        }
     }
 }

@@ -19,46 +19,96 @@ namespace Alderto.Services.GuildBankManagers
             _transactions = transactions;
         }
 
-        public Task<GuildBankItem> GetBankItemAsync(int itemId)
+        public Task<GuildBankItem> GetBankItemAsync(int itemId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null)
         {
-            return _context.GuildBankItems.FindAsync(itemId);
+            var items = _context.GuildBankItems as IQueryable<GuildBankItem>;
+            if (options != null)
+                items = options.Invoke(items);
+            return items.SingleOrDefaultAsync(i => i.Id == itemId);
         }
 
-        public Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName)
+        public Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null)
         {
-            return _context.GuildBankItems.SingleOrDefaultAsync(i => i.GuildBankId == bankId && i.Name == itemName);
+            var items = _context.GuildBankItems as IQueryable<GuildBankItem>;
+            if (options != null)
+                items = options.Invoke(items);
+            return items.SingleOrDefaultAsync(i => i.GuildBankId == bankId && i.Name == itemName);
         }
 
-        public Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId)
+        public Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null)
         {
-            return _context.GuildBankItems.Where(u => u.GuildBankId == bankId).ToListAsync();
+            var items = _context.GuildBankItems as IQueryable<GuildBankItem>;
+            if (options != null)
+                items = options.Invoke(items);
+            return items.Where(u => u.GuildBankId == bankId).ToListAsync();
         }
 
         public async Task<GuildBankItem> CreateBankItemAsync(GuildBank bank, GuildBankItem item, ulong adminId)
         {
+            // Ensure item is in the correct bank.
             item.GuildBankId = bank.Id;
 
+            // Add the bank to database.
             _context.GuildBankItems.Add(item);
+
+            // Log changes.
+            await _transactions.LogBankItemCreateAsync(bank, item, adminId);
+
+            // Save Changes
             await _context.SaveChangesAsync();
-            await _transactions.LogBankItemChangeAsync(bank, item, adminId, adminId, $"{item.Quantity} **{item.Name}** added to the bank.");
+
+            // Lastly return the item.
             return item;
         }
 
         public async Task UpdateBankItemAsync(int itemId, ulong adminId, Action<GuildBankItem> changes, ulong? transactorId = null)
         {
-            var item = await GetBankItemAsync(itemId);
+            // Get the item.
+            var item = await GetBankItemAsync(itemId, o => o.Include(i => i.GuildBank));
+
+            // Create a copy for logging purposes.
+            var oldItem = item.MemberwiseClone();
+
+            // Apply changes.
             changes(item);
+
+            // Ensure core values weren't changed.
+            item.Id = oldItem.Id;
+            item.GuildBankId = oldItem.GuildBankId;
+            
+            // Log changes.
+            await _transactions.LogBankItemUpdateAsync(item.GuildBank, oldItem, item, adminId);
+
+            // Save Changes
             await _context.SaveChangesAsync();
         }
 
-        public Task UpdateBankItemQuantityAsync(int itemId, ulong adminId, double deltaQuantity, ulong? transactorId = null)
+        public async Task UpdateBankItemQuantityAsync(int itemId, ulong adminId, double deltaQuantity, ulong? transactorId = null)
         {
-            throw new NotImplementedException();
+            // Get the item.
+            var item = await GetBankItemAsync(itemId, o => o.Include(i => i.GuildBank));
+
+            // Apply quantity change.
+            item.Quantity += deltaQuantity;
+
+            // Log changes.
+            await _transactions.LogBankItemQuantityUpdateAsync(item.GuildBank, item, deltaQuantity, adminId);
+
+            // Save Changes
+            await _context.SaveChangesAsync();
         }
 
         public async Task RemoveBankItemAsync(int itemId, ulong moderatorId)
         {
-            _context.Remove(await GetBankItemAsync(itemId));
+            // Get the item.
+            var item = await GetBankItemAsync(itemId, o => o.Include(i => i.GuildBank));
+
+            // Remove from database.
+            _context.Remove(item);
+
+            // Log removal.
+            await _transactions.LogBankItemDeleteAsync(item.GuildBank, item, moderatorId);
+
             await _context.SaveChangesAsync();
         }
     }

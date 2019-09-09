@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 
@@ -11,22 +12,25 @@ namespace Alderto.Services.GuildBankManagers
         /// Gets the bank item with from the given primary key.
         /// </summary>
         /// <param name="itemId">Primary key of the item.</param>
+        /// <param name="options">Additional includes.</param>
         /// <returns>Item represented by the primary key.</returns>
-        Task<GuildBankItem> GetBankItemAsync(int itemId);
+        Task<GuildBankItem> GetBankItemAsync(int itemId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
 
         /// <summary>
         /// Gets the bank item with from the given bank with the specified name.
         /// </summary>
         /// <param name="bankId">Primary key of the bank.</param>
         /// <param name="itemName">Name of the item.</param>
-        Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName);
+        /// <param name="options">Additional includes.</param>
+        Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
 
         /// <summary>
         /// Fetches contents of the bank.
         /// </summary>
         /// <param name="bankId">Id of bank to get contents of.</param>
+        /// <param name="options">Additional includes.</param>
         /// <returns>Bank contents.</returns>
-        Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId);
+        Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
 
         /// <summary>
         /// Creates a new item in a given bank.

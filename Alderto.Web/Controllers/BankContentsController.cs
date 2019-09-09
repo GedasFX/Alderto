@@ -30,11 +30,12 @@ namespace Alderto.Web.Controllers
         {
             var userId = User.GetId();
             var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+
             var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            var createdBank = await _contents.CreateBankItemAsync(await _bank.GetGuildBankAsync(guildId, bankId), item, userId);
+            var createdBank = await _contents.CreateBankItemAsync(bank, item, userId);
 
             return Content(createdBank);
         }
