@@ -24,8 +24,8 @@ export class BankItemsDetailsComponent implements OnInit, OnDestroy {
     private readonly fb: FormBuilder,
     private readonly bankApi: AldertoWebBankApi,
     private readonly guild: GuildService,
-    private readonly modal: BsModalRef,
-    private readonly toastr: ToastrService) {
+    private readonly toastr: ToastrService,
+    public readonly modal: BsModalRef) {
   }
 
   public ngOnInit() {

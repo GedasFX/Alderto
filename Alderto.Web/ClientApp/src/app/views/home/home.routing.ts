@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NewsComponent } from './news.component';
+import { HomeLayoutComponent } from "./home.layout";
 
 const routes: Routes = [
   {
     path: '',
+    component: HomeLayoutComponent,
     data: {
       title: 'Home'
     },

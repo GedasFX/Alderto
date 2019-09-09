@@ -28,8 +28,8 @@ export class BankItemsCreateComponent implements OnInit, OnDestroy {
   constructor(
     private readonly fb: FormBuilder,
     private readonly bankApi: AldertoWebBankApi,
-    private readonly modal: BsModalRef,
-    private readonly toastr: ToastrService) {
+    private readonly toastr: ToastrService,
+    public readonly modal: BsModalRef) {
   }
 
   public ngOnInit() {

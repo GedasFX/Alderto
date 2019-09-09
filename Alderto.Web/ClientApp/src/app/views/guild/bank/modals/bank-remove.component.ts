@@ -20,8 +20,8 @@ export class BankRemoveComponent implements OnInit, OnDestroy {
   constructor(
     private readonly bankApi: AldertoWebBankApi,
     private readonly guild: GuildService,
-    private readonly modal: BsModalRef,
-    private readonly toastr: ToastrService) {
+    private readonly toastr: ToastrService,
+    public readonly modal: BsModalRef) {
   }
 
   public ngOnInit(): void {

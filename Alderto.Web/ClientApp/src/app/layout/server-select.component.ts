@@ -11,7 +11,7 @@ export class ServerSelectComponent implements OnInit {
   public currentServerName = "Please select a server";
 
   constructor(
-    private readonly guilds: GuildService) { }
+    public readonly guilds: GuildService) { }
 
   public ngOnInit() {
     this.guilds.currentGuild$.subscribe(g => {
