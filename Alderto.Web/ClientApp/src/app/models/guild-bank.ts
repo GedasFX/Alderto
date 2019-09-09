@@ -5,6 +5,8 @@ export interface IGuildBank {
   currencyCount: number;
   logChannelId: string;
 
+  canModify: boolean;
+
   contents: IGuildBankItem[];
 }
 

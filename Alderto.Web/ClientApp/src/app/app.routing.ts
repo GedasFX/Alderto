@@ -19,7 +19,8 @@ const routes: Routes = [
   {
     path: 'guild/:id',
     loadChildren: () => import('./views/guild/guild.module').then(m => m.GuildModule),
-    data: { title: 'Guild' }
+    data: { title: 'Guild' },
+    canActivate: [AuthGuard]
   },
   {
     path: '**',

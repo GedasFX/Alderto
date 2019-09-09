@@ -13,6 +13,7 @@ import { Subject } from 'rxjs';
 })
 export class BankItemsDetailsComponent implements OnInit, OnDestroy {
   public item: IGuildBankItem;
+  public canModify: boolean;
 
   public onItemEdited: Subject<void>;
   public onItemDeleted: Subject<void>;
@@ -29,10 +30,10 @@ export class BankItemsDetailsComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     this.formGroup = this.fb.group({
-      name: [this.item.name, [Validators.required, Validators.maxLength(70)]],
-      description: [this.item.description, Validators.maxLength(280)],
-      value: [this.item.value, [Validators.required, Validators.min(-1000000000000000000), Validators.max(1000000000000000000)]],
-      quantity: [this.item.quantity, [Validators.required, Validators.min(-1000000000000000000), Validators.max(1000000000000000000)]],
+      name: [{ value: this.item.name, disabled: !this.canModify }, [Validators.required, Validators.maxLength(70)]],
+      description: [{ value: this.item.description, disabled: !this.canModify }, Validators.maxLength(280)],
+      value: [{ value: this.item.value, disabled: !this.canModify }, [Validators.required, Validators.min(-1000000000000000000), Validators.max(1000000000000000000)]],
+      quantity: [{ value: this.item.quantity, disabled: !this.canModify }, [Validators.required, Validators.min(-1000000000000000000), Validators.max(1000000000000000000)]],
       imageUrl: [this.item.imageUrl, [Validators.maxLength(140)]]
     });
 

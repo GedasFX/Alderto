@@ -9,7 +9,7 @@ export class JwtInterceptor implements HttpInterceptor {
   constructor(private readonly accountService: AccountService) { }
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const currentUser = this.accountService.getUser();
+    const currentUser = this.accountService.user;
     if (currentUser) {
       if (request.url.startsWith('/api/')) {
         // Going to the API
@@ -25,7 +25,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
         request = request.clone({
           setHeaders: {
-            Authorization: `Bearer ${currentUser.discordToken}`
+            Authorization: `Bearer ${currentUser.discord}`
           }
         });
 

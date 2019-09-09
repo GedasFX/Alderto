@@ -26,13 +26,12 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  public loginDiscord() {
-    this.account.loginDiscord();
+  public login() {
+    this.account.login();
   }
 
   public logout() {
     this.account.logout();
-    location.reload(true);
   }
 
   private getDefaultAvatar(discriminator): string {

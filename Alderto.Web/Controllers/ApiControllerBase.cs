@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, Authorize]
+    [ApiController, Authorize, RequireHttps]
     public abstract class ApiControllerBase : ControllerBase
     {
         protected IActionResult Forbid(ErrorMessage message)

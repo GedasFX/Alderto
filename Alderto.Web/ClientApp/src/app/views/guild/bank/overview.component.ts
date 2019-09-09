@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IGuildBank, IGuildBankItem } from 'src/app/models';
-import { AldertoWebBankApi, NavigationService } from 'src/app/services';
+import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 import { BankCreateComponent } from './modals/bank-create.component';
 import { BankRemoveComponent } from './modals/bank-remove.component';
@@ -14,13 +14,18 @@ import { BankItemsDetailsComponent } from './modals/bank-items-details.component
   templateUrl: 'overview.component.html',
   styleUrls: ['overview.component.scss']
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
   public guildBanks: IGuildBank[] = [];
   public bankValues = {};
+
+  public isAdmin: boolean;
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private readonly bankApi: AldertoWebBankApi,
     private readonly nav: NavigationService,
+    private readonly guild: GuildService,
     private readonly modal: BsModalService) {
   }
 
@@ -31,10 +36,18 @@ export class OverviewComponent implements OnInit {
 
 
   public ngOnInit(): void {
+    this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
+      if (g !== undefined)
+        this.isAdmin = g.isAdmin;
+    }));
     this.bankApi.fetchBanks(this.nav.getCurrentGuildId()).subscribe(banks => {
       this.guildBanks = banks;
       this.guildBanks.forEach(b => this.updateValue(b));
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   public openBankCreateModal(): void {
@@ -84,7 +97,7 @@ export class OverviewComponent implements OnInit {
   public openItemDetailsModal(bank: IGuildBank, item: IGuildBankItem): void {
     const modal = this.modal.show(BankItemsDetailsComponent,
       {
-        initialState: { item },
+        initialState: { item, canModify: bank.canModify },
         ignoreBackdropClick: true
       });
     (modal.content.onItemDeleted as Subject<void>).subscribe(() => {

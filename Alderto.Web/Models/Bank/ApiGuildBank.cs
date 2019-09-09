@@ -16,7 +16,7 @@ namespace Alderto.Web.Models.Bank
         public bool CanModify { get; set; }
 
         public ICollection<GuildBankItem> Contents { get; set; }
-        
+
         public ApiGuildBank() { }
         public ApiGuildBank(ulong guildId, string name)
         {
@@ -32,6 +32,7 @@ namespace Alderto.Web.Models.Bank
         public ApiGuildBank(GuildBank guildBank)
             : this(guildBank.Id, guildBank.GuildId, guildBank.LogChannelId, guildBank.Name)
         {
+            Contents = guildBank.Contents;
         }
     }
 }
