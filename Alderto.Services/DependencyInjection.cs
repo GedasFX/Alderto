@@ -22,8 +22,8 @@ namespace Alderto.Services
 
                 // Add Guild bank managers
                 .AddScoped<IGuildBankManager, GuildBankManager>()
-                .AddScoped<IGuildBankItemManager, GuildBankItemManager>()
-                .AddScoped<IGuildBankTransactionsManager, GuildBankTransactionsManager>();
+                .AddScoped<IGuildBankContentsManager, GuildBankContentsManager>()
+                .AddScoped<IGuildLogger, GuildLogger>();
 
             return services;
         }

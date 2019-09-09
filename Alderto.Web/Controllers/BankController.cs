@@ -29,7 +29,7 @@ namespace Alderto.Web.Controllers
             bool ValidateModifyAccess(GuildBank bank) =>
                 user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
 
-            var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
+            var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
             var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b) });
             return Content(outBanks);
         }
@@ -39,14 +39,14 @@ namespace Alderto.Web.Controllers
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
             GuildBank bank)
         {
-            // Ensure user has admin rights
+            // Ensure user has admin rights 
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            var b = await _bank.CreateGuildBankAsync(guildId, bank.Name, bank.LogChannelId);
+            var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.LogChannelId);
 
             return Content(new ApiGuildBank(b) { CanModify = true });
         }
