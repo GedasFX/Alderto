@@ -4,6 +4,9 @@ using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Alderto.Web.Models.Bank;
+using Discord.WebSocket;
 
 namespace Alderto.Web.Controllers
 {
@@ -11,18 +14,24 @@ namespace Alderto.Web.Controllers
     public class BankController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
+        private readonly DiscordSocketClient _client;
 
-        public BankController(IGuildBankManager bank)
+        public BankController(IGuildBankManager bank, DiscordSocketClient client)
         {
             _bank = bank;
+            _client = client;
         }
 
         [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
-            var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
+            var user = _client.GetGuild(guildId).GetUser(User.GetId());
+            bool ValidateModifyAccess(GuildBank bank) =>
+                user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
 
-            return Content(banks);
+            var banks = await _bank.GetAllGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
+            var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b) });
+            return Content(outBanks);
         }
 
         [HttpPost]
@@ -38,8 +47,8 @@ namespace Alderto.Web.Controllers
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
             var b = await _bank.CreateGuildBankAsync(guildId, bank.Name, bank.LogChannelId);
-            
-            return Content(b);
+
+            return Content(new ApiGuildBank(b) { CanModify = true });
         }
 
         [HttpPatch("{bankId}")]
