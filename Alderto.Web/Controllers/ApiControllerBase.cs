@@ -78,6 +78,20 @@ namespace Alderto.Web.Controllers
             // === BadRequest ===
 
             /// <summary>
+            /// BadRequest reason. Used when the bot does not have access to a particular resource.
+            /// </summary>
+            public static ErrorMessage MissingChannelAccess { get; } =
+                new ErrorMessage(3000,
+                    "The bot does not have access to this channel. Make sure the bot has Read Messages permission.");
+
+            /// <summary>
+            /// BadRequest reason. Used when the bot does not have permissions to a perform a particular action.
+            /// </summary>
+            public static ErrorMessage MissingWritePermissions { get; } =
+                new ErrorMessage(3000,
+                    "The bot does not have Send Messages or Embed Links permissions in this channel. To function properly, the bot requires both of these permissions.");
+
+            /// <summary>
             /// BadRequest reason. Used when received over 100 guilds in a request.
             /// </summary>
             public static ErrorMessage GuildCountOver100 { get; } =

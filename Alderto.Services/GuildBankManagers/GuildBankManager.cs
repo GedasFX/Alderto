@@ -13,13 +13,11 @@ namespace Alderto.Services.GuildBankManagers
     {
         private readonly IAldertoDbContext _context;
         private readonly IGuildLogger _transactions;
-        private readonly IGuildBankContentsManager _items;
 
-        public GuildBankManager(IAldertoDbContext context, IGuildLogger transactions, IGuildBankContentsManager items)
+        public GuildBankManager(IAldertoDbContext context, IGuildLogger transactions)
         {
             _context = context;
             _transactions = transactions;
-            _items = items;
         }
 
         private IQueryable<GuildBank> FetchGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
@@ -58,11 +56,11 @@ namespace Alderto.Services.GuildBankManagers
             var bank = new GuildBank(guildId, bankName) { LogChannelId = logChannelId };
             _context.GuildBanks.Add(bank);
 
-            // Save changes
-            await _context.SaveChangesAsync();
-
             // Log the creation of the bank
             await _transactions.LogBankCreateAsync(guildId, adminId, bank);
+
+            // Save changes
+            await _context.SaveChangesAsync();
 
             // Return the added bank
             return bank;

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Alderto.Web.Models.Bank;
+using Discord.Net;
 using Discord.WebSocket;
 
 namespace Alderto.Web.Controllers
@@ -46,9 +47,23 @@ namespace Alderto.Web.Controllers
             if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.LogChannelId);
-
-            return Content(new ApiGuildBank(b) { CanModify = true });
+            try
+            {
+                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.LogChannelId);
+                return Content(new ApiGuildBank(b) { CanModify = true });
+            }
+            catch (HttpException e)
+            {
+                switch (e.DiscordCode)
+                {
+                    case 50001:
+                        return BadRequest(ErrorMessages.MissingChannelAccess);
+                    case 50013:
+                        return BadRequest(ErrorMessages.MissingWritePermissions);
+                    default:
+                        throw;
+                }
+            }
         }
 
         [HttpPatch("{bankId}")]
