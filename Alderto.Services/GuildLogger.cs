@@ -2,7 +2,6 @@
 using Alderto.Data.Models.GuildBank;
 using Discord;
 using Discord.WebSocket;
-using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
 namespace Alderto.Services
 {
