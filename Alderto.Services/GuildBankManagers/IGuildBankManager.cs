@@ -50,14 +50,16 @@ namespace Alderto.Services.GuildBankManagers
         /// </summary>
         /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of guild bank to remove.</param>
-        Task RemoveGuildBankAsync(ulong guildId, string name);
+        /// <param name="adminId">Id of user, who removed the bank.</param>
+        Task RemoveGuildBankAsync(ulong guildId, string name, ulong adminId);
 
         /// <summary>
         /// Removes a guild bank of a given name.
         /// </summary>
         /// <param name="guildId">Guild Id.</param>
         /// <param name="id">Id of guild bank to remove.</param>
-        Task RemoveGuildBankAsync(ulong guildId, int id);
+        /// <param name="adminId">Id of user, who removed the bank.</param>
+        Task RemoveGuildBankAsync(ulong guildId, int id, ulong adminId);
 
         /// <summary>
         /// Updates the guild bank as described in <see cref="changes"/>

@@ -57,7 +57,7 @@ namespace Alderto.Services.GuildBankManagers
             _context.GuildBanks.Add(bank);
 
             // Log the creation of the bank
-            await _transactions.LogBankCreateAsync(guildId, adminId, bank);
+            await _transactions.LogBankCreateAsync(bank, adminId);
 
             // Save changes
             await _context.SaveChangesAsync();
@@ -88,20 +88,24 @@ namespace Alderto.Services.GuildBankManagers
             bank.GuildId = initialBank.GuildId;
 
             // Log the modification of the bank
-            await _transactions.LogBankUpdateAsync(initialBank.GuildId, adminId, initialBank, bank);
+            await _transactions.LogBankUpdateAsync(initialBank, bank, adminId);
 
             // Save changes
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveGuildBankAsync(ulong guildId, string name)
+        public async Task RemoveGuildBankAsync(ulong guildId, string name, ulong adminId)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, name));
-            await _context.SaveChangesAsync();
+            await RemoveGuildBankAsync(await GetGuildBankAsync(guildId, name, b => b.Include(e => e.Contents)), adminId);
         }
-        public async Task RemoveGuildBankAsync(ulong guildId, int id)
+        public async Task RemoveGuildBankAsync(ulong guildId, int id, ulong adminId)
         {
-            _context.GuildBanks.Remove(await GetGuildBankAsync(guildId, id));
+            await RemoveGuildBankAsync(await GetGuildBankAsync(guildId, id, b => b.Include(e => e.Contents)), adminId);
+        }
+        private async Task RemoveGuildBankAsync(GuildBank bank, ulong adminId)
+        {
+            _context.GuildBanks.Remove(bank);
+            await _transactions.LogBankDeleteAsync(bank, adminId);
             await _context.SaveChangesAsync();
         }
     }

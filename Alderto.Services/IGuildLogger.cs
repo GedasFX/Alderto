@@ -5,6 +5,8 @@ namespace Alderto.Services
 {
     public interface IGuildLogger
     {
+
+
         /// <summary>
         /// Logs the transaction in the guild bank.
         /// </summary>
@@ -16,21 +18,28 @@ namespace Alderto.Services
         Task LogBankItemChangeAsync(GuildBank bank, GuildBankItem changedItem, ulong adminId, ulong transactorId,
             string comment);
 
+        Task LogBankItemDeleteAsync(GuildBank bank, GuildBankItem deletedItem, ulong adminId);
+
         /// <summary>
         /// Logs the creation of a guild bank.
         /// </summary>
-        /// <param name="guildId">Id of guild the bank exists in.</param>
         /// <param name="adminId">Id of user who created the bank.</param>
-        /// <param name="newBank">The newly created bank.</param>
-        Task LogBankCreateAsync(ulong guildId, ulong adminId, GuildBank newBank);
+        /// <param name="bank">The newly created bank.</param>
+        Task LogBankCreateAsync(GuildBank bank, ulong adminId);
 
         /// <summary>
         /// Logs the changes of a guild bank.
         /// </summary>
-        /// <param name="guildId">Id of guild the bank exists in.</param>
-        /// <param name="adminId">Id of user who changed the bank.</param>
         /// <param name="oldBank">Bank snapshot before changes were applied.</param>
         /// <param name="newBank">Bank snapshot after changes were applied.</param>
-        Task LogBankUpdateAsync(ulong guildId, ulong adminId, GuildBank oldBank, GuildBank newBank);
+        /// <param name="adminId">Id of user who changed the bank.</param>
+        Task LogBankUpdateAsync(GuildBank oldBank, GuildBank newBank, ulong adminId);
+
+        /// <summary>
+        /// Logs the removal of a guild bank.
+        /// </summary>
+        /// <param name="bank">Bank that was deleted.</param>
+        /// <param name="adminId">Id of user who changed the bank.</param>
+        Task LogBankDeleteAsync(GuildBank bank, ulong adminId);
     }
 }

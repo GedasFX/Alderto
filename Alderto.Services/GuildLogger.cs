@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Discord;
 using Discord.Net;
@@ -40,37 +41,70 @@ namespace Alderto.Services
             await channel.SendMessageAsync(embed: logMessage.Build()).ConfigureAwait(false);
         }
 
-        public async Task LogBankCreateAsync(ulong guildId, ulong adminId, GuildBank newBank)
+        public async Task LogBankItemDeleteAsync(GuildBank bank, GuildBankItem deletedItem, ulong adminId)
         {
             // Do not log if there is nowhere to log.
-            if (newBank.LogChannelId == null)
+            if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(guildId);
+            var guild = _client.GetGuild(bank.GuildId);
             var admin = guild.GetUser(adminId);
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)newBank.LogChannelId);
+            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)
                 .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}");
 
-            logMessage.AddField("Name", $"{newBank.Name}")
-                .AddField("Log Channel", $"<#{newBank.LogChannelId}>");
-
+            logMessage.WithDescription("The following bank item was deleted:");
             logMessage
-                .WithDescription("The following bank was created:");
+                .AddField("Name", deletedItem.Name, true)
+                .AddField("Description", deletedItem.Description, true)
+                .AddField("Quantity", deletedItem.Quantity, true)
+                .AddField("Value", deletedItem.Value, true);
+
+            try
+            {
+                logMessage.WithThumbnailUrl(deletedItem.ImageUrl);
+            }
+            catch (ArgumentException)
+            {
+                // URL is not well formed. Ignore error, will not display image as it wont work in the first place.
+            }
 
             await channel.SendMessageAsync(embed: logMessage.Build());
         }
 
-        public async Task LogBankUpdateAsync(ulong guildId, ulong adminId, GuildBank oldBank, GuildBank newBank)
+        public async Task LogBankCreateAsync(GuildBank bank, ulong adminId)
+        {
+            // Do not log if there is nowhere to log.
+            if (bank.LogChannelId == null)
+                return;
+
+            var guild = _client.GetGuild(bank.GuildId);
+            var admin = guild.GetUser(adminId);
+
+            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+
+            var logMessage = new EmbedBuilder()
+                .WithAuthor(admin)
+                .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}");
+
+            logMessage.WithDescription("The following bank was created:");
+            logMessage
+                .AddField("Name", $"{bank.Name}", true)
+                .AddField("Log Channel", $"<#{bank.LogChannelId}>", true);
+
+            await channel.SendMessageAsync(embed: logMessage.Build());
+        }
+
+        public async Task LogBankUpdateAsync(GuildBank oldBank, GuildBank newBank, ulong adminId)
         {
             // Do not log if there is nowhere to log.
             if (newBank.LogChannelId == null && oldBank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(guildId);
+            var guild = _client.GetGuild(oldBank.GuildId);
             var admin = guild.GetUser(adminId);
 
             // Special case: Log channel change in old channel and log other changes in the updated channel.
@@ -106,25 +140,43 @@ namespace Alderto.Services
             if (oldBank.Name != newBank.Name)
             {
                 logMessage.WithDescription("The following changes were applied:");
-                logMessage.AddField("Name", $"{oldBank.Name} -> {newBank.Name}");
+                logMessage.AddField("Name", $"{oldBank.Name} -> {newBank.Name}", true);
             }
 
             await channel.SendMessageAsync(embed: logMessage.Build());
         }
 
+        public async Task LogBankDeleteAsync(GuildBank bank, ulong adminId)
+        {
+            // Do not log if there is nowhere to log.
+            if (bank.LogChannelId == null)
+                return;
 
-        //public async Task LogAsync(int bankId, ulong adminId, ulong transactorId, double amountDelta, int itemId = 0, string comment = null,
-        //    bool saveChanges = false)
-        //{
-        //    var message = new GuildBankTransaction
-        //    {
-        //        BankId = bankId,
-        //        AdminId = adminId,
-        //        MemberId = transactorId,
-        //        Amount = amountDelta,
-        //        ItemId = itemId != 0 ? (int?)itemId : null,
-        //        Comment = comment,
-        //        TransactionDate = DateTimeOffset.UtcNow
-        //    };
+            var guild = _client.GetGuild(bank.GuildId);
+            var admin = guild.GetUser(adminId);
+
+            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+
+            var logMessage = new EmbedBuilder()
+                .WithAuthor(admin)
+                .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}");
+
+            logMessage.WithDescription("The following bank was deleted:");
+
+            logMessage
+                .AddField("Name", $"{bank.Name}", true)
+                .AddField("Log Channel", $"<#{bank.LogChannelId}>", true);
+
+            await channel.SendMessageAsync(embed: logMessage.Build());
+
+            // Offload logging of item deletions to another thread.
+            await Task.Factory.StartNew(async () =>
+            {
+                foreach (var item in bank.Contents)
+                {
+                    await LogBankItemDeleteAsync(bank, item, adminId);
+                }
+            }).ConfigureAwait(false);
+        }
     }
 }

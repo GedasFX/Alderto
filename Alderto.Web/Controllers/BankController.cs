@@ -93,7 +93,14 @@ namespace Alderto.Web.Controllers
             if (!await User.IsDiscordAdminAsync(guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
-            await _bank.RemoveGuildBankAsync(guildId, bankId);
+            try
+            {
+                await _bank.RemoveGuildBankAsync(guildId, bankId, User.GetId());
+            }
+            catch (HttpException e)
+            {
+                return HandleHttpError(e);
+            }
 
             return NoContent();
         }
