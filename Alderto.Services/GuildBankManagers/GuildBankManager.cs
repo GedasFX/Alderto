@@ -66,16 +66,31 @@ namespace Alderto.Services.GuildBankManagers
             return bank;
         }
 
-        public async Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes)
+        public async Task UpdateGuildBankAsync(ulong guildId, string name, ulong adminId, Action<GuildBank> changes)
         {
-            var gb = await GetGuildBankAsync(guildId, name);
-            changes(gb);
-            await _context.SaveChangesAsync();
+            await UpdateGuildBankAsync(await GetGuildBankAsync(guildId, name), adminId, changes);
         }
-        public async Task UpdateGuildBankAsync(ulong guildId, int id, Action<GuildBank> changes)
+        public async Task UpdateGuildBankAsync(ulong guildId, int id, ulong adminId, Action<GuildBank> changes)
         {
-            var gb = await GetGuildBankAsync(guildId, id);
-            changes(gb);
+            await UpdateGuildBankAsync(await GetGuildBankAsync(guildId, id), adminId, changes);
+        }
+
+        private async Task UpdateGuildBankAsync(GuildBank bank, ulong adminId, Action<GuildBank> changes)
+        {
+            // Take a snapshot of the bank pre changes.
+            var initialBank = bank.MemberwiseClone();
+            
+            // Apply the changes.
+            changes(bank);
+
+            // Ensure that core keys are intact.
+            bank.Id = initialBank.Id;
+            bank.GuildId = initialBank.GuildId;
+
+            // Log the modification of the bank
+            await _transactions.LogBankUpdateAsync(initialBank.GuildId, adminId, initialBank, bank);
+
+            // Save changes
             await _context.SaveChangesAsync();
         }
 

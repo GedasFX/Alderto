@@ -64,15 +64,17 @@ namespace Alderto.Services.GuildBankManagers
         /// </summary>
         /// <param name="guildId">Guild Id.</param>
         /// <param name="name">Name of bank to update.</param>
+        /// <param name="adminId">Id of user, who updated the bank.</param>
         /// <param name="changes">Changes to apply.</param>
-        Task UpdateGuildBankAsync(ulong guildId, string name, Action<GuildBank> changes);
+        Task UpdateGuildBankAsync(ulong guildId, string name, ulong adminId, Action<GuildBank> changes);
 
         /// <summary>
         /// Updates the guild bank as described in <see cref="changes"/>
         /// </summary>
         /// <param name="guildId">Guild Id.</param>
         /// <param name="id">Id of bank to update.</param>
+        /// <param name="adminId">Id of user, who updated the bank.</param>
         /// <param name="changes">Changes to apply.</param>
-        Task UpdateGuildBankAsync(ulong guildId, int id, Action<GuildBank> changes);
+        Task UpdateGuildBankAsync(ulong guildId, int id, ulong adminId, Action<GuildBank> changes);
     }
 }

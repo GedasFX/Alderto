@@ -54,15 +54,7 @@ namespace Alderto.Web.Controllers
             }
             catch (HttpException e)
             {
-                switch (e.DiscordCode)
-                {
-                    case 50001:
-                        return BadRequest(ErrorMessages.MissingChannelAccess);
-                    case 50013:
-                        return BadRequest(ErrorMessages.MissingWritePermissions);
-                    default:
-                        throw;
-                }
+                return HandleHttpError(e);
             }
         }
 
@@ -79,13 +71,20 @@ namespace Alderto.Web.Controllers
             if (dbBank != null && dbBank.Id != bankId)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
-            await _bank.UpdateGuildBankAsync(guildId, bankId, b =>
+            try
             {
-                b.Name = bank.Name;
-                b.LogChannelId = bank.LogChannelId;
-            });
+                await _bank.UpdateGuildBankAsync(guildId, bankId, User.GetId(), b =>
+                {
+                    b.Name = bank.Name;
+                    b.LogChannelId = bank.LogChannelId;
+                });
+            }
+            catch (HttpException e)
+            {
+                return HandleHttpError(e);
+            }
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{bankId}")]
@@ -95,7 +94,24 @@ namespace Alderto.Web.Controllers
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             await _bank.RemoveGuildBankAsync(guildId, bankId);
-            return Ok();
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Handles MissingAccess and MissingPermissions discord error codes.
+        /// </summary>
+        private IActionResult HandleHttpError(HttpException e)
+        {
+            switch (e.DiscordCode)
+            {
+                case 50001:
+                    return BadRequest(ErrorMessages.MissingChannelAccess);
+                case 50013:
+                    return BadRequest(ErrorMessages.MissingWritePermissions);
+                default:
+                    throw e;
+            }
         }
     }
 }

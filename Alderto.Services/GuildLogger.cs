@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 
 namespace Alderto.Services
@@ -60,7 +61,7 @@ namespace Alderto.Services
             logMessage
                 .WithDescription("The following bank was created:");
 
-            await channel.SendMessageAsync(embed: logMessage.Build()).ConfigureAwait(false);
+            await channel.SendMessageAsync(embed: logMessage.Build());
         }
 
         public async Task LogBankUpdateAsync(ulong guildId, ulong adminId, GuildBank oldBank, GuildBank newBank)
@@ -79,12 +80,16 @@ namespace Alderto.Services
             {
                 var c = (ISocketMessageChannel)guild.GetChannel((ulong)oldBank.LogChannelId);
                 var comment = newBank.LogChannelId == null
-                    ? $"Log channel for bank {oldBank.Name} was removed."
-                    : $"Log channel for bank {oldBank.Name} was changed to <#{newBank.LogChannelId}>.";
-                await c.SendMessageAsync(embed: new EmbedBuilder()
-                    .WithAuthor(admin)
-                    .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}")
-                    .WithDescription(comment).Build()).ConfigureAwait(false);
+                    ? $"Log channel for bank **{oldBank.Name}** was removed."
+                    : $"Log channel for bank **{oldBank.Name}** was changed to <#{newBank.LogChannelId}>.";
+                try
+                {
+                    await c.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithAuthor(admin)
+                        .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}")
+                        .WithDescription(comment).Build());
+                }
+                catch (HttpException) { /* Ignore error. Bot most likely does not have access to previous channel anymore. No point disallowing log channel change. */ }
             }
 
             // Ensure that the updated bank has a log channel.
@@ -99,12 +104,12 @@ namespace Alderto.Services
 
             // Check every property change
             if (oldBank.Name != newBank.Name)
+            {
+                logMessage.WithDescription("The following changes were applied:");
                 logMessage.AddField("Name", $"{oldBank.Name} -> {newBank.Name}");
+            }
 
-            logMessage
-                .WithDescription("The following changes were applied:");
-
-            await channel.SendMessageAsync(embed: logMessage.Build()).ConfigureAwait(false);
+            await channel.SendMessageAsync(embed: logMessage.Build());
         }
 
 

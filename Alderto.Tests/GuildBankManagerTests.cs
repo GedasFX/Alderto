@@ -17,7 +17,7 @@ namespace Alderto.Tests
             var context = new MockDbContext();
             var transactions = new GuildLogger(new Discord.WebSocket.DiscordSocketClient());
             _items = new GuildBankContentsManager(context, transactions);
-            _manager = new GuildBankManager(context, transactions, _items);
+            _manager = new GuildBankManager(context, transactions);
         }
 
         [Fact]
