@@ -3,10 +3,10 @@ using System;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Alderto.Data.Migrations
+namespace Alderto.Web.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
     partial class AldertoDbContextModelSnapshot : ModelSnapshot
@@ -15,9 +15,9 @@ namespace Alderto.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
                 {
@@ -50,8 +50,7 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("GuildId")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
@@ -66,9 +65,6 @@ namespace Alderto.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(32);
 
-                    b.Property<decimal?>("ViewerRoleId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId", "Name")
@@ -80,8 +76,7 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description")
                         .HasMaxLength(280);

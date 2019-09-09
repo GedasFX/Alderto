@@ -3,23 +3,23 @@ using System;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Alderto.Data.Migrations
+namespace Alderto.Web.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    [Migration("20190727133056_removeidentity")]
-    partial class removeidentity
+    [Migration("20190909202031_initpostgres")]
+    partial class initpostgres
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
                 {
@@ -47,6 +47,59 @@ namespace Alderto.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Guilds");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("GuildId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<decimal?>("LogChannelId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<decimal>("ModeratorRoleId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("GuildBanks");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(280);
+
+                    b.Property<int>("GuildBankId");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(140);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(70);
+
+                    b.Property<double>("Quantity");
+
+                    b.Property<double>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildBankId");
+
+                    b.ToTable("GuildBankItems");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildConfiguration", b =>
@@ -101,30 +154,6 @@ namespace Alderto.Data.Migrations
                     b.ToTable("GuildMembers");
                 });
 
-            modelBuilder.Entity("Alderto.Data.Models.GuildMemberDonation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Donation")
-                        .HasMaxLength(100);
-
-                    b.Property<DateTimeOffset>("DonationDate");
-
-                    b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.Property<decimal>("MemberId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GuildId", "MemberId");
-
-                    b.ToTable("GuildMemberDonations");
-                });
-
             modelBuilder.Entity("Alderto.Data.Models.Member", b =>
                 {
                     b.Property<decimal>("Id")
@@ -149,6 +178,22 @@ namespace Alderto.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
+                {
+                    b.HasOne("Alderto.Data.Models.Guild", "Guild")
+                        .WithMany("GuildBanks")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
+                {
+                    b.HasOne("Alderto.Data.Models.GuildBank.GuildBank", "GuildBank")
+                        .WithMany("Contents")
+                        .HasForeignKey("GuildBankId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Alderto.Data.Models.GuildConfiguration", b =>
                 {
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
@@ -167,14 +212,6 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.Member", "Member")
                         .WithMany("GuildMembers")
                         .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Alderto.Data.Models.GuildMemberDonation", b =>
-                {
-                    b.HasOne("Alderto.Data.Models.GuildMember", "GuildMember")
-                        .WithMany("Donations")
-                        .HasForeignKey("GuildId", "MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

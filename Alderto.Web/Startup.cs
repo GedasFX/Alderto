@@ -33,7 +33,7 @@ namespace Alderto.Web
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
                 {
-                    options.UseNpgsql(Configuration["DbConnectionString"]);
+                    options.UseNpgsql(Configuration["DbConnectionString"], builder => builder.MigrationsAssembly("Alderto.Web"));
                 });
 
             // Add database accessors.
@@ -100,18 +100,14 @@ namespace Alderto.Web
             });
             services.AddCommandHandler();
         }
-        
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
             // Start the bot.
             cmdHandler.StartAsync().ConfigureAwait(false);
 
-            if (env.IsDevelopment())
-            {
-                // app.UseDeveloperExceptionPage();
-            }
-            else
+            if (!env.IsDevelopment())
             {
                 app.UseHsts();
             }

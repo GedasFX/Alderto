@@ -47,11 +47,11 @@ namespace Alderto.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-#if DEBUG
-            optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.UseSqlServer(
-                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
-#endif
+//#if DEBUG
+//            optionsBuilder.EnableSensitiveDataLogging();
+//            optionsBuilder.UseSqlServer(
+//                "Server=(localdb)\\mssqllocaldb;Database=Alderto;Trusted_Connection=True;MultipleActiveResultSets=true");
+//#endif
             base.OnConfiguring(optionsBuilder);
         }
     }

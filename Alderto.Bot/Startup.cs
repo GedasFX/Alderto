@@ -18,7 +18,7 @@ namespace Alderto.Bot
         public IServiceProvider ConfigureServices(IConfiguration config) => new ServiceCollection()
             // Add database
             .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder =>
-                builder.UseSqlServer(config["DbConnectionString"]))
+                builder.UseNpgsql(config["DbConnectionString"]))
 
             // Add discord socket client
             .AddDiscordSocketClient(config["DiscordApp:BotToken"],
