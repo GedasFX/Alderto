@@ -3,52 +3,10 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\20190717192318_flip.cs" />
-    <Compile Remove="Migrations\20190717192318_flip.Designer.cs" />
-    <Compile Remove="Migrations\20190717193037_flip.cs" />
-    <Compile Remove="Migrations\20190717193037_flip.Designer.cs" />
-    <Compile Remove="Migrations\20190717205624_currencysymbolpref.cs" />
-    <Compile Remove="Migrations\20190717205624_currencysymbolpref.Designer.cs" />
-    <Compile Remove="Migrations\20190717210357_currencymodulepref.cs" />
-    <Compile Remove="Migrations\20190717210357_currencymodulepref.Designer.cs" />
-    <Compile Remove="Migrations\20190717210744_currencymodulepref.cs" />
-    <Compile Remove="Migrations\20190717210744_currencymodulepref.Designer.cs" />
-    <Compile Remove="Migrations\20190717210831_currencymodulepref.cs" />
-    <Compile Remove="Migrations\20190717210831_currencymodulepref.Designer.cs" />
-    <Compile Remove="Migrations\20190720165037_limitstringsize.cs" />
-    <Compile Remove="Migrations\20190720165037_limitstringsize.Designer.cs" />
-    <Compile Remove="Migrations\20190720165801_dropcustomcommands.cs" />
-    <Compile Remove="Migrations\20190720165801_dropcustomcommands.Designer.cs" />
-    <Compile Remove="Migrations\20190720173404_prefix.cs" />
-    <Compile Remove="Migrations\20190720173404_prefix.Designer.cs" />
-    <Compile Remove="Migrations\20190722150202_donation.cs" />
-    <Compile Remove="Migrations\20190722150202_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190722150742_donation.cs" />
-    <Compile Remove="Migrations\20190722150742_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190722151254_donation.cs" />
-    <Compile Remove="Migrations\20190722151254_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190722151525_donation.cs" />
-    <Compile Remove="Migrations\20190722151525_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190722151905_donation.cs" />
-    <Compile Remove="Migrations\20190722151905_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190722152338_donation.cs" />
-    <Compile Remove="Migrations\20190722152338_donation.Designer.cs" />
-    <Compile Remove="Migrations\20190723144035_pkchangeyetagain.cs" />
-    <Compile Remove="Migrations\20190723144035_pkchangeyetagain.Designer.cs" />
-    <Compile Remove="Migrations\20190723150859_intolong.cs" />
-    <Compile Remove="Migrations\20190723150859_intolong.Designer.cs" />
-    <Compile Remove="Migrations\20190811131718_guildbank.cs" />
-    <Compile Remove="Migrations\20190811131718_guildbank.Designer.cs" />
-    <Compile Remove="Migrations\20190811132744_guildbank.cs" />
-    <Compile Remove="Migrations\20190811132744_guildbank.Designer.cs" />
-    <Compile Remove="Migrations\20190811220332_GbTweaks.cs" />
-    <Compile Remove="Migrations\20190811220332_GbTweaks.Designer.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
