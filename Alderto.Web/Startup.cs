@@ -107,12 +107,6 @@ namespace Alderto.Web
             // Start the bot.
             cmdHandler.StartAsync().ConfigureAwait(false);
 
-            if (!env.IsDevelopment())
-            {
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
             app.UseCookiePolicy();
 
             app.UseSpaStaticFiles();
