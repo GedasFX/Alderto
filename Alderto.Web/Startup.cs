@@ -33,8 +33,14 @@ namespace Alderto.Web
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
                 {
-                    options.UseNpgsql(Configuration["DbConnectionString"], builder =>
-                        builder.MigrationsAssembly("Alderto.Web"));
+                    options.UseNpgsql(
+                        $"Server={Configuration["Database:Host"]};" +
+                        $"Port={Configuration["Database:Port"]};" +
+                        $"Database={Configuration["Database:Database"]};" +
+                        $"UserId={Configuration["Database:Username"]};" +
+                        $"Password={Configuration["Database:Password"]};" +
+                        Configuration["Extras"],
+                        builder => builder.MigrationsAssembly("Alderto.Web"));
                 });
 
             // Add database accessors.
@@ -51,8 +57,8 @@ namespace Alderto.Web
                 })
                 .AddDiscord(options =>
                 {
-                    options.ClientId = Configuration["DiscordApp:ClientId"];
-                    options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                    options.ClientId = Configuration["DiscordAPI:ClientId"];
+                    options.ClientSecret = Configuration["DiscordAPI:ClientSecret"];
                     options.SaveTokens = true;
 
                     options.Scope.Add("guilds");
@@ -66,7 +72,7 @@ namespace Alderto.Web
                         ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey =
-                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
+                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
                 .AddCookie(options =>
@@ -90,7 +96,7 @@ namespace Alderto.Web
 
             // === <Bot> ===
             // Add discord socket client
-            services.AddDiscordSocketClient(Configuration["DiscordApp:BotToken"],
+            services.AddDiscordSocketClient(Configuration["DiscordAPI:BotToken"],
                 socketConfig => { socketConfig.LogLevel = LogSeverity.Info; });
 
             // Add command handling services
@@ -109,7 +115,7 @@ namespace Alderto.Web
             cmdHandler.StartAsync().ConfigureAwait(false);
 
             // Check if https is configured
-            if (Configuration["Kestrel:Endpoints:Https"] != null)
+            if (Configuration["Kestrel:Endpoints:Https:Url"] != null)
             {
                 if (env.IsProduction())
                     app.UseHsts();
