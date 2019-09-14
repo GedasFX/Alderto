@@ -63,8 +63,7 @@ namespace Alderto.Bot
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddUserSecrets("c53fe5d3-16e9-400d-a588-4859345371e5")
-                .AddJsonFile("settings.json")
-                .AddJsonFile("configuration.json")
+                .AddJsonFile("appsettings.json")
                 .AddJsonFile("commands.json")
                 .Build();
         }

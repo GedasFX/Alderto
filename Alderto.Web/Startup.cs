@@ -91,7 +91,7 @@ namespace Alderto.Web
             // === <Bot> ===
             // Add discord socket client
             services.AddDiscordSocketClient(Configuration["DiscordApp:BotToken"],
-                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
+                socketConfig => { socketConfig.LogLevel = LogSeverity.Info; });
 
             // Add command handling services
             services.AddCommandService(serviceConfig =>
@@ -107,6 +107,15 @@ namespace Alderto.Web
         {
             // Start the bot.
             cmdHandler.StartAsync().ConfigureAwait(false);
+
+            // Check if https is configured
+            if (Configuration["Kestrel:Endpoints:Https"] != null)
+            {
+                if (env.IsProduction())
+                    app.UseHsts();
+
+                app.UseHttpsRedirection();
+            }
 
             app.UseCookiePolicy();
 
