@@ -13,6 +13,8 @@ export class NavigationService {
   public readonly navItems$: BehaviorSubject<INavData[]>;
   public readonly currentGuildId$: BehaviorSubject<string>;
 
+  private hNav = homeNav;
+
   constructor(router: Router) {
     this.navItems$ = new BehaviorSubject<INavData[]>(homeNav);
     this.currentGuildId$ = new BehaviorSubject<string>(undefined);
@@ -41,7 +43,7 @@ export class NavigationService {
    * Updates nav items to use the home layout.
    */
   private onNavigatedToHome() {
-    this.navItems$.next(homeNav);
+    this.navItems$.next(this.hNav);
   }
 
   /**
@@ -50,8 +52,9 @@ export class NavigationService {
    */
   private onNavigatedToGuild(guildId: string) {
     // Replace :id with actual guildId.
-    const nav = JSON.parse(JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId)) as INavData[];
-    this.navItems$.next(nav);
+    const gNav = JSON.stringify(guildNav).replace(new RegExp(':id', 'g'), guildId) + ',';
+    const nav = JSON.stringify(homeNav).replace('{},', gNav);
+    this.navItems$.next(JSON.parse(nav));
     this.currentGuildId$.next(guildId);
   }
 
