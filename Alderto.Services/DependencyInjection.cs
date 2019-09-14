@@ -1,4 +1,5 @@
-﻿using Alderto.Services.GuildBankManagers;
+﻿using System;
+using Alderto.Services.GuildBankManagers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Services
@@ -26,6 +27,19 @@ namespace Alderto.Services
                 .AddScoped<IGuildLogger, GuildLogger>();
 
             return services;
+        }
+
+        /// <summary>
+        /// Adds news provider for 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="options"></param>
+        public static IServiceCollection AddNewsProvider(this IServiceCollection services, Action<NewsProviderOptions> options = null) =>
+            services.AddSingleton<INewsProvider, NewsProvider>().Configure(options);
+
+        public sealed class NewsProviderOptions
+        {
+            public ulong NewsChannelId { get; set; }
         }
     }
 }

@@ -1,14 +1,27 @@
-﻿using Discord.WebSocket;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 
 namespace Alderto.Services
 {
-    public class NewsProvider
+    public class NewsProvider : INewsProvider
     {
-        private readonly DiscordSocketClient _client;
+        private readonly ISocketMessageChannel _channel;
 
-        public NewsProvider(DiscordSocketClient client)
+        public NewsProvider(DiscordSocketClient client, IOptions<DependencyInjection.NewsProviderOptions> options)
         {
-            _client = client;
+            _channel = (ISocketMessageChannel)client.GetChannel(options.Value.NewsChannelId);
+        }
+
+        public async Task<IEnumerable<IMessage>> GetLatestNewsAsync(int count)
+        {
+            if (_channel == null)
+                return Enumerable.Empty<IMessage>();
+
+            return await _channel.GetMessagesAsync(count).FlattenAsync();
         }
     }
 }

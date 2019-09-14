@@ -22,7 +22,7 @@ namespace Alderto.Web.Controllers
             // Json parser sometimes has trouble passing Lists.
             var userGuilds = guilds as ICollection<DiscordGuild> ?? guilds.ToArray();
             if (userGuilds.Count > 100)
-                return BadRequest(ErrorMessages.GuildCountOver100);
+                return BadRequest(ErrorMessages.PayloadOver100);
 
             // _bot.GetGuild(ulong id) returns null if bot is currently not connected to that guild.
             var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuild(ulong.Parse(userGuild.Id)) != null);

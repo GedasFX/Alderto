@@ -46,6 +46,9 @@ namespace Alderto.Web
             // Add database accessors.
             services.AddBotManagers();
 
+            ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
+            services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
+
             // === <Web> ===
             // Use discord as authentication service.
             services
@@ -97,7 +100,7 @@ namespace Alderto.Web
             // === <Bot> ===
             // Add discord socket client
             services.AddDiscordSocketClient(Configuration["DiscordAPI:BotToken"],
-                socketConfig => { socketConfig.LogLevel = LogSeverity.Info; });
+                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
 
             // Add command handling services
             services.AddCommandService(serviceConfig =>
