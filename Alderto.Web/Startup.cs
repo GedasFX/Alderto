@@ -33,7 +33,8 @@ namespace Alderto.Web
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
                 {
-                    options.UseNpgsql(Configuration["DbConnectionString"], builder => builder.MigrationsAssembly("Alderto.Web"));
+                    options.UseNpgsql(Configuration["DbConnectionString"], builder =>
+                        builder.MigrationsAssembly("Alderto.Web"));
                 });
 
             // Add database accessors.
