@@ -9,11 +9,6 @@ const routes: Routes = [
   {
     // Index.
     path: '',
-    pathMatch: 'full',
-    redirectTo: 'home'
-  },
-  {
-    path: 'home',
     loadChildren: () => import('./views/home/home.module').then(m => m.HomeModule)
   },
   {

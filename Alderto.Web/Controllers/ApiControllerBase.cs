@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, Authorize, RequireHttps]
+    [ApiController, Authorize]
     public abstract class ApiControllerBase : ControllerBase
     {
         protected IActionResult Forbid(ErrorMessage message)
@@ -92,10 +92,10 @@ namespace Alderto.Web.Controllers
                     "The bot does not have Send Messages or Embed Links permissions in this channel. To function properly, the bot requires both of these permissions.");
 
             /// <summary>
-            /// BadRequest reason. Used when received over 100 guilds in a request.
+            /// BadRequest reason. Used when received over 100 elements in a request.
             /// </summary>
-            public static ErrorMessage GuildCountOver100 { get; } =
-                new ErrorMessage(3100, "Guild count cannot exceed 100.");
+            public static ErrorMessage PayloadOver100 { get; } =
+                new ErrorMessage(3100, "Request payload cannot exceed 100 elements.");
 
             /// <summary>
             /// BadRequest reason. Used when bank with the given name already exists.

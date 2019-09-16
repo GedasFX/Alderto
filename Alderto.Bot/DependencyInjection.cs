@@ -65,11 +65,7 @@ namespace Alderto.Bot
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddCommandService(this IServiceCollection services,
             Action<CommandServiceConfig> config = null) =>
-            services.AddSingleton<CommandService, CommandServiceWrapper>()
-                .Configure<CommandServiceConfig>(localConfig =>
-                {
-                    config?.Invoke(localConfig);
-                });
+            services.AddSingleton<CommandService, CommandServiceWrapper>().Configure(config);
 
         private class CommandServiceWrapper : CommandService
         {

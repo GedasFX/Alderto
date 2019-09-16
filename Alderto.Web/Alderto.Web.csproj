@@ -38,12 +38,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create - Copy %282%29.component.scss">
       <DependentUpon>bank-create.component.html</DependentUpon>
     </None>
     <None Update="ClientApp\src\app\views\guild\bank\modals\bank-create - Copy - Copy.component.scss">
       <DependentUpon>bankContents-add.component.html</DependentUpon>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

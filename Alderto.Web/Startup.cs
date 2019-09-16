@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
@@ -32,12 +33,22 @@ namespace Alderto.Web
             // === <General> ===
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
-                {
-                    options.UseNpgsql(Configuration["DbConnectionString"], builder => builder.MigrationsAssembly("Alderto.Web"));
-                });
+            {
+                options.UseNpgsql(
+                    $"Server={Configuration["Database:Host"]};" +
+                    $"Port={Configuration["Database:Port"]};" +
+                    $"Database={Configuration["Database:Database"]};" +
+                    $"UserId={Configuration["Database:Username"]};" +
+                    $"Password={Configuration["Database:Password"]};" +
+                    Configuration["Database:Extras"],
+                    builder => builder.MigrationsAssembly("Alderto.Data"));
+            });
 
             // Add database accessors.
             services.AddBotManagers();
+
+            ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
+            services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
 
             // === <Web> ===
             // Use discord as authentication service.
@@ -50,8 +61,8 @@ namespace Alderto.Web
                 })
                 .AddDiscord(options =>
                 {
-                    options.ClientId = Configuration["DiscordApp:ClientId"];
-                    options.ClientSecret = Configuration["DiscordApp:ClientSecret"];
+                    options.ClientId = Configuration["DiscordAPI:ClientId"];
+                    options.ClientSecret = Configuration["DiscordAPI:ClientSecret"];
                     options.SaveTokens = true;
 
                     options.Scope.Add("guilds");
@@ -65,7 +76,7 @@ namespace Alderto.Web
                         ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey =
-                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:SigningSecret"]))
+                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
                 .AddCookie(options =>
@@ -89,7 +100,7 @@ namespace Alderto.Web
 
             // === <Bot> ===
             // Add discord socket client
-            services.AddDiscordSocketClient(Configuration["DiscordApp:BotToken"],
+            services.AddDiscordSocketClient(Configuration["DiscordAPI:BotToken"],
                 socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
 
             // Add command handling services
@@ -104,15 +115,21 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
-            // Start the bot.
-            cmdHandler.StartAsync().ConfigureAwait(false);
+            // Make sure the database is up to date
+            Task.Run(() => UpdateDatabase(app));
 
-            if (!env.IsDevelopment())
+            // Start the bot.
+            Task.Run(cmdHandler.StartAsync);
+
+            // Check if https is configured
+            if (Configuration["Kestrel:Endpoints:Https:Url"] != null)
             {
-                app.UseHsts();
+                if (env.IsProduction())
+                    app.UseHsts();
+
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseCookiePolicy();
 
             app.UseSpaStaticFiles();
@@ -136,6 +153,21 @@ namespace Alderto.Web
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
+        }
+
+        public async Task UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<IAldertoDbContext>())
+                {
+                    Console.Out.WriteLine("Initializing database...");
+                    await context.Database.MigrateAsync();
+                    Console.Out.WriteLine("Database ready!");
+                }
+            }
         }
     }
 }

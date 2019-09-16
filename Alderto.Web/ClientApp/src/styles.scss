@@ -33,3 +33,9 @@ a {
   margin-left: 0.25em;
   display: block;
 }
+
+@media (max-width: 991.98px) {
+  .navbar .navbar-brand {
+    visibility: hidden;
+  }
+}
