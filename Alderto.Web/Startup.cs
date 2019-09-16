@@ -132,6 +132,8 @@ namespace Alderto.Web
 
             app.UseCookiePolicy();
 
+            app.UseSpaStaticFiles();
+
             app.UseAuthentication();
 
             app.UseMvc(routes =>
