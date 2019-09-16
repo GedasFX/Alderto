@@ -34,7 +34,7 @@ Tutorial how to set up the configuration:
 
 To activate SSL in `appsettings.json` remove the two comments surrounding `Kestrel:Endpoints:Https`:
 ```
-"Kestrel": {
+  "Kestrel": {
     "Endpoints": {
       /* If you wish to use SSL, uncomment the part "Https". Requires certificate present on the device. See Kestrel help for more info. */
       /*  <- REMOVE!!!
