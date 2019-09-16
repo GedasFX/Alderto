@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
@@ -32,16 +33,16 @@ namespace Alderto.Web
             // === <General> ===
             // Add database.
             services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
-                {
-                    options.UseNpgsql(
-                        $"Server={Configuration["Database:Host"]};" +
-                        $"Port={Configuration["Database:Port"]};" +
-                        $"Database={Configuration["Database:Database"]};" +
-                        $"UserId={Configuration["Database:Username"]};" +
-                        $"Password={Configuration["Database:Password"]};" +
-                        Configuration["Extras"],
-                        builder => builder.MigrationsAssembly("Alderto.Web"));
-                });
+            {
+                options.UseNpgsql(
+                    $"Server={Configuration["Database:Host"]};" +
+                    $"Port={Configuration["Database:Port"]};" +
+                    $"Database={Configuration["Database:Database"]};" +
+                    $"UserId={Configuration["Database:Username"]};" +
+                    $"Password={Configuration["Database:Password"]};" +
+                    Configuration["Database:Extras"],
+                    builder => builder.MigrationsAssembly("Alderto.Data"));
+            });
 
             // Add database accessors.
             services.AddBotManagers();
@@ -114,8 +115,11 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
         {
+            // Make sure the database is up to date
+            Task.Run(() => UpdateDatabase(app));
+
             // Start the bot.
-            cmdHandler.StartAsync().ConfigureAwait(false);
+            Task.Run(cmdHandler.StartAsync);
 
             // Check if https is configured
             if (Configuration["Kestrel:Endpoints:Https:Url"] != null)
@@ -127,8 +131,6 @@ namespace Alderto.Web
             }
 
             app.UseCookiePolicy();
-
-            app.UseSpaStaticFiles();
 
             app.UseAuthentication();
 
@@ -149,6 +151,21 @@ namespace Alderto.Web
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
+        }
+
+        public async Task UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<IAldertoDbContext>())
+                {
+                    Console.Out.WriteLine("Initializing database...");
+                    await context.Database.MigrateAsync();
+                    Console.Out.WriteLine("Database ready!");
+                }
+            }
         }
     }
 }

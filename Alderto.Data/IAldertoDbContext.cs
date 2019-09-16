@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Alderto.Data
 {
-    public interface IAldertoDbContext
+    public interface IAldertoDbContext : IDisposable
     {
         // === 
 
@@ -188,11 +188,6 @@ namespace Alderto.Data
         ///     This is usually because the data in the database has been modified since it was loaded into memory.
         /// </exception>
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///     Releases the allocated resources for this context.
-        /// </summary>
-        void Dispose();
 
         /// <summary>
         ///     Gets an <see cref="T:Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry`1" /> for the given entity. The entry provides
