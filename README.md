@@ -33,7 +33,7 @@ Tutorial how to set up the configuration:
 >In order to use SSL, you must first have a certificate present on the host device. Big cloud hosting providers, such as AWS of Azure can issue a certificate, otherwise you will have to issue one yourself. [Let's encrypt](https://letsencrypt.org/) is a project that can help you achieve that.
 
 To activate SSL in `appsettings.json` remove the two comments surrounding `Kestrel:Endpoints:Https`:
-```json
+```
 "Kestrel": {
     "Endpoints": {
       /* If you wish to use SSL, uncomment the part "Https". Requires certificate present on the device. See Kestrel help for more info. */
