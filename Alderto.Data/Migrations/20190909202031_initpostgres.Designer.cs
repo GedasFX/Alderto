@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Alderto.Web.Migrations
+namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
     [Migration("20190909202031_initpostgres")]

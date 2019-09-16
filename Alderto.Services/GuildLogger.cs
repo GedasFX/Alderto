@@ -31,7 +31,7 @@ namespace Alderto.Services
                 .WithAuthor(admin)
                 .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}");
 
-            logMessage.WithDescription("The following bank item was created:");
+            logMessage.WithDescription($"The following item was created in bank **{bank.Name}**:");
             logMessage
                 .AddField("Name", item.Name, true)
                 .AddField("Description", item.Description ?? "N/A", true)
@@ -136,7 +136,7 @@ namespace Alderto.Services
                 .WithAuthor(admin)
                 .WithFooter($"Req. by {admin.Username}#{admin.Discriminator}");
 
-            logMessage.WithDescription("The following bank item was deleted:");
+            logMessage.WithDescription($"The following item was deleted from bank **{bank.Name}**:");
             logMessage
                 .AddField("Name", item.Name, true)
                 .AddField("Description", item.Description ?? "N/A", true)

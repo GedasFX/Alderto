@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Alderto.Web.Migrations
+namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
     partial class AldertoDbContextModelSnapshot : ModelSnapshot

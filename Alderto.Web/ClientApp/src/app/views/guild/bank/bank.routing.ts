@@ -9,19 +9,7 @@ const routes: Routes = [
     data: {
       title: 'Bank'
     },
-    children: [
-      {
-        path: '',
-        redirectTo: 'overview'
-      },
-      {
-        path: 'overview',
-        component: OverviewComponent,
-        data: {
-          title: 'Overview'
-        }
-      }
-    ]
+    component: OverviewComponent
   }
 ];
 

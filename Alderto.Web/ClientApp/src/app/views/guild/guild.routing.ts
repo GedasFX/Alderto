@@ -11,7 +11,8 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'overview'
+        redirectTo: 'bank',
+        pathMatch: 'full'
       },
       {
         path: 'overview',

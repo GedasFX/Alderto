@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, RequireHttps, Route("api/account")]
+    [ApiController, Route("api/account")]
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> _logger;
@@ -53,7 +53,7 @@ namespace Alderto.Web.Controllers
                     new Claim("discord", userDiscordToken)
                 }),
                 signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SigningSecret"])),
+                    new SymmetricSecurityKey(Convert.FromBase64String(_configuration["JWTPrivateKey"])),
                     SecurityAlgorithms.HmacSha256Signature),
                 expires: authResult.Properties.ExpiresUtc?.DateTime
             );
