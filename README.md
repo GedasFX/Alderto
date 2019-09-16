@@ -24,7 +24,7 @@ Bot's configuration can be found at `appsettings.json` file.
 Tutorial how to set up the configuration:
 * Set `JWTPrivateKey` to any base64 string with length of at least 32.
 * Set `Database:Host`, `Database:Port`, `Database:Username`, `Database:Password` to your PostgreSQL db connection. `Database:Database` can be set to whatever you like, default is `"Alderto"`. 
-* `"DiscordAPI:ClientId"` and `"DiscordAPI:ClientSecret"` can be found at https://discordapp.com/developers/applications/[Your_Bot_Application_ID]/information
+* `DiscordAPI:ClientId` and `DiscordAPI:ClientSecret` can be found at https://discordapp.com/developers/applications/[Your_Bot_Application_ID]/information
 * `"DiscordAPI:BotToken"` can be found at https://discordapp.com/developers/applications/[Your_Bot_Application_ID]/bots
 * `Discord:ErrorLogChannelId` is the channel where bot will send its error messages. `Discord:NewsChannelId` is the channel where bot will get its news from (not available in lite version). 
  > To get id's for channels and other things, follow [this guide from Discord support](https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).
