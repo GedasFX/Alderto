@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Alderto.Web.Migrations
+namespace Alderto.Data.Migrations
 {
     public partial class initpostgres : Migration
     {

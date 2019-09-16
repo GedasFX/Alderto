@@ -17,11 +17,20 @@ namespace Alderto.Bot
     {
         public IServiceProvider ConfigureServices(IConfiguration config) => new ServiceCollection()
             // Add database
-            .AddDbContext<IAldertoDbContext, AldertoDbContext>(builder =>
-                builder.UseNpgsql(config["DbConnectionString"]))
+            .AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+            {
+                options.UseNpgsql(
+                    $"Server={config["Database:Host"]};" +
+                    $"Port={config["Database:Port"]};" +
+                    $"Database={config["Database:Database"]};" +
+                    $"UserId={config["Database:Username"]};" +
+                    $"Password={config["Database:Password"]};" +
+                    config["Database:Extras"],
+                    builder => builder.MigrationsAssembly("Alderto.Data"));
+            })
 
             // Add discord socket client
-            .AddDiscordSocketClient(config["DiscordApp:BotToken"],
+            .AddDiscordSocketClient(config["DiscordAPI:BotToken"],
                 socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; })
 
             // Add command handling services
@@ -34,7 +43,7 @@ namespace Alderto.Bot
 
             // Add managers for various bot modules.
             .AddBotManagers()
-            
+
             // Add logger service
             .AddLogging(lb => { lb.AddConsole(); })
 
@@ -49,6 +58,16 @@ namespace Alderto.Bot
             var config = BuildConfig();
             var services = ConfigureServices(config);
 
+            using (var scope = services.CreateScope())
+            {
+                Console.Out.WriteLine("Initializing database...");
+                using (var context = scope.ServiceProvider.GetRequiredService<IAldertoDbContext>())
+                {
+                    await context.Database.MigrateAsync();
+                }
+                Console.Out.WriteLine("Database ready!");
+            }
+
             // Effectively start the bot.
             // Initializes all of the necessary singleton services from the the IServiceProvider.
             // There has to be a better way to do this, but this does the job well enough.
@@ -62,9 +81,9 @@ namespace Alderto.Bot
         {
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddUserSecrets("c53fe5d3-16e9-400d-a588-4859345371e5")
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("commands.json")
+                .AddUserSecrets("c53fe5d3-16e9-400d-a588-4859345371e5")
                 .Build();
         }
     }
