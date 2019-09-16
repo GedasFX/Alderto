@@ -55,7 +55,7 @@ Process:
 1) Launch project in Visual Studio.
   > There are 2 versions of the bot. Lite and Full. To use lite version, select `Alderto.Bot` as startup project. 
   > For full version select `Alderto.Web` as startup project.
-3) Set up user secrets with the key `c53fe5d3-16e9-400d-a588-4859345371e5`. Follow [this guide](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.2) on how to do this.
+3) Set up user secrets with the key `c53fe5d3-16e9-400d-a588-4859345371e5`. Follow [this guide](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.2#set-a-secret) on how to do this. Alternatively you can edit `appsettings.json`, however be wary that you can leak your private keys in source control.
 1) *[Optional: Full version only] Set up Angular app:
    * Go to folder `Alderto.Web/ClientApp`;
    * Open command line and type the following commands:
