@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Alderto.Web.Helpers;
+using Discord.WebSocket;
 
 namespace Alderto.Web.Extensions
 {
@@ -10,11 +11,12 @@ namespace Alderto.Web.Extensions
         /// Contacts the Discord API to verify that the user is administrator of a given guild.
         /// </summary>
         /// <param name="user">Claims Principal.</param>
+        /// <param name="client">Discord client to check admin status of.</param>
         /// <param name="guildId">The Id of guild to check if user is admin of.</param>
         /// <returns>True if user was confirmed to be admin of a given guild.</returns>
-        public static async Task<bool> IsDiscordAdminAsync(this ClaimsPrincipal user, ulong guildId)
+        public static bool IsDiscordAdminAsync(this ClaimsPrincipal user, DiscordSocketClient client, ulong guildId)
         {
-            return await DiscordApi.VerifyAdminAsync(guildId, $"Bearer {user.GetDiscordToken()}");
+            return client.GetGuild(guildId).GetUser(user.GetId()).GuildPermissions.Administrator;
         }
 
         /// <summary>

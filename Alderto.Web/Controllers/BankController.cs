@@ -37,11 +37,11 @@ namespace Alderto.Web.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateBank(ulong guildId,
-            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
+            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
             GuildBank bank)
         {
             // Ensure user has admin rights 
-            if (!await User.IsDiscordAdminAsync(guildId))
+            if (!User.IsDiscordAdminAsync(_client, guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
@@ -49,7 +49,7 @@ namespace Alderto.Web.Controllers
 
             try
             {
-                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.LogChannelId);
+                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.ModeratorRoleId, bank.LogChannelId);
                 return Content(new ApiGuildBank(b) { CanModify = true });
             }
             catch (HttpException e)
@@ -60,10 +60,10 @@ namespace Alderto.Web.Controllers
 
         [HttpPatch("{bankId}")]
         public async Task<IActionResult> EditBank(ulong guildId, int bankId,
-            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId))]
+            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
             GuildBank bank)
         {
-            if (!await User.IsDiscordAdminAsync(guildId))
+            if (!User.IsDiscordAdminAsync(_client, guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             // If not renaming this would always return itself. Check for id difference instead.
@@ -77,6 +77,7 @@ namespace Alderto.Web.Controllers
                 {
                     b.Name = bank.Name;
                     b.LogChannelId = bank.LogChannelId;
+                    b.ModeratorRoleId = bank.ModeratorRoleId;
                 });
             }
             catch (HttpException e)
@@ -90,7 +91,7 @@ namespace Alderto.Web.Controllers
         [HttpDelete("{bankId}")]
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
-            if (!await User.IsDiscordAdminAsync(guildId))
+            if (!User.IsDiscordAdminAsync(_client, guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             try

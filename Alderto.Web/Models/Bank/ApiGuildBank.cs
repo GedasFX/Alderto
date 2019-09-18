@@ -1,21 +1,13 @@
-﻿using System.Collections.Generic;
-using Alderto.Data.Models.GuildBank;
+﻿using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Web.Models.Bank
 {
-    public class ApiGuildBank
+    public class ApiGuildBank : GuildBank
     {
-        public int Id { get; set; }
-        public ulong GuildId { get; set; }
-        public ulong? LogChannelId { get; set; }
-        public string Name { get; set; }
-
         /// <summary>
         /// True if person requesting this resource has write access to it.
         /// </summary>
         public bool CanModify { get; set; }
-
-        public ICollection<GuildBankItem> Contents { get; set; }
 
         public ApiGuildBank() { }
         public ApiGuildBank(ulong guildId, string name)
@@ -23,16 +15,17 @@ namespace Alderto.Web.Models.Bank
             GuildId = guildId;
             Name = name;
         }
-        public ApiGuildBank(int id, ulong guildId, ulong? logChannelId, string name)
+        public ApiGuildBank(int id, ulong guildId, ulong? logChannelId, ulong moderatorRoleId, string name)
             : this(guildId, name)
         {
             Id = id;
             LogChannelId = logChannelId;
+            ModeratorRoleId = moderatorRoleId;
         }
         public ApiGuildBank(GuildBank guildBank)
-            : this(guildBank.Id, guildBank.GuildId, guildBank.LogChannelId, guildBank.Name)
+            : this(guildBank.Id, guildBank.GuildId, guildBank.LogChannelId, guildBank.ModeratorRoleId, guildBank.Name)
         {
-            Contents = guildBank.Contents;
+            
         }
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { IGuild, IGuildChannel } from 'src/app/models';
+import { IGuild, IGuildChannel, IGuildRole } from 'src/app/models';
 import { DiscordWebApi, AldertoWebUserApi, AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
 
@@ -41,6 +41,13 @@ export class GuildService {
       return this.updateChannels(guild);
   }
 
+  public getRoles(guild: IGuild): Promise<IGuildRole[]> {
+    if (guild.roles != null)
+      return new Promise<IGuildRole[]>(r => r(guild.roles));
+    else
+      return this.updateRoles(guild);
+  }
+
   public updateChannels(guild: IGuild): Promise<IGuildChannel[]> {
     return new Promise<IGuildChannel[]>(resolve => {
       this.guildApi.fetchChannels(guild.id).subscribe(channels => {
@@ -50,11 +57,20 @@ export class GuildService {
     });
   }
 
+  public updateRoles(guild: IGuild): Promise<IGuildRole[]> {
+    return new Promise<IGuildRole[]>(resolve => {
+      this.guildApi.fetchRoles(guild.id).subscribe(roles => {
+        guild.roles = roles;
+        resolve(roles);
+      });
+    });
+  }
+
   public getCurrentGuildId(): string {
     return this.currentGuild$.value.id;
   }
 
   public isAdmin(guild: IGuild): boolean {
-    return ((guild.permissions & 1 << 2) != 0);
+    return ((guild.permissions & 1 << 2) !== 0);
   }
 }

@@ -17,12 +17,21 @@ namespace Alderto.Web.Controllers
         }
 
         [HttpGet("channels")]
-        public async Task<IActionResult> Channels(ulong guildId)
+        public IActionResult Channels(ulong guildId)
         {
-            if (!await User.IsDiscordAdminAsync(guildId))
+            if (!User.IsDiscordAdminAsync(_client, guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
             return Content(_client.GetGuild(guildId).TextChannels.Select(c => new { c.Id, c.Name }));
+        }
+
+        [HttpGet("roles")]
+        public IActionResult Roles(ulong guildId)
+        {
+            if (!User.IsDiscordAdminAsync(_client, guildId))
+                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+
+            return Content(_client.GetGuild(guildId).Roles.Select(c => new { c.Id, c.Name }));
         }
     }
 }

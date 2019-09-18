@@ -4,6 +4,7 @@ export interface IGuildBank {
   name: string;
   currencyCount: number;
   logChannelId: string;
+  moderatorRoleId: string;
 
   canModify: boolean;
 

@@ -17,8 +17,8 @@ export class AldertoWebBankApi {
     return this.http.post<IGuildBank>(`/api/guilds/${guildId}/banks`, bank);
   }
 
-  public editBank(guildId: string, bankId: number, name: string, logChannelId: string) {
-    return this.http.patch(`/api/guilds/${guildId}/banks/${bankId}`, { name, logChannelId });
+  public editBank(guildId: string, bank: IGuildBank) {
+    return this.http.patch(`/api/guilds/${guildId}/banks/${bank.id}`, bank);
   }
 
   public removeBank(guildId: string, bankId: number) {
