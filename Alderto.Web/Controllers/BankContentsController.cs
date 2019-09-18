@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
+using Alderto.Web.Models.Bank;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +38,7 @@ namespace Alderto.Web.Controllers
 
             var createdBank = await _contents.CreateBankItemAsync(bank, item, userId);
 
-            return Content(createdBank);
+            return Content(new ApiGuildBankItem(createdBank));
         }
 
         [HttpPatch("{itemId}")]

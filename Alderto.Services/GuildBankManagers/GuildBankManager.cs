@@ -42,7 +42,7 @@ namespace Alderto.Services.GuildBankManagers
             return FetchGuildBanks(guildId, options).ToListAsync();
         }
 
-        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string bankName, ulong moderatorRoleId = 0, ulong? logChannelId = null)
+        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string bankName, ulong? moderatorRoleId = null, ulong? logChannelId = null)
         {
             // Ensure foreign key constraint is not violated.
             var guild = await _context.Guilds.FindAsync(guildId);
