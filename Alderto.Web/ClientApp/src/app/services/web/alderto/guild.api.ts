@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IGuildChannel } from 'src/app/models';
+import { IGuildChannel, IGuildRole } from 'src/app/models';
 
 @Injectable({
   providedIn: 'root'
@@ -11,5 +11,9 @@ export class AldertoWebGuildApi {
 
   public fetchChannels(id: string): Observable<IGuildChannel[]> {
     return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/channels`);
+  }
+
+  public fetchRoles(id: string): Observable<IGuildRole[]> {
+    return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/roles`);
   }
 }

@@ -4,7 +4,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { AldertoWebBankApi, GuildService } from 'src/app/services';
-import { IGuildBank, IGuildChannel } from 'src/app/models';
+import { IGuildBank, IGuildChannel, IGuildRole } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription, Subject } from 'rxjs';
 
@@ -16,10 +16,12 @@ export class BankCreateComponent implements OnInit, OnDestroy {
 
   // List of channels in dropdown.
   public channelSelect: IGuildChannel[];
+  public roleSelect: IGuildRole[];
 
   public formGroup = this.fb.group({
     name: [null, Validators.required],
-    logChannelId: []
+    logChannelId: [],
+    moderatorRoleId: []
   });
 
   private subscriptions: Subscription[] = [];
@@ -36,6 +38,7 @@ export class BankCreateComponent implements OnInit, OnDestroy {
     this.onBankCreated = new Subject();
     this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
       this.guild.getChannels(g).then(c => this.channelSelect = c);
+      this.guild.getRoles(g).then(r => this.roleSelect = r);
     }));
   }
 
@@ -51,7 +54,8 @@ export class BankCreateComponent implements OnInit, OnDestroy {
     this.bankApi.createNewBank(this.guild.getCurrentGuildId(),
       {
         name: this.formGroup.value.name,
-        logChannelId: this.formGroup.value.logChannelId
+        logChannelId: this.formGroup.value.logChannelId,
+        moderatorRoleId: this.formGroup.value.moderatorRoleId
       } as IGuildBank).subscribe(
         bank => {
           // Ensure contents are not null for future usage.

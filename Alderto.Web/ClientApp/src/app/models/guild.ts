@@ -8,9 +8,15 @@ export interface IGuild {
   isAdmin: boolean;
 
   channels: IGuildChannel[];
+  roles: IGuildRole[];
 }
 
 export interface IGuildChannel {
+  id: string;
+  name: string;
+}
+
+export interface IGuildRole {
   id: string;
   name: string;
 }

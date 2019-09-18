@@ -30,6 +30,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   public updateValue(bank: IGuildBank): number {
+    if (bank.contents == null) {
+      this.bankValues[bank.id] = 0;
+      return 0;
+    }
+
     this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
     return this.bankValues[bank.id];
   }

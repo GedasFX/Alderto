@@ -17,8 +17,12 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Log channel:</label>
+        <label>Log channel (optional):</label>
         <ng-select *ngIf="channelSelect" [items]="channelSelect" bindValue="id" bindLabel="name" placeholder="None" formControlName="logChannelId"></ng-select>
+      </div>
+      <div class="form-group">
+        <label>Moderator role (optional):</label>
+        <ng-select *ngIf="roleSelect" [items]="roleSelect" bindValue="id" bindLabel="name" placeholder="None" formControlName="moderatorRoleId"></ng-select>
       </div>
     </div>
     <div class="modal-footer">

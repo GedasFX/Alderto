@@ -107,7 +107,7 @@ namespace Alderto.Bot.Modules
             await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
         }
 
-        [Command("Timely"), Alias("Tub", "ClaimTub")]
+        [Command("Timely"), Alias("Tub", "ClaimTub", "Moon")]
         [Summary("Grants a timely currency reward.")]
         public async Task Timely()
         {
