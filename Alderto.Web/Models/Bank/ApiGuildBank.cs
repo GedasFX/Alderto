@@ -1,8 +1,12 @@
-﻿using Alderto.Data.Models.GuildBank;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Alderto.Data.Models;
+using Alderto.Data.Models.GuildBank;
+using Newtonsoft.Json;
 
 namespace Alderto.Web.Models.Bank
 {
-    public class ApiGuildBank : GuildBank
+    public sealed class ApiGuildBank : GuildBank
     {
         /// <summary>
         /// True if person requesting this resource has write access to it.
@@ -15,7 +19,17 @@ namespace Alderto.Web.Models.Bank
             GuildId = guildId;
             Name = name;
         }
-        public ApiGuildBank(int id, ulong guildId, ulong? logChannelId, ulong moderatorRoleId, string name)
+
+        [JsonIgnore]
+        public override Guild Guild
+        {
+            get => base.Guild;
+            set => base.Guild = value;
+        }
+
+        public new IEnumerable<ApiGuildBankItem> Contents { get; set; }
+
+        public ApiGuildBank(int id, ulong guildId, ulong? logChannelId, ulong? moderatorRoleId, string name)
             : this(guildId, name)
         {
             Id = id;
@@ -25,7 +39,7 @@ namespace Alderto.Web.Models.Bank
         public ApiGuildBank(GuildBank guildBank)
             : this(guildBank.Id, guildBank.GuildId, guildBank.LogChannelId, guildBank.ModeratorRoleId, guildBank.Name)
         {
-            
+            Contents = guildBank.Contents?.Select(c => new ApiGuildBankItem(c));
         }
     }
 }

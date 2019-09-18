@@ -31,7 +31,7 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// Id of role, which allows to modify contents of the bank.
         /// </summary>
-        public ulong ModeratorRoleId { get; set; }
+        public ulong? ModeratorRoleId { get; set; }
 
         /// <summary>
         /// Guild, referenced by <see cref="GuildId"/>.

@@ -44,7 +44,7 @@ namespace Alderto.Services.GuildBankManagers
         /// <param name="name">Name of bank to add to be added to the database.</param>
         /// <param name="moderatorRoleId">If of moderator role.</param>
         /// <param name="logChannelId">Id of channel to log info to.</param>
-        Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string name, ulong moderatorRoleId = 0, ulong? logChannelId = null);
+        Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string name, ulong? moderatorRoleId = null, ulong? logChannelId = null);
 
         /// <summary>
         /// Removes a guild bank of a given name.
