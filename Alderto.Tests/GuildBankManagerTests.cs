@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Tests.MockedEntities;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Alderto.Tests
@@ -14,7 +16,9 @@ namespace Alderto.Tests
 
         public GuildBankManagerTests()
         {
-            var context = new MockDbContext();
+            var services = MockServices.ScopedServiceProvider;
+
+            var context = services.GetService<AldertoDbContext>();
             var transactions = new GuildLogger(new Discord.WebSocket.DiscordSocketClient());
             _manager = new GuildBankManager(context, transactions);
             _items = new GuildBankContentsManager(context, transactions);

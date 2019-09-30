@@ -10,16 +10,16 @@ namespace Alderto.Services
 {
     public class GuildMemberManager : IGuildMemberManager
     {
-        private readonly IAldertoDbContext _context;
+        private readonly AldertoDbContext _context;
 
-        public GuildMemberManager(IAldertoDbContext context)
+        public GuildMemberManager(AldertoDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Adds a member to <see cref="IAldertoDbContext.GuildMembers"/> and, if needed,
-        /// creates a guild in <see cref="IAldertoDbContext.Guilds"/> and a member in <see cref="IAldertoDbContext.Members"/>
+        /// Adds a member to <see cref="AldertoDbContext.GuildMembers"/> and, if needed,
+        /// creates a guild in <see cref="AldertoDbContext.Guilds"/> and a member in <see cref="AldertoDbContext.Members"/>
         /// </summary>
         /// <param name="guildMember">New <see cref="GuildMember"/> to add.</param>
         public async Task AddGuildMemberAsync(GuildMember guildMember)

@@ -34,7 +34,7 @@ namespace Alderto.Web
         {
             // === <General> ===
             // Add database.
-            services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+            services.AddDbContext<AldertoDbContext>(options =>
             {
                 options.UseNpgsql(
                     $"Server={Configuration["Database:Host"]};" +
@@ -51,6 +51,7 @@ namespace Alderto.Web
 
             ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
+            services.AddMessagesManager();
 
             // === <Web> ===
             // Use discord as authentication service.
@@ -163,7 +164,7 @@ namespace Alderto.Web
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 
-            using var context = serviceScope.ServiceProvider.GetService<IAldertoDbContext>();
+            await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
             var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
 
             logger.Log(LogLevel.Information, "Initializing database...");

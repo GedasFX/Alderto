@@ -4,7 +4,7 @@ using Alderto.Web.Models;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild
 {
     [Route("api/guilds/{guildId}")]
     public class GuildController : ApiControllerBase

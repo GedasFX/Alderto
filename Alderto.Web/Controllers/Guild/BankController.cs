@@ -1,15 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Alderto.Web.Models.Bank;
 using Discord.Net;
 using Discord.WebSocket;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild
 {
     [Route("api/guilds/{guildId}/banks")]
     public class BankController : ApiControllerBase

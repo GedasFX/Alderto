@@ -32,7 +32,7 @@ namespace Alderto.Services
             // Config does not exist in the cache. Check database. If does not exist in db - use defaults.
             using (var scope = _services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetService<IAldertoDbContext>();
+                var context = scope.ServiceProvider.GetService<AldertoDbContext>();
                 cfg = await context.GuildPreferences.FindAsync(guildId) ?? GuildConfiguration.DefaultConfiguration;
             }
 
@@ -60,20 +60,18 @@ namespace Alderto.Services
             config.GuildId = guildId;
 
             // Then update the database.
-            using (var scope = _services.CreateScope())
+            using var scope = _services.CreateScope();
+            using var context = scope.ServiceProvider.GetService<AldertoDbContext>();
+            if (guildPreferencesPresentInDatabase)
             {
-                var context = scope.ServiceProvider.GetService<IAldertoDbContext>();
-                if (guildPreferencesPresentInDatabase)
-                {
-                    context.GuildPreferences.Update(config);
-                }
-                else
-                {
-                    await context.GuildPreferences.AddAsync(config);
-                }
-
-                await context.SaveChangesAsync();
+                context.GuildPreferences.Update(config);
             }
+            else
+            {
+                context.GuildPreferences.Add(config);
+            }
+
+            await context.SaveChangesAsync();
         }
     }
 }

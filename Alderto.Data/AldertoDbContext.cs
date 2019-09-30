@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data
 {
-    public class AldertoDbContext : DbContext, IAldertoDbContext
+    public class AldertoDbContext : DbContext
     {
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<GuildMember> GuildMembers { get; set; }
