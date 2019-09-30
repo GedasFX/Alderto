@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Services;
 using Alderto.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +14,11 @@ namespace Alderto.Web.Controllers.Guild.Channel
         {
             _msgManager = msgManager;
         }
-
-        [HttpGet]
-        public IActionResult List(ulong guildId, ulong channelId)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         [HttpGet("{messageId}")]
-        public IActionResult Get(ulong guildId, ulong channelId, ulong msgId)
+        public async Task<IActionResult> Get(ulong guildId, ulong channelId, ulong messageId)
         {
-            throw new NotImplementedException();
+            return Content(await _msgManager.GetMessageAsync(guildId, channelId, messageId));
         }
 
         [HttpPost]
@@ -36,16 +29,17 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpPatch("{messageId}")]
-        public async Task<IActionResult> Update(ulong guildId, ulong channelId, ulong messageId, [Bind] string message)
+        public async Task<IActionResult> Update(ulong guildId, ulong channelId, ulong messageId, [Bind(nameof(ApiMessage.Contents))] ApiMessage message)
         {
-            await _msgManager.EditMessageAsync(guildId, channelId, messageId, message);
+            await _msgManager.EditMessageAsync(guildId, channelId, messageId, message.Contents);
             return Ok();
         }
 
         [HttpDelete("{messageId}")]
-        public IActionResult Delete(ulong guildId, ulong channelId, ulong messageId)
+        public async Task<IActionResult> Delete(ulong guildId, ulong channelId, ulong messageId)
         {
-            throw new NotImplementedException();
+            await _msgManager.RemoveMessageAsync(guildId, channelId, messageId);
+            return NoContent();
         }
     }
 }
