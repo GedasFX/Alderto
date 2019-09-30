@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Alderto.Services;
 using Alderto.Tests.MockedEntities;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Alderto.Tests
@@ -11,7 +12,7 @@ namespace Alderto.Tests
 
         public GuildPreferencesTests()
         {
-            _provider = new GuildPreferencesProvider(new MockServiceProvider().ServiceProvider);
+            _provider = MockServices.ServiceProvider.GetService<IGuildPreferencesProvider>();
         }
 
         [Fact]
@@ -30,10 +31,6 @@ namespace Alderto.Tests
 
             // Check if currency symbol saved.
             Assert.Equal("test", pref.CurrencySymbol);
-
-            // Check if id update works
-            await _provider.UpdatePreferencesAsync(guildId: 1, configuration => { configuration.GuildId = 44444; });
-            Assert.Equal((ulong)1, pref.GuildId);
         }
     }
 }

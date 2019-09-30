@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Services;
+using Alderto.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
@@ -22,13 +23,7 @@ namespace Alderto.Web.Controllers
 
             var news = await _news.GetLatestNewsAsync(count);
 
-            return Content(news.Select(m => new
-            {
-                AuthorUsername = m.Author.Username,
-                AuthorAvatarId = m.Author.AvatarId,
-                m.CreatedAt,
-                m.Content
-            }));
+            return Content(news.Select(m => new ApiMessage(m)));
         }
     }
 }

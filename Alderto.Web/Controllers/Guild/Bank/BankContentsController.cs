@@ -7,7 +7,7 @@ using Alderto.Web.Models.Bank;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild.Bank
 {
     [Route("api/guilds/{guildId}/banks/{bankId}/items")]
     public class BankContentsController : ApiControllerBase

@@ -1,5 +1,5 @@
-﻿using Alderto.Data.Models.GuildBank;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
+using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Web.Models.Bank
 {

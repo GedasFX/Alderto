@@ -73,7 +73,7 @@ namespace Alderto.Web.Controllers
             return Content(
                 "<script>" +
                     $"localStorage.setItem('user', '{ JsonConvert.SerializeObject(user) }');" +
-                    "window.location.href = '/'" +
+                     "window.location.href = '/'" +
                 "</script>", "text/html");
         }
     }

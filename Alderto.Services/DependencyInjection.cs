@@ -30,7 +30,7 @@ namespace Alderto.Services
         }
 
         /// <summary>
-        /// Adds news provider for 
+        /// Adds a news source for the application.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="options"></param>
@@ -41,5 +41,13 @@ namespace Alderto.Services
         {
             public ulong NewsChannelId { get; set; }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddMessagesManager(this IServiceCollection services) =>
+            services.AddSingleton<IMessagesManager, MessagesManager>();
     }
 }
