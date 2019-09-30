@@ -10,10 +10,10 @@ namespace Alderto.Services.GuildBankManagers
 {
     public class GuildBankContentsManager : IGuildBankContentsManager
     {
-        private readonly IAldertoDbContext _context;
+        private readonly AldertoDbContext _context;
         private readonly IGuildLogger _transactions;
 
-        public GuildBankContentsManager(IAldertoDbContext context, IGuildLogger transactions)
+        public GuildBankContentsManager(AldertoDbContext context, IGuildLogger transactions)
         {
             _context = context;
             _transactions = transactions;

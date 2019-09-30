@@ -50,11 +50,9 @@ namespace Alderto.Bot.Services
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            using (var scope = _services.CreateScope())
-            {
-                await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
-            }
-            
+            using var scope = _services.CreateScope();
+            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
+
         }
         
         public async Task HandleCommandAsync(SocketMessage messageParam)
@@ -75,7 +73,8 @@ namespace Alderto.Bot.Services
             var prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).Prefix;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot)
+            // TODO: Re add || message.Author.IsBot
+            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
 
             // Create a WebSocket-based command context based on the message
@@ -85,46 +84,44 @@ namespace Alderto.Bot.Services
             // created, along with the service provider for precondition checks.
 
             // Create a scope to prevent leaks.
-            using (var scope = _services.CreateScope())
+            using var scope = _services.CreateScope();
+            // TODO: Upgrade this to RunMode.Async
+
+            // Keep in mind that result does not indicate a return value
+            // rather an object stating if the command executed successfully.
+            var result = await _commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
+
+            // Delete successful triggers.
+            if (result.IsSuccess)
             {
-                // TODO: Upgrade this to RunMode.Async
-
-                // Keep in mind that result does not indicate a return value
-                // rather an object stating if the command executed successfully.
-                var result = await _commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
-
-                // Delete successful triggers.
-                if (result.IsSuccess)
+                try
                 {
-                    try
-                    {
-                        await message.DeleteAsync();
-                    }
-                    catch (Discord.Net.HttpException)
-                    {
-                        // Delete most likely failed due to no ManageMessages permission. Ignore regardless.
-                    }
+                    await message.DeleteAsync();
                 }
-
-                // Optionally, we may inform the user if the command fails
-                // to be executed; however, this may not always be desired,
-                // as it may clog up the request queue should a user spam a
-                // command.
-
-                else if (result.Error != CommandError.UnknownCommand)
+                catch (Discord.Net.HttpException)
                 {
-                    try
-                    {
-                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                            .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
-                    }
-                    catch (Discord.Net.HttpException e)
-                    {
-                        // 50013 occurs when bot cannot send embedded messages. All error reports use embeds.
-                        if (e.DiscordCode == 50013)
-                            await context.Channel.SendMessageAsync(
-                                "Bot requires guild permission EmbedLinks to function properly.");
-                    }
+                    // Delete most likely failed due to no ManageMessages permission. Ignore regardless.
+                }
+            }
+
+            // Optionally, we may inform the user if the command fails
+            // to be executed; however, this may not always be desired,
+            // as it may clog up the request queue should a user spam a
+            // command.
+
+            else if (result.Error != CommandError.UnknownCommand)
+            {
+                try
+                {
+                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
+                }
+                catch (Discord.Net.HttpException e)
+                {
+                    // 50013 occurs when bot cannot send embedded messages. All error reports use embeds.
+                    if (e.DiscordCode == 50013)
+                        await context.Channel.SendMessageAsync(
+                            "Bot requires guild permission EmbedLinks to function properly.");
                 }
             }
         }

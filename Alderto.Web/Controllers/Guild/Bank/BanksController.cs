@@ -1,32 +1,36 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Alderto.Web.Models.Bank;
 using Discord.Net;
 using Discord.WebSocket;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild.Bank
 {
     [Route("api/guilds/{guildId}/banks")]
-    public class BankController : ApiControllerBase
+    public class BanksController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
         private readonly DiscordSocketClient _client;
 
-        public BankController(IGuildBankManager bank, DiscordSocketClient client)
+        public BanksController(IGuildBankManager bank, DiscordSocketClient client)
         {
             _bank = bank;
             _client = client;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
-            var user = _client.GetGuild(guildId).GetUser(User.GetId());
+            var user = _client.GetGuild(guildId)?.GetUser(User.GetId());
+            if (user == null)
+                return NotFound();
+
             bool ValidateModifyAccess(GuildBank bank) =>
                 user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
 
@@ -111,15 +115,12 @@ namespace Alderto.Web.Controllers
         /// </summary>
         private IActionResult HandleHttpError(HttpException e)
         {
-            switch (e.DiscordCode)
+            return e.DiscordCode switch
             {
-                case 50001:
-                    return BadRequest(ErrorMessages.MissingChannelAccess);
-                case 50013:
-                    return BadRequest(ErrorMessages.MissingWritePermissions);
-                default:
-                    throw e;
-            }
+                50001 => BadRequest(ErrorMessages.MissingChannelAccess),
+                50013 => BadRequest(ErrorMessages.MissingWritePermissions),
+                _ => throw e
+            };
         }
     }
 }

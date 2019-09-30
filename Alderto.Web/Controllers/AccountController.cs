@@ -61,7 +61,7 @@ namespace Alderto.Web.Controllers
             var user = new
             {
                 id = userId.Value,
-                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value,
+                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value.Replace("'", "\\'"),
                 discord = userDiscordToken,
                 token = tokenHandler.WriteToken(token)
             };
@@ -73,7 +73,7 @@ namespace Alderto.Web.Controllers
             return Content(
                 "<script>" +
                     $"localStorage.setItem('user', '{ JsonConvert.SerializeObject(user) }');" +
-                    "window.location.href = '/'" +
+                     "window.location.href = '/'" +
                 "</script>", "text/html");
         }
     }

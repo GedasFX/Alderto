@@ -3,19 +3,22 @@ using Alderto.Bot.Lua;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Alderto.Tests
 {
     public class CustomCommandProviderTests
     {
-        private readonly ICustomCommandProvider _service;
-        private readonly IAldertoDbContext _context;
+        private readonly ICustomCommandProvider _provider;
+        private readonly AldertoDbContext _context;
 
         public CustomCommandProviderTests()
         {
-            _context = new MockDbContext();
-            _service = new CustomCommandProvider(_context);
+            var services = MockServices.ScopedServiceProvider;
+
+            _context = services.GetService<AldertoDbContext>();
+            _provider = services.GetService<ICustomCommandProvider>();
         }
 
         [Fact]
@@ -41,9 +44,9 @@ end
             await _context.Guilds.AddAsync(new Guild(1));
             await _context.SaveChangesAsync();
 
-            await _service.ReloadCommands(1);
+            await _provider.ReloadCommands(1);
 
-            var cmd = await _service.RunCommandAsync(guildId: 1, cmdName: "test", null, "4", "2");
+            var cmd = await _provider.RunCommandAsync(guildId: 1, cmdName: "test", null, "4", "2");
             Assert.Equal(expected: 4, (long)cmd[0]);
         }
     }

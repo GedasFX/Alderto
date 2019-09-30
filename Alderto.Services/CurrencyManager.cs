@@ -7,9 +7,9 @@ namespace Alderto.Services
 {
     public class CurrencyManager : ICurrencyManager
     {
-        private readonly IAldertoDbContext _context;
+        private readonly AldertoDbContext _context;
 
-        public CurrencyManager(IAldertoDbContext context)
+        public CurrencyManager(AldertoDbContext context)
         {
             _context = context;
         }

@@ -11,9 +11,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web
@@ -32,7 +35,7 @@ namespace Alderto.Web
         {
             // === <General> ===
             // Add database.
-            services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+            services.AddDbContext<AldertoDbContext>(options =>
             {
                 options.UseNpgsql(
                     $"Server={Configuration["Database:Host"]};" +
@@ -49,6 +52,7 @@ namespace Alderto.Web
 
             ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
+            services.AddMessagesManager();
 
             // === <Web> ===
             // Use discord as authentication service.
@@ -83,17 +87,13 @@ namespace Alderto.Web
                 {
                     options.Cookie.Name = ".Session";
                 });
+            services.AddAuthorization();
 
             // Add Mvc
-            services
-                .AddMvc()
-                .AddJsonOptions(options =>
-                {
-                    options.UseCamelCasing(true);
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong>());
-                    options.SerializerSettings.Converters.Add(new SnowflakeConverter<ulong?>());
-                });
+            services.AddMvcCore().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
+            });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
@@ -113,7 +113,7 @@ namespace Alderto.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, CommandHandler cmdHandler)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CommandHandler cmdHandler)
         {
             // Make sure the database is up to date
             Task.Run(() => UpdateDatabase(app));
@@ -134,18 +134,26 @@ namespace Alderto.Web
 
             app.UseSpaStaticFiles();
 
+            app.UseRouting();
+
             app.UseAuthentication();
-
-            app.UseMvc(routes =>
+            app.UseAuthorization();
+            
+            app.UseEndpoints(p =>
             {
-                routes.MapRoute(
-                    name: "api",
-                    template: "api/[controller]/[action]");
-                routes.MapRoute(
-                    name: "spa",
-                    template: "{*url}");
-            });
+                // Map the API controller attribute routing.
+                p.MapControllers();
 
+                // All unmapped api requests should return NotFound
+                p.Map("/api/{*url}", context =>
+                {
+                    context.Response.OnStarting(() =>
+                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status404NotFound));
+
+                    return Task.CompletedTask;
+                });
+            });
+            
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())
@@ -157,17 +165,16 @@ namespace Alderto.Web
 
         public async Task UpdateDatabase(IApplicationBuilder app)
         {
-            using (var serviceScope = app.ApplicationServices
+            using var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<IAldertoDbContext>())
-                {
-                    Console.Out.WriteLine("Initializing database...");
-                    await context.Database.MigrateAsync();
-                    Console.Out.WriteLine("Database ready!");
-                }
-            }
+                .CreateScope();
+
+            await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
+            var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
+
+            logger.Log(LogLevel.Information, "Initializing database...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Database ready!");
         }
     }
 }

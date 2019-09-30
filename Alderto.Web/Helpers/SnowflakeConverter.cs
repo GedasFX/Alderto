@@ -1,21 +1,20 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Alderto.Web.Helpers
 {
     // Due to number in JavaScript having an upper limit of size (2^53), send all UInt64 as strings.
-    public class SnowflakeConverter<T> : JsonConverter<T>
+    public class SnowflakeConverter : JsonConverter<ulong>
     {
-        public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer)
+        public override ulong Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            serializer.Serialize(writer, value.ToString());
+            return reader.GetUInt64();
         }
 
-        public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, ulong value, JsonSerializerOptions options)
         {
-            return JToken.ReadFrom(reader).Value<T>();
+            writer.WriteStringValue(value.ToString());
         }
     }
 }
