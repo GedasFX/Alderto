@@ -12,7 +12,8 @@ namespace Alderto.Services
         /// <param name="guildId">Id of guild the channel is.</param>
         /// <param name="channelId">Id of channel.</param>
         /// <param name="message">Message to post.</param>
-        Task PostMessageAsync(ulong guildId, ulong channelId, [MaxLength(2000)] string message);
+        /// <returns>Newly created message.</returns>
+        Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, [MaxLength(2000)] string message);
 
         /// <summary>
         /// Gets a posted message in the specified guild channel.

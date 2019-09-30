@@ -15,7 +15,7 @@ namespace Alderto.Services
             _client = client;
         }
 
-        public Task PostMessageAsync(ulong guildId, ulong channelId, string message)
+        public Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, string message)
         {
             return GetChannel(guildId, channelId).SendMessageAsync(message);
         }
