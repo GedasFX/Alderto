@@ -9,7 +9,7 @@ A discord accountant bot with a Web user interface.
   > Faster, less setup time, cannot control it thru Web.
 
 ## Instalation
-Requirements: [.Net Core 2.2 **Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2), [A recent version of PostgreSQL](https://www.postgresql.org/download/) (v11.x works).
+Requirements: [.Net Core 3.0 **Runtime**](https://dotnet.microsoft.com/download/dotnet-core/3.0), [A recent version of PostgreSQL](https://www.postgresql.org/download/) (v11.x works).
 
 Process:
 1) Download [latest release](/GedasFX/Alderto/releases/latest/);
@@ -48,7 +48,7 @@ To activate SSL in `appsettings.json` remove the two comments surrounding `Kestr
   }
 ```
 ## Development
-Requirements: [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) with [.Net Core 2.2 **SDK**](https://dotnet.microsoft.com/download/dotnet-core/2.2), [Node.js version 10.9.0 or later](https://nodejs.org/en/) (for WebUI only)
+Requirements: [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) with [.Net Core 3.0 **SDK**](https://dotnet.microsoft.com/download/dotnet-core/3.0), [Node.js version 10.9.0 or later](https://nodejs.org/en/) (for WebUI only)
 
 Process:
 1) Clone the repository 
