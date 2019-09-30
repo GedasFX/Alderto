@@ -73,7 +73,8 @@ namespace Alderto.Bot.Services
             var prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).Prefix;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot)
+            // TODO: Re add || message.Author.IsBot
+            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
 
             // Create a WebSocket-based command context based on the message
