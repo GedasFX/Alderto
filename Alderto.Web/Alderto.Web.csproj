@@ -10,10 +10,10 @@
 
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.0.0" />
@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
+    <ProjectReference Include="..\AspNet.Security.OAuth.Discord\AspNet.Security.OAuth.Discord.csproj" />
   </ItemGroup>
 
   <ItemGroup>
