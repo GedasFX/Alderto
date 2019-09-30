@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Services;
 using Alderto.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
@@ -15,7 +16,7 @@ namespace Alderto.Web.Controllers
             _news = news;
         }
 
-        [HttpGet("api/news")]
+        [HttpGet("api/news"), AllowAnonymous]
         public async Task<IActionResult> GetLatestNewsAsync(int count = 10)
         {
             if (count > 100)

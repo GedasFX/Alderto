@@ -31,7 +31,8 @@ export class AccountComponent implements OnInit {
   }
 
   public logout() {
-    this.account.logout();
+      this.account.logout();
+      window.location.href = '/';
   }
 
   private getDefaultAvatar(discriminator): string {
