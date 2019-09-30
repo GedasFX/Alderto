@@ -17,7 +17,7 @@ namespace Alderto.Bot
     {
         public IServiceProvider ConfigureServices(IConfiguration config) => new ServiceCollection()
             // Add database
-            .AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+            .AddDbContext<AldertoDbContext>(options =>
             {
                 options.UseNpgsql(
                     $"Server={config["Database:Host"]};" +
@@ -61,7 +61,7 @@ namespace Alderto.Bot
             using (var scope = services.CreateScope())
             {
                 Console.Out.WriteLine("Initializing database...");
-                using (var context = scope.ServiceProvider.GetRequiredService<IAldertoDbContext>())
+                using (var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>())
                 {
                     await context.Database.MigrateAsync();
                 }

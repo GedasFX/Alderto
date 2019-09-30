@@ -16,11 +16,11 @@ namespace Alderto.Bot.Lua
         /// </summary>
         private const int CustomCommandExecTimeout = 100;
 
-        private readonly IAldertoDbContext _context;
+        private readonly AldertoDbContext _context;
         private readonly NLua.Lua _luaState;
         private readonly Dictionary<string, LuaFunction> _commands;
 
-        public CustomCommandProvider(IAldertoDbContext context)
+        public CustomCommandProvider(AldertoDbContext context)
         {
             _context = context;
             _luaState = new NLua.Lua();

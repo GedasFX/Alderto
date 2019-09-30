@@ -6,6 +6,7 @@
     <UserSecretsId>c53fe5d3-16e9-400d-a588-4859345371e5</UserSecretsId>
     <StartupObject>Alderto.Bot.Program</StartupObject>
     <Configurations>Debug;Release</Configurations>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|AnyCPU'">
@@ -36,9 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Alderto.Bot.Lua\Alderto.Bot.Lua.csproj" />
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
     <ProjectReference Include="..\Alderto.Services\Alderto.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

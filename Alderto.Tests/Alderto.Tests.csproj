@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <Configurations>Debug;Release;Testing</Configurations>
+
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Alderto.Bot.Lua\Alderto.Bot.Lua.csproj" />
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
   </ItemGroup>
 

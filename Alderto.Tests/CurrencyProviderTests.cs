@@ -3,6 +3,7 @@ using Alderto.Data;
 using Alderto.Services;
 using Alderto.Tests.MockedEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Alderto.Tests
@@ -10,14 +11,16 @@ namespace Alderto.Tests
     public class CurrencyProviderTests
     {
         private readonly ICurrencyManager _manager;
-        private readonly IAldertoDbContext _context;
-        private readonly GuildMemberManager _guildMemberManager;
+        private readonly AldertoDbContext _context;
+        private readonly IGuildMemberManager _guildMemberManager;
 
         public CurrencyProviderTests()
         {
-            _context = new MockDbContext();
-            _manager = new CurrencyManager(_context);
-            _guildMemberManager = new GuildMemberManager(_context);
+            var services = MockServices.ScopedServiceProvider;
+
+            _context = services.GetService<AldertoDbContext>();
+            _manager = services.GetService<ICurrencyManager>();
+            _guildMemberManager = services.GetService<IGuildMemberManager>();
         }
 
         [Fact]
@@ -35,7 +38,7 @@ namespace Alderto.Tests
         {
             var user = Dummies.Alice;
             var member = await _guildMemberManager.GetGuildMemberAsync(user);
-            
+
             // At the start, the currency count should be 0.
             Assert.Equal(expected: 0, member.CurrencyCount);
 

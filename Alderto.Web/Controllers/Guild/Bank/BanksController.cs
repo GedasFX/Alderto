@@ -1,29 +1,30 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.GuildBankManagers;
 using Alderto.Web.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Alderto.Web.Models.Bank;
 using Discord.Net;
 using Discord.WebSocket;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild.Bank
 {
     [Route("api/guilds/{guildId}/banks")]
-    public class BankController : ApiControllerBase
+    public class BanksController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
         private readonly DiscordSocketClient _client;
 
-        public BankController(IGuildBankManager bank, DiscordSocketClient client)
+        public BanksController(IGuildBankManager bank, DiscordSocketClient client)
         {
             _bank = bank;
             _client = client;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
             var user = _client.GetGuild(guildId)?.GetUser(User.GetId());

@@ -4,6 +4,7 @@ using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Services;
+using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,7 +35,7 @@ namespace Alderto.Web
         {
             // === <General> ===
             // Add database.
-            services.AddDbContext<IAldertoDbContext, AldertoDbContext>(options =>
+            services.AddDbContext<AldertoDbContext>(options =>
             {
                 options.UseNpgsql(
                     $"Server={Configuration["Database:Host"]};" +
@@ -51,6 +52,7 @@ namespace Alderto.Web
 
             ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
+            services.AddMessagesManager();
 
             // === <Web> ===
             // Use discord as authentication service.
@@ -88,7 +90,10 @@ namespace Alderto.Web
             services.AddAuthorization();
 
             // Add Mvc
-            services.AddMvcCore();
+            services.AddMvcCore().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
+            });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
@@ -129,10 +134,11 @@ namespace Alderto.Web
 
             app.UseSpaStaticFiles();
 
+            app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseRouting();
+            
             app.UseEndpoints(p =>
             {
                 // Map the API controller attribute routing.
@@ -163,7 +169,7 @@ namespace Alderto.Web
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 
-            using var context = serviceScope.ServiceProvider.GetService<IAldertoDbContext>();
+            await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
             var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
 
             logger.Log(LogLevel.Information, "Initializing database...");
