@@ -18,7 +18,7 @@ namespace Alderto.Tests
             var transactions = new GuildLogger(new Discord.WebSocket.DiscordSocketClient());
             _manager = new GuildBankManager(context, transactions);
             _items = new GuildBankContentsManager(context, transactions);
-            
+
         }
 
         [Fact]
@@ -53,11 +53,15 @@ namespace Alderto.Tests
             Assert.Equal(1u, b.GuildId);
 
             var item = await _items.CreateBankItemAsync(b, new GuildBankItem { Name = "bb", Description = "cc" }, 1);
-            //await _manager.UpdateGuildBankAsync(1, "main", 1, 2, "bb", 6666);
-            //await _manager.ModifyItemCountAsync(1, "main", 1, 3, "bb", -2266.4);
+            await _manager.UpdateGuildBankAsync(1, "main", 1, bb =>
+            {
+                bb.GuildId = 2;
+                bb.Name = "bb";
+            });
+            await _items.UpdateBankItemAsync(item.Id, 1, bb => bb.Quantity -= 2266.4);
 
-            //var bi = await _items.GetBankItemAsync(item.Id);
-            //Assert.Equal(4399.6, bi.Quantity);
+            var bi = await _items.GetBankItemAsync(item.Id);
+            Assert.Equal(-2266.4, bi.Quantity);
         }
     }
 }

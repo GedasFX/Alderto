@@ -24,7 +24,7 @@ namespace Alderto.Tests
         public async Task Give()
         {
             var user = Dummies.Alice;
-            await _manager.ModifyPointsAsync(await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id), deltaPoints: 20);
+            await _manager.ModifyPointsAsync(await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id), 20);
             var dbUser = await _context.GuildMembers.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
 
             Assert.Equal(expected: 20, dbUser.CurrencyCount);
@@ -56,7 +56,7 @@ namespace Alderto.Tests
             // Cooldown check #2.
             res = await _manager.GrantTimelyRewardAsync(member, amount: -5, cooldown: 1);
             Assert.Null(res);
-            Assert.Equal(expected: -2, member.CurrencyCount);
+            Assert.Equal(-2, member.CurrencyCount);
         }
     }
 }

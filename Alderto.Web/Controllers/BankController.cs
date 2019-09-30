@@ -26,7 +26,10 @@ namespace Alderto.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
-            var user = _client.GetGuild(guildId).GetUser(User.GetId());
+            var user = _client.GetGuild(guildId)?.GetUser(User.GetId());
+            if (user == null)
+                return NotFound();
+
             bool ValidateModifyAccess(GuildBank bank) =>
                 user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
 
@@ -111,15 +114,12 @@ namespace Alderto.Web.Controllers
         /// </summary>
         private IActionResult HandleHttpError(HttpException e)
         {
-            switch (e.DiscordCode)
+            return e.DiscordCode switch
             {
-                case 50001:
-                    return BadRequest(ErrorMessages.MissingChannelAccess);
-                case 50013:
-                    return BadRequest(ErrorMessages.MissingWritePermissions);
-                default:
-                    throw e;
-            }
+                50001 => BadRequest(ErrorMessages.MissingChannelAccess),
+                50013 => BadRequest(ErrorMessages.MissingWritePermissions),
+                _ => throw e
+            };
         }
     }
 }

@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <UserSecretsId>c53fe5d3-16e9-400d-a588-4859345371e5</UserSecretsId>
     <StartupObject>Alderto.Bot.Program</StartupObject>
-    <Configurations>Debug;Release;Testing</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|AnyCPU'">
