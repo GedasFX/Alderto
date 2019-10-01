@@ -20,7 +20,7 @@ namespace Alderto.Web.Models.Bank
             Id = guildBankItem.Id;
             Name = guildBankItem.Name;
             Quantity = guildBankItem.Quantity;
-            Value = guildBankItem.Quantity;
+            Value = guildBankItem.Value;
         }
     }
 }
