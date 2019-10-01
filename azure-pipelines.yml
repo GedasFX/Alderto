@@ -28,17 +28,29 @@ steps:
     configuration: '$(buildConfiguration)'
     arguments: '--collect "Code coverage"'
 
-- task: VSBuild@1
+# - task: VSBuild@1
+#   inputs:
+#     solution: '$(solution)'
+#     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+#     platform: '$(buildPlatform)'
+#     configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'Alderto'
 
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Free Trial(48deb513-8cca-43a6-b40f-6c8f9faf1b4a)'
     appType: 'webApp'
     appName: 'AldertoWeb20190910063936'
-    package: '$(build.artifactStagingDirectory)\WebApp.zip'
+    package: '$(build.artifactStagingDirectory)'
     deploymentMethod: 'zipDeploy'
