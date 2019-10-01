@@ -41,4 +41,4 @@ steps:
     appType: 'webApp'
     appName: 'AldertoWeb20190910063936'
     package: '$(build.artifactStagingDirectory)\WebApp.zip'
-    deploymentMethod: 'auto'
+    deploymentMethod: 'zipDeploy'
