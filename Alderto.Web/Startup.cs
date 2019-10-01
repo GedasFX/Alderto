@@ -93,6 +93,7 @@ namespace Alderto.Web
             services.AddMvcCore().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
+                options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
             });
 
             // In production, the Angular files will be served from this directory
