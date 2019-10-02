@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Alderto.Web.Controllers
 {
@@ -57,22 +57,21 @@ namespace Alderto.Web.Controllers
                     SecurityAlgorithms.HmacSha256Signature),
                 expires: authResult.Properties.ExpiresUtc?.DateTime
             );
-
             var user = new
             {
                 id = userId.Value,
-                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value.Replace("'", "\'"),
+                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value,
                 discord = userDiscordToken,
                 token = tokenHandler.WriteToken(token)
             };
 
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
             await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
-
+            
             // Faking a view. Sends the token to localStorage and redirecting to main webpage.
             return Content(
                 "<script>" +
-                    $"localStorage.setItem('user', '{ JsonConvert.SerializeObject(user) }');" +
+                    $"localStorage.setItem('user', '{ JsonSerializer.Serialize(user) }');" +
                      "window.location.href = '/'" +
                 "</script>", "text/html");
         }
