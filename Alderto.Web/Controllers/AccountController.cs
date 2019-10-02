@@ -67,7 +67,7 @@ namespace Alderto.Web.Controllers
 
             _logger.LogInformation($"User {User.Identity.Name} has logged in.");
             await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
-            
+
             // Faking a view. Sends the token to localStorage and redirecting to main webpage.
             return Content(
                 "<script>" +
