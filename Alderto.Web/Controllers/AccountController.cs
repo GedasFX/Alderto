@@ -15,8 +15,8 @@ using System.Text.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, Route("api/account")]
-    public class AccountController : ControllerBase
+    [Route("account")]
+    public class AccountController : ApiControllerBase
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _configuration;

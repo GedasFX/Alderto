@@ -66,14 +66,13 @@ namespace Alderto.Bot.Lua
                 throw new LuaCommandNotFoundException($"Function {functionName} does not exist or is not registered.");
 
             // Function exists. Execute it.
-            using (var c = new CancellationTokenSource())
-            {
-                // Safeguard against infinite loops and such.
-                c.CancelAfter(CustomCommandExecTimeout);
 
-                // Wrap an array of objects into a new array so the function in Lua has args parameter as an array.
-                return await Task.Run(NewMethod(args, func), c.Token);
-            }
+            // Safeguard against infinite loops and such.
+            using var c = new CancellationTokenSource();
+            c.CancelAfter(CustomCommandExecTimeout);
+
+            // Wrap an array of objects into a new array so the function in Lua has args parameter as an array.
+            return await Task.Run(NewMethod(args, func), c.Token);
         }
 
         private static System.Func<object[]> NewMethod(object[] args, LuaFunction func) => () => func.Call(new object[] { args });
@@ -106,15 +105,14 @@ namespace Alderto.Bot.Lua
         /// <returns></returns>
         public async Task RegisterCommand(string functionName, string code)
         {
-            using (var c = new CancellationTokenSource())
+            using var c = new CancellationTokenSource();
+            c.CancelAfter(CustomCommandExecTimeout);
+
+            await Task.Run(() =>
             {
-                c.CancelAfter(CustomCommandExecTimeout);
-                await Task.Run(() =>
-                {
-                    _luaState.DoString($"function {functionName} (args) {code} end");
-                    _commands[functionName] = _luaState.GetFunction(functionName);
-                }, c.Token);
-            }
+                _luaState.DoString($"function {functionName} (args) {code} end");
+                _commands[functionName] = _luaState.GetFunction(functionName);
+            }, c.Token);
         }
     }
 }

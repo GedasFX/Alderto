@@ -11,6 +11,7 @@ namespace Alderto.Web.Models
         public string AuthorAvatarId { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? EditedAt { get; set; }
 
         public string Contents { get; set; }
 
@@ -21,6 +22,7 @@ namespace Alderto.Web.Models
             AuthorUsername = message.Author.Username;
             AuthorAvatarId = message.Author.AvatarId;
             CreatedAt = message.CreatedAt;
+            EditedAt = message.EditedTimestamp;
             Contents = message.Content;
         }
     }

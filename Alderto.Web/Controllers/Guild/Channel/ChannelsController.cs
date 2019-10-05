@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild.Channel
 {
-    [Route("api/guilds/{guildId}/channels")]
+    [Route("guilds/{guildId}/channels")]
     public class ChannelsController : ApiControllerBase
     {
         private readonly DiscordSocketClient _client;

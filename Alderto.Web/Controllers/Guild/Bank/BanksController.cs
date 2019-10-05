@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
-    [Route("api/guilds/{guildId}/banks")]
+    [Route("guilds/{guildId}/banks")]
     public class BanksController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;

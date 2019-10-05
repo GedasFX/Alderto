@@ -20,6 +20,11 @@ namespace Alderto.Services
             return GetChannel(guildId, channelId).SendMessageAsync(message);
         }
 
+        public Task<IUserMessage> ImportMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<IMessage> GetMessageAsync(ulong guildId, ulong channelId, ulong messageId)
         {
             return GetChannel(guildId, channelId).GetMessageAsync(messageId);

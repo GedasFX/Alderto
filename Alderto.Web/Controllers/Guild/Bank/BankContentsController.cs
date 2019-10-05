@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
-    [Route("api/guilds/{guildId}/banks/{bankId}/items")]
+    [Route("guilds/{guildId}/banks/{bankId}/items")]
     public class BankContentsController : ApiControllerBase
     {
         private readonly IGuildBankContentsManager _contents;

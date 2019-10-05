@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -90,11 +89,13 @@ namespace Alderto.Web
             services.AddAuthorization();
 
             // Add Mvc
-            services.AddMvcCore().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
-                options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
-            });
+            services
+                .AddMvcCore()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
+                });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
@@ -131,30 +132,19 @@ namespace Alderto.Web
                 app.UseHttpsRedirection();
             }
 
-            app.UseCookiePolicy();
-
-            app.UseSpaStaticFiles();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-            
-            app.UseEndpoints(p =>
+            // Configure api routing
+            app.Map("/api", api =>
             {
-                // Map the API controller attribute routing.
-                p.MapControllers();
+                api.UseRouting();
 
-                // All unmapped api requests should return NotFound
-                p.Map("/api/{*url}", context =>
-                {
-                    context.Response.OnStarting(() =>
-                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status404NotFound));
+                api.UseAuthentication();
+                api.UseAuthorization();
 
-                    return Task.CompletedTask;
-                });
+                api.UseEndpoints(p => { p.MapControllers(); });
             });
-            
+
+            // Use SPA Application
+            app.UseSpaStaticFiles();
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())

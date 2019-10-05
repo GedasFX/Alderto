@@ -16,7 +16,7 @@ namespace Alderto.Web.Controllers
             _news = news;
         }
 
-        [HttpGet("api/news"), AllowAnonymous]
+        [HttpGet("news"), AllowAnonymous]
         public async Task<IActionResult> GetLatestNewsAsync(int count = 10)
         {
             if (count > 100)

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild
 {
-    [Route("api/guilds/{guildId}/roles")]
+    [Route("guilds/{guildId}/roles")]
     public class RolesController : ApiControllerBase
     {
         private readonly DiscordSocketClient _client;

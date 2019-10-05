@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/users")]
+    [Route("users")]
     public class UserController : ApiControllerBase
     {
         private readonly DiscordSocketClient _bot;

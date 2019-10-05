@@ -17,25 +17,19 @@ namespace Alderto.Web.Models.Bank
         /// </summary>
         public bool CanModify { get; set; }
 
-        public ApiGuildBank() { }
-        public ApiGuildBank(ulong guildId, string name)
-        {
-            GuildId = guildId;
-            Name = name;
-        }
-        
         public IEnumerable<ApiGuildBankItem> Contents { get; set; }
 
-        public ApiGuildBank(int id, ulong guildId, ulong? logChannelId, ulong? moderatorRoleId, string name)
-            : this(guildId, name)
-        {
-            Id = id;
-            LogChannelId = logChannelId;
-            ModeratorRoleId = moderatorRoleId;
-        }
+        public ApiGuildBank() { }
         public ApiGuildBank(GuildBank guildBank)
-            : this(guildBank.Id, guildBank.GuildId, guildBank.LogChannelId, guildBank.ModeratorRoleId, guildBank.Name)
         {
+            Id = guildBank.Id;
+
+            GuildId = guildBank.GuildId;
+            Name = guildBank.Name;
+
+            LogChannelId = guildBank.LogChannelId;
+            ModeratorRoleId = guildBank.ModeratorRoleId;
+
             Contents = guildBank.Contents?.Select(c => new ApiGuildBankItem(c));
         }
     }

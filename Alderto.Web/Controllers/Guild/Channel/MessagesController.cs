@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild.Channel
 {
-    [Route("api/guilds/{guildId}/channels/{channelId}/messages")]
+    [Route("guilds/{guildId}/channels/{channelId}/messages")]
     public class MessagesController : ApiControllerBase
     {
         private readonly IMessagesManager _msgManager;
@@ -14,11 +14,19 @@ namespace Alderto.Web.Controllers.Guild.Channel
         {
             _msgManager = msgManager;
         }
-        
+
+        [HttpGet]
+        public async Task<IActionResult> Get(ulong guildId, ulong channelId)
+        {
+            var msg = await _msgManager.GetMessageAsync(guildId, channelId);
+            return Content(new ApiMessage(msg));
+        }
+
         [HttpGet("{messageId}")]
         public async Task<IActionResult> Get(ulong guildId, ulong channelId, ulong messageId)
         {
-            return Content(await _msgManager.GetMessageAsync(guildId, channelId, messageId));
+            var msg = await _msgManager.GetMessageAsync(guildId, channelId, messageId); 
+            return Content(new ApiMessage(msg));
         }
 
         [HttpPost]
