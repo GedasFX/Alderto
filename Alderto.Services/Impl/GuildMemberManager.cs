@@ -6,7 +6,7 @@ using Alderto.Data;
 using Alderto.Data.Models;
 using Discord;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class GuildMemberManager : IGuildMemberManager
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 
-namespace Alderto.Services.GuildBankManagers
+namespace Alderto.Services
 {
     public interface IGuildBankContentsManager
     {

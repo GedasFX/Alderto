@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class NewsProvider : INewsProvider
     {

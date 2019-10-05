@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services.GuildBankManagers;
+using Alderto.Services;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord.Net;

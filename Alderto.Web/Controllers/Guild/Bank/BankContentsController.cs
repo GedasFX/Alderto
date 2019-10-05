@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services.GuildBankManagers;
+using Alderto.Services;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord.WebSocket;
@@ -89,7 +89,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             // First get the bank.
             if (bank == null)
                 return NotFound(ErrorMessages.BankNotFound);
-            
+
             // Get the guild and check if it is present.
             var guild = _client.GetGuild(bank.GuildId);
             if (guild == null)

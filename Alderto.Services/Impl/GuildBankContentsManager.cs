@@ -6,7 +6,7 @@ using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Services.GuildBankManagers
+namespace Alderto.Services.Impl
 {
     public class GuildBankContentsManager : IGuildBankContentsManager
     {
@@ -75,7 +75,7 @@ namespace Alderto.Services.GuildBankManagers
             // Ensure core values weren't changed.
             item.Id = oldItem.Id;
             item.GuildBankId = oldItem.GuildBankId;
-            
+
             // Log changes.
             await _transactions.LogBankItemUpdateAsync(item.GuildBank, oldItem, item, adminId);
 

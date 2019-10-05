@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services.GuildBankManagers;
+using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,6 @@ namespace Alderto.Bot.Modules
     [Group, Alias("GuildBank", "GB")]
     public class GuildBankModule : ModuleBase<SocketCommandContext>
     {
-
         private readonly IGuildBankManager _guildBankManager;
 
         public GuildBankModule(IGuildBankManager guildBankManager)

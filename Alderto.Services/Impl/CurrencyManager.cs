@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class CurrencyManager : ICurrencyManager
     {

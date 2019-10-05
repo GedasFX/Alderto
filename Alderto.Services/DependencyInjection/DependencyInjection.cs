@@ -1,8 +1,9 @@
 ﻿using System;
-using Alderto.Services.GuildBankManagers;
-using Microsoft.Extensions.DependencyInjection;
+using Alderto.Services;
+using Alderto.Services.Impl;
 
-namespace Alderto.Services
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjection
     {

@@ -7,7 +7,7 @@ using Alderto.Data.Models;
 using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Services.GuildBankManagers
+namespace Alderto.Services.Impl
 {
     public class GuildBankManager : IGuildBankManager
     {
@@ -83,7 +83,7 @@ namespace Alderto.Services.GuildBankManagers
         {
             // Take a snapshot of the bank pre changes.
             var initialBank = bank.MemberwiseClone();
-            
+
             // Apply the changes.
             changes(bank);
 

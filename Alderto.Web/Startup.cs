@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Services;
 using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
@@ -82,10 +81,7 @@ namespace Alderto.Web
                             new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = ".Session";
-                });
+                .AddCookie(options => { options.Cookie.Name = ".Session"; });
             services.AddAuthorization();
 
             // Add Mvc

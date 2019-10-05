@@ -5,7 +5,7 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class GuildLogger : IGuildLogger
     {

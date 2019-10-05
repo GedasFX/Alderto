@@ -2,7 +2,7 @@
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.GuildBankManagers;
+using Alderto.Services.Impl;
 using Alderto.Tests.MockedEntities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

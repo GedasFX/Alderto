@@ -4,7 +4,7 @@ using Alderto.Services.Exceptions.NotFound;
 using Discord;
 using Discord.WebSocket;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class MessagesManager : IMessagesManager
     {

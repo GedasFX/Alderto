@@ -5,7 +5,7 @@ using Alderto.Data;
 using Alderto.Data.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Alderto.Services
+namespace Alderto.Services.Impl
 {
     public class GuildPreferencesProvider : IGuildPreferencesProvider
     {
