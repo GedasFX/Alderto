@@ -96,18 +96,15 @@ namespace Alderto.Web
             services
                 .AddMvcCore()
                 .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.InvalidModelStateResponseFactory = context =>
                     {
-                        options.InvalidModelStateResponseFactory =
-                            context =>
-                            {
-                                var errorMsg = context.ModelState
-                                    .Where(s => s.Value.Errors.Count > 0)
-                                    .Select(s =>
-                                        (string.IsNullOrWhiteSpace(s.Key) ? "" : $"{s.Key}: ") +
-                                        $"{s.Value.Errors.First().ErrorMessage}").ToArray();
-                                return new BadRequestObjectResult(new ErrorMessage(400, 0, errorMsg));
-                            };
-                    })
+                        var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
+                        var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
+                                       value.Errors[0].ErrorMessage;
+                        return new BadRequestObjectResult(new ErrorMessage(400, 0, errorMsg));
+                    };
+                })
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
@@ -166,22 +163,22 @@ namespace Alderto.Web
             }
             catch (Exception e)
             {
-        // Handle known API Exceptions.
-        if (e is ApiException apiException)
+                // Handle known API Exceptions.
+                if (e is ApiException apiException)
                 {
                     context.Response.OnStarting(() =>
             {
-                                        context.Response.ContentType = "application/json";
-                                        context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
-                                        {
-                                            1 => StatusCodes.Status403Forbidden,
-                                            2 => StatusCodes.Status404NotFound,
-                                            3 => StatusCodes.Status400BadRequest,
-                                            _ => throw e
-                                        };
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
+                {
+                    1 => StatusCodes.Status403Forbidden,
+                    2 => StatusCodes.Status404NotFound,
+                    3 => StatusCodes.Status400BadRequest,
+                    _ => throw e
+                };
 
-                                        return Task.CompletedTask;
-                                    });
+                return Task.CompletedTask;
+            });
 
                     await context.Response.WriteAsync(
                 JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
