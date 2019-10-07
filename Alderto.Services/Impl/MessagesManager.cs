@@ -1,52 +1,82 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Services.Exceptions.BadRequest;
 using Alderto.Services.Exceptions.NotFound;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
 {
     public class MessagesManager : IMessagesManager
     {
         private readonly DiscordSocketClient _client;
+        private readonly AldertoDbContext _context;
 
-        public MessagesManager(DiscordSocketClient client)
+        public MessagesManager(DiscordSocketClient client, AldertoDbContext context)
         {
             _client = client;
+            _context = context;
         }
 
-        public Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, string message)
+        public Task<List<GuildManagedMessage>> ListMessagesAsync(ulong guildId)
         {
-            return GetChannel(guildId, channelId).SendMessageAsync(message);
+            return _context.GuildManagedMessages.Where(m => m.GuildId == guildId).ToListAsync();
         }
 
-        public Task<IUserMessage> ImportMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        public async Task<IMessage> GetMessageAsync(ulong guildId, ulong messageId)
         {
-            throw new System.NotImplementedException();
+            var msg = await GetManagedMessage(guildId, messageId);
+            return await GetDiscordChannel(guildId, msg.ChannelId).GetMessageAsync(messageId);
         }
 
-        public Task<IMessage> GetMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        public async Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, string message)
         {
-            return GetChannel(guildId, channelId).GetMessageAsync(messageId);
+            var discordMessage = await GetDiscordChannel(guildId, channelId).SendMessageAsync(message);
+
+            _context.GuildManagedMessages.Add(new GuildManagedMessage(guildId, channelId, discordMessage.Id));
+            await _context.SaveChangesAsync();
+
+            return discordMessage;
         }
 
-        public async Task EditMessageAsync(ulong guildId, ulong channelId, ulong messageId, string newMessageContents)
+        public async Task<IUserMessage> ImportMessageAsync(ulong guildId, ulong channelId, ulong messageId)
         {
-            var message = await GetBotMessageAsync(guildId, channelId, messageId);
+            var discordMessage = await GetDiscordBotMessageAsync(guildId, channelId, messageId);
+
+            _context.GuildManagedMessages.Add(new GuildManagedMessage(guildId, channelId, messageId));
+            await _context.SaveChangesAsync();
+
+            return discordMessage;
+        }
+
+        public async Task EditMessageAsync(ulong guildId, ulong messageId, string newMessageContents)
+        {
+            var message = await GetDiscordBotMessageAsync(await GetManagedMessage(guildId, messageId));
 
             // User can always edit its own posts.
             await message.ModifyAsync(msg => msg.Content = newMessageContents);
         }
 
-        public async Task RemoveMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        public async Task RemoveMessageAsync(ulong guildId, ulong messageId)
         {
-            var message = await GetBotMessageAsync(guildId, channelId, messageId);
+            var message = await GetDiscordBotMessageAsync(await GetManagedMessage(guildId, messageId));
 
             // User can always delete its own posts.
             await message.DeleteAsync();
         }
 
-        private IMessageChannel GetChannel(ulong guildId, ulong channelId)
+
+        private Task<GuildManagedMessage> GetManagedMessage(ulong guildId, ulong messageId)
+        {
+            return _context.GuildManagedMessages.SingleOrDefaultAsync(message => message.GuildId == guildId && message.MessageId == messageId) ?? throw new MessageNotFoundException();
+        }
+
+        private IMessageChannel GetDiscordChannel(ulong guildId, ulong channelId)
         {
             var guild = _client.GetGuild(guildId);
             if (guild == null)
@@ -62,9 +92,14 @@ namespace Alderto.Services.Impl
             return msgChannel;
         }
 
-        private async Task<IUserMessage> GetBotMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        private Task<IUserMessage> GetDiscordBotMessageAsync(GuildManagedMessage msg)
         {
-            var channel = GetChannel(guildId, channelId);
+            return GetDiscordBotMessageAsync(msg.GuildId, msg.ChannelId, msg.MessageId);
+        }
+
+        private async Task<IUserMessage> GetDiscordBotMessageAsync(ulong guildId, ulong channelId, ulong messageId)
+        {
+            var channel = GetDiscordChannel(guildId, channelId);
 
             var message = await channel.GetMessageAsync(messageId);
             if (message == null)

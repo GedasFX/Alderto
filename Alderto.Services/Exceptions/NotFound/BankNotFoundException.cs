@@ -4,21 +4,21 @@ using System.Runtime.Serialization;
 namespace Alderto.Services.Exceptions.NotFound
 {
     [Serializable]
-    public class GuildNotFoundException : ApiException
+    public class BankNotFoundException : ApiException
     {
-        public GuildNotFoundException() : base(2100)
+        public BankNotFoundException() : base(2200)
         {
         }
 
-        public GuildNotFoundException(string message) : base(message)
+        public BankNotFoundException(string message) : base(message)
         {
         }
 
-        public GuildNotFoundException(string message, Exception inner) : base(message, inner)
+        public BankNotFoundException(string message, Exception inner) : base(message, inner)
         {
         }
 
-        protected GuildNotFoundException(
+        protected BankNotFoundException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {

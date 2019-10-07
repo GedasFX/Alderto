@@ -33,11 +33,13 @@ namespace Alderto.Data
                 .HasKey(g => new { g.GuildId, g.MemberId });
 
             modelBuilder.Entity<GuildBank>()
+                // Frequent searches for guild banks are done by GuildId
+                // Additionally a constraint for no duplicate names require unique index.
                 .HasIndex(b => new { b.GuildId, b.Name })
                 .IsUnique();
 
             modelBuilder.Entity<GuildManagedMessage>()
-                .HasKey(m => new { m.GuildId, m.ChannelId, m.MessageId });
+                .HasKey(m => new { m.GuildId, m.MessageId });
 
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });

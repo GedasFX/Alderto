@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Models.Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;

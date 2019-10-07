@@ -7,6 +7,8 @@ namespace Alderto.Web.Models
     {
         public ulong Id { get; set; }
 
+        public ulong ChannelId { get; set; }
+
         public string AuthorUsername { get; set; }
         public string AuthorAvatarId { get; set; }
 
@@ -19,10 +21,14 @@ namespace Alderto.Web.Models
         public ApiMessage(IMessage message)
         {
             Id = message.Id;
+            ChannelId = message.Channel.Id;
+
             AuthorUsername = message.Author.Username;
             AuthorAvatarId = message.Author.AvatarId;
+
             CreatedAt = message.CreatedAt;
             EditedAt = message.EditedTimestamp;
+
             Contents = message.Content;
         }
     }

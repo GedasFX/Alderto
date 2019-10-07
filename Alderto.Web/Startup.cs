@@ -1,15 +1,19 @@
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,7 +85,10 @@ namespace Alderto.Web
                             new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
-                .AddCookie(options => { options.Cookie.Name = ".Session"; });
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = ".Session";
+                });
             services.AddAuthorization();
 
             // Add Mvc
@@ -128,13 +135,51 @@ namespace Alderto.Web
                 app.UseHttpsRedirection();
             }
 
-            // Configure api routing
+            // Configure api routing.
             app.Map("/api", api =>
             {
                 api.UseRouting();
 
                 api.UseAuthentication();
                 api.UseAuthorization();
+
+                // Handle Service errors
+                api.Use(async (context, next) =>
+                {
+                    try
+                    {
+                        await next.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        // Handle known API Exceptions.
+                        if (e is ApiException apiException)
+                        {
+                            await context.Response.WriteAsync(
+                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+
+                            switch (apiException.ErrorCode % 1000)
+                            {
+                                case 1:
+                                    context.Response.OnStarting(() =>
+                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status403Forbidden));
+                                    break;
+                                case 2:
+                                    context.Response.OnStarting(() =>
+                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status404NotFound));
+                                    break;
+                                case 3:
+                                    context.Response.OnStarting(() =>
+                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status400BadRequest));
+                                    break;
+                                default:
+                                    throw;
+                            }
+                        }
+                        else
+                            throw;
+                    }
+                });
 
                 api.UseEndpoints(p => { p.MapControllers(); });
             });
