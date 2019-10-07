@@ -43,6 +43,12 @@
             new ErrorMessage(2101, "The specified user was not found.");
 
         /// <summary>
+        /// NotFound reason. Used when bot was unable to find the channel.
+        /// </summary>
+        public static ErrorMessage ChannelNotFound { get; } =
+            new ErrorMessage(2102, "The specified channel was not found.");
+
+        /// <summary>
         /// NotFound reason. Used when bot was unable to find the bank.
         /// </summary>
         public static ErrorMessage BankNotFound { get; } =
@@ -85,6 +91,7 @@
                 1200 => UserNotBankModerator,
                 2100 => GuildNotFound,
                 2101 => UserNotFound,
+                2102 => ChannelNotFound,
                 2200 => BankNotFound,
                 3000 => MissingChannelAccess,
                 3001 => MissingWritePermissions,

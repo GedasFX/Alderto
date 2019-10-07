@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Alderto.Services.Exceptions.NotFound
 {
     [Serializable]
-    public class ChannelNotFoundException : Exception
+    public class ChannelNotFoundException : ApiException
     {
-        public ChannelNotFoundException()
+        public ChannelNotFoundException() : base(2102)
         {
         }
 

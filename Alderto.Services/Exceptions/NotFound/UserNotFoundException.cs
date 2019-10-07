@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Alderto.Services.Exceptions.NotFound
 {
     [Serializable]
-    public class UserNotFoundException : Exception
+    public class UserNotFoundException : ApiException
     {
-        public UserNotFoundException()
+        public UserNotFoundException() : base(2101)
         {
         }
 

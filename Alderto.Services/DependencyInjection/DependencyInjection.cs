@@ -49,6 +49,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <returns></returns>
         public static IServiceCollection AddMessagesManager(this IServiceCollection services) =>
-            services.AddSingleton<IMessagesManager, MessagesManager>();
+            services.AddScoped<IMessagesManager, MessagesManager>();
     }
 }

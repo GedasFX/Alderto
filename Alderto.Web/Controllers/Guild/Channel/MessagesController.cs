@@ -33,8 +33,13 @@ namespace Alderto.Web.Controllers.Guild.Channel
         [HttpPost]
         public async Task<IActionResult> Create(ulong guildId, [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))] ApiMessage message)
         {
+            if (message.ChannelId == 0)
+            {
+                return NotFound();
+            }
+
             // If create new message
-            if (message.Contents != null && message.ChannelId != 0)
+            if (message.Contents != null)
             {
                 var msg = await _msgManager.PostMessageAsync(guildId, message.ChannelId, message.Contents);
                 return Content(new ApiMessage(msg));

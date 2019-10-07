@@ -155,26 +155,35 @@ namespace Alderto.Web
                         // Handle known API Exceptions.
                         if (e is ApiException apiException)
                         {
-                            await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
-
-                            switch (apiException.ErrorCode % 1000)
+                            switch (apiException.ErrorCode / 1000)
                             {
                                 case 1:
                                     context.Response.OnStarting(() =>
-                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status403Forbidden));
+                                    {
+                                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                                        return Task.CompletedTask;
+                                    });
                                     break;
                                 case 2:
                                     context.Response.OnStarting(() =>
-                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status404NotFound));
+                                    {
+                                        context.Response.StatusCode = StatusCodes.Status404NotFound;
+                                        return Task.CompletedTask;
+                                    });
                                     break;
                                 case 3:
                                     context.Response.OnStarting(() =>
-                                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status400BadRequest));
+                                    {
+                                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                                        return Task.CompletedTask;
+                                    });
                                     break;
                                 default:
                                     throw;
                             }
+
+                            await context.Response.WriteAsync(
+                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
                         }
                         else
                             throw;
