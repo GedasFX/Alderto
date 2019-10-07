@@ -34,10 +34,8 @@ namespace Alderto.Web.Helpers
             // Add the data.
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
-                using (var stream = new StreamWriter(req.GetRequestStream()))
-                {
-                    await stream.WriteAsync(jsonData);
-                }
+                await using var stream = new StreamWriter(req.GetRequestStream());
+                await stream.WriteAsync(jsonData);
             }
 
             return req;
@@ -58,14 +56,13 @@ namespace Alderto.Web.Helpers
 
             try
             {
-                using (var response = await request.GetResponseAsync())
-                {
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    using (var stream = new StreamReader(response.GetResponseStream()))
-                    {
-                        return JsonConvert.DeserializeObject<T>(await stream.ReadToEndAsync());
-                    }
-                }
+                using var response = await request.GetResponseAsync();
+                var stream = response?.GetResponseStream();
+                if (stream == null)
+                    throw new Exception();
+
+                using var sr = new StreamReader(stream);
+                return JsonConvert.DeserializeObject<T>(await sr.ReadToEndAsync());
             }
             catch (Exception)
             {

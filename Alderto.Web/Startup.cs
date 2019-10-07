@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -93,6 +95,19 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvcCore()
+                .ConfigureApiBehaviorOptions(options =>
+                    {
+                        options.InvalidModelStateResponseFactory =
+                            context =>
+                            {
+                                var errorMsg = context.ModelState
+                                    .Where(s => s.Value.Errors.Count > 0)
+                                    .Select(s =>
+                                        (string.IsNullOrWhiteSpace(s.Key) ? "" : $"{s.Key}: ") +
+                                        $"{s.Value.Errors.First().ErrorMessage}").ToArray();
+                                return new BadRequestObjectResult(new ErrorMessage(400, 0, errorMsg));
+                            };
+                    })
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
@@ -144,37 +159,37 @@ namespace Alderto.Web
 
                 // Handle Service errors
                 api.Use(async (context, next) =>
+        {
+            try
+            {
+                await next.Invoke();
+            }
+            catch (Exception e)
+            {
+        // Handle known API Exceptions.
+        if (e is ApiException apiException)
                 {
-                    try
-                    {
-                        await next.Invoke();
-                    }
-                    catch (Exception e)
-                    {
-                        // Handle known API Exceptions.
-                        if (e is ApiException apiException)
-                        {
-                            context.Response.OnStarting(() =>
-                            {
-                                context.Response.ContentType = "application/json";
-                                context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
-                                {
-                                    1 => StatusCodes.Status403Forbidden,
-                                    2 => StatusCodes.Status404NotFound,
-                                    3 => StatusCodes.Status400BadRequest,
-                                    _ => throw e
-                                };
+                    context.Response.OnStarting(() =>
+            {
+                                        context.Response.ContentType = "application/json";
+                                        context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
+                                        {
+                                            1 => StatusCodes.Status403Forbidden,
+                                            2 => StatusCodes.Status404NotFound,
+                                            3 => StatusCodes.Status400BadRequest,
+                                            _ => throw e
+                                        };
 
-                                return Task.CompletedTask;
-                            });
+                                        return Task.CompletedTask;
+                                    });
 
-                            await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
-                        }
-                        else
-                            throw;
-                    }
-                });
+                    await context.Response.WriteAsync(
+                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+                }
+                else
+                    throw;
+            }
+        });
 
                 api.UseEndpoints(p => { p.MapControllers(); });
             });
