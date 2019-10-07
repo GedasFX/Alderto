@@ -82,6 +82,12 @@
         public static ErrorMessage BankNameAlreadyExists { get; } =
             new ErrorMessage(3200, "A bank with the given name already exists.");
 
+        /// <summary>
+        /// BadRequest reason. Used received name was empty.
+        /// </summary>
+        public static ErrorMessage NameIsNull { get; } =
+            new ErrorMessage(3300, "Name cannot be empty.");
+
 
         public static ErrorMessage FromCode(int code)
         {
@@ -97,6 +103,7 @@
                 3001 => MissingWritePermissions,
                 3100 => PayloadOver100,
                 3200 => BankNameAlreadyExists,
+                3300 => NameIsNull,
                 _ => null
             };
         }

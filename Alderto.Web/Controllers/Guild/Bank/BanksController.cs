@@ -7,7 +7,6 @@ using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord.Net;
 using Discord.WebSocket;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +24,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             _client = client;
         }
 
-        [HttpGet, Authorize]
+        [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
             var user = _client.GetGuild(guildId)?.GetUser(User.GetId());
@@ -38,6 +37,12 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
             var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b) });
             return Content(outBanks);
+        }
+
+        [HttpGet("{bankId}")]
+        public IActionResult GetBank(ulong guildId, int bankId)
+        {
+            return Content("Placeholder");
         }
 
         [HttpPost]

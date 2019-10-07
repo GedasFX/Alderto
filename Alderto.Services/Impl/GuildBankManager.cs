@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Data.Models.GuildBank;
+using Alderto.Services.Exceptions.BadRequest;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
@@ -44,6 +45,9 @@ namespace Alderto.Services.Impl
 
         public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string bankName, ulong? moderatorRoleId = null, ulong? logChannelId = null)
         {
+            if (string.IsNullOrWhiteSpace(bankName))
+                throw new NameCannotBeNullException();
+
             // Ensure foreign key constraint is not violated.
             var guild = await _context.Guilds.FindAsync(guildId);
             if (guild == null)

@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Add Guild bank managers
                 .AddScoped<IGuildBankManager, GuildBankManager>()
-                .AddScoped<IGuildBankContentsManager, GuildBankContentsManager>()
+                .AddScoped<IGuildBankItemsManager, GuildBankItemsManager>()
                 .AddScoped<IGuildLogger, GuildLogger>();
 
             return services;

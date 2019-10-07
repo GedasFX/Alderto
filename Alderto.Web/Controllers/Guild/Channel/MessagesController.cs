@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Alderto.Services;
 using Alderto.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,26 +16,26 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(ulong guildId)
+        public async Task<IActionResult> ListMessages(ulong guildId)
         {
             var messages = await _msgManager.ListMessagesAsync(guildId);
             return Content(messages);
         }
 
         [HttpGet("{messageId}")]
-        public async Task<IActionResult> Get(ulong guildId, ulong messageId)
+        public async Task<IActionResult> GetMessage(ulong guildId, ulong messageId)
         {
             var msg = await _msgManager.GetMessageAsync(guildId, messageId);
             return Content(new ApiMessage(msg));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ulong guildId, [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))] ApiMessage message)
+        public async Task<IActionResult> CreateMessage(ulong guildId, [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))] ApiMessage message)
         {
-            if (message.ChannelId == 0)
-            {
-                return NotFound();
-            }
+            //if (message.ChannelId == 0)
+            //{
+            //    return NotFound();
+            //}
 
             // If create new message
             if (message.Contents != null)
@@ -56,14 +55,14 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpPatch("{messageId}")]
-        public async Task<IActionResult> Update(ulong guildId, ulong messageId, [Bind(nameof(ApiMessage.Contents))] ApiMessage message)
+        public async Task<IActionResult> UpdateMessage(ulong guildId, ulong messageId, [Bind(nameof(ApiMessage.Contents))] ApiMessage message)
         {
             await _msgManager.EditMessageAsync(guildId, messageId, message.Contents);
             return Ok();
         }
 
         [HttpDelete("{messageId}")]
-        public async Task<IActionResult> Delete(ulong guildId, ulong messageId)
+        public async Task<IActionResult> DeleteMessage(ulong guildId, ulong messageId)
         {
             await _msgManager.RemoveMessageAsync(guildId, messageId);
             return NoContent();

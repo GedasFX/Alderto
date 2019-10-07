@@ -6,7 +6,7 @@ using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Services
 {
-    public interface IGuildBankContentsManager
+    public interface IGuildBankItemsManager
     {
         /// <summary>
         /// Gets the bank item with from the given primary key.

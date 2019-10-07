@@ -8,7 +8,6 @@ using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
-using Discord.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -155,32 +154,19 @@ namespace Alderto.Web
                         // Handle known API Exceptions.
                         if (e is ApiException apiException)
                         {
-                            switch (apiException.ErrorCode / 1000)
+                            context.Response.OnStarting(() =>
                             {
-                                case 1:
-                                    context.Response.OnStarting(() =>
-                                    {
-                                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                                        return Task.CompletedTask;
-                                    });
-                                    break;
-                                case 2:
-                                    context.Response.OnStarting(() =>
-                                    {
-                                        context.Response.StatusCode = StatusCodes.Status404NotFound;
-                                        return Task.CompletedTask;
-                                    });
-                                    break;
-                                case 3:
-                                    context.Response.OnStarting(() =>
-                                    {
-                                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                                        return Task.CompletedTask;
-                                    });
-                                    break;
-                                default:
-                                    throw;
-                            }
+                                context.Response.ContentType = "application/json";
+                                context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
+                                {
+                                    1 => StatusCodes.Status403Forbidden,
+                                    2 => StatusCodes.Status404NotFound,
+                                    3 => StatusCodes.Status400BadRequest,
+                                    _ => throw e
+                                };
+
+                                return Task.CompletedTask;
+                            });
 
                             await context.Response.WriteAsync(
                                 JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));

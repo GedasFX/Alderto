@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
 {
-    public class GuildBankContentsManager : IGuildBankContentsManager
+    public class GuildBankItemsManager : IGuildBankItemsManager
     {
         private readonly AldertoDbContext _context;
         private readonly IGuildLogger _transactions;
 
-        public GuildBankContentsManager(AldertoDbContext context, IGuildLogger transactions)
+        public GuildBankItemsManager(AldertoDbContext context, IGuildLogger transactions)
         {
             _context = context;
             _transactions = transactions;

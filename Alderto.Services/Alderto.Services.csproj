@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DependencyInjection\" />
+  </ItemGroup>
+
 </Project>

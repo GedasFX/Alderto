@@ -12,7 +12,7 @@ namespace Alderto.Tests
     public class GuildBankManagerTests
     {
         private readonly IGuildBankManager _manager;
-        private readonly IGuildBankContentsManager _items;
+        private readonly IGuildBankItemsManager _items;
 
         public GuildBankManagerTests()
         {
@@ -21,7 +21,7 @@ namespace Alderto.Tests
             var context = services.GetService<AldertoDbContext>();
             var transactions = new GuildLogger(new Discord.WebSocket.DiscordSocketClient());
             _manager = new GuildBankManager(context, transactions);
-            _items = new GuildBankContentsManager(context, transactions);
+            _items = new GuildBankItemsManager(context, transactions);
 
         }
 
