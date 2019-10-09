@@ -243,13 +243,12 @@ namespace Alderto.Services.Impl
             await channel.SendMessageAsync(embed: logMessage.Build());
 
             // Offload logging of item deletions to another thread.
-            await Task.Factory.StartNew(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
-                foreach (var item in bank.Contents)
-                {
-                    await LogBankItemDeleteAsync(bank, item, modId);
-                }
-            }).ConfigureAwait(false);
+                if (bank.Contents != null)
+                    foreach (var item in bank.Contents)
+                        await LogBankItemDeleteAsync(bank, item, modId);
+            });
         }
     }
 }

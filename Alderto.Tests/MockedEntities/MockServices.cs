@@ -1,7 +1,7 @@
 ﻿using System;
-using Alderto.Bot;
 using Alderto.Bot.Lua;
 using Alderto.Data;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,7 +19,7 @@ namespace Alderto.Tests.MockedEntities
         {
             ServiceProvider = new ServiceCollection()
                 .AddDbContext<AldertoDbContext>(builder => builder.UseInMemoryDatabase(Guid.NewGuid().ToString()))
-                .AddDiscordSocketClient("")
+                .AddSingleton(new DiscordSocketClient())
                 .AddLuaCommandHandler()
                 .AddBotManagers()
                 .BuildServiceProvider();

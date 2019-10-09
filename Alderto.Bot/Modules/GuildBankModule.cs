@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
 using Alderto.Services.Exceptions.NotFound;
-using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 

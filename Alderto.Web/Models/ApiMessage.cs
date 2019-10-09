@@ -17,7 +17,9 @@ namespace Alderto.Web.Models
 
         public string Contents { get; set; }
 
+#nullable disable
         public ApiMessage() { }
+#nullable restore
         public ApiMessage(IMessage message)
         {
             Id = message.Id;

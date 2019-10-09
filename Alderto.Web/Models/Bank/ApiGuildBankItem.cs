@@ -6,7 +6,7 @@ namespace Alderto.Web.Models.Bank
     public sealed class ApiGuildBankItem : GuildBankItem
     {
         [JsonIgnore]
-        public override GuildBank GuildBank {
+        public override GuildBank? GuildBank {
             get => base.GuildBank;
             set => base.GuildBank = value;
         }

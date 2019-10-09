@@ -10,6 +10,7 @@ using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -182,7 +183,25 @@ namespace Alderto.Web
                     });
 
                             await context.Response.WriteAsync(
-                        JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+                        }
+                        else if (e is HttpException discordException)
+                        {
+                            context.Response.OnStarting(() =>
+                            {
+                                context.Response.ContentType = "application/json";
+                                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                                return Task.CompletedTask;
+                            });
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(
+                                discordException.DiscordCode switch
+                                {
+                                    50001 => ErrorMessages.MissingChannelAccess,
+                                    50013 => ErrorMessages.MissingWritePermissions,
+                                    _ => throw e
+                                }));
                         }
                         else
                             throw;
