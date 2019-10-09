@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace Alderto.Web
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices([NotNull] IServiceCollection services)
         {
             // === <General> ===
             // Add database.
@@ -53,7 +54,7 @@ namespace Alderto.Web
             // Add database accessors.
             services.AddBotManagers();
 
-            ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
+            _ = ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
             services.AddMessagesManager();
 
@@ -156,37 +157,37 @@ namespace Alderto.Web
 
                 // Handle Service errors
                 api.Use(async (context, next) =>
-        {
-            try
-            {
-                await next.Invoke();
-            }
-            catch (Exception e)
-            {
-                // Handle known API Exceptions.
-                if (e is ApiException apiException)
                 {
-                    context.Response.OnStarting(() =>
-            {
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
-                {
-                    1 => StatusCodes.Status403Forbidden,
-                    2 => StatusCodes.Status404NotFound,
-                    3 => StatusCodes.Status400BadRequest,
-                    _ => throw e
-                };
+                    try
+                    {
+                        await next.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        // Handle known API Exceptions.
+                        if (e is ApiException apiException)
+                        {
+                            context.Response.OnStarting(() =>
+                    {
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
+                        {
+                            1 => StatusCodes.Status403Forbidden,
+                            2 => StatusCodes.Status404NotFound,
+                            3 => StatusCodes.Status400BadRequest,
+                            _ => throw e
+                        };
 
-                return Task.CompletedTask;
-            });
+                        return Task.CompletedTask;
+                    });
 
-                    await context.Response.WriteAsync(
-                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
-                }
-                else
-                    throw;
-            }
-        });
+                            await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+                        }
+                        else
+                            throw;
+                    }
+                });
 
                 api.UseEndpoints(p => { p.MapControllers(); });
             });
@@ -202,7 +203,7 @@ namespace Alderto.Web
             });
         }
 
-        public async Task UpdateDatabase(IApplicationBuilder app)
+        private static async Task UpdateDatabase(IApplicationBuilder app)
         {
             using var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
@@ -211,9 +212,9 @@ namespace Alderto.Web
             await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
             var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
 
-            logger.Log(LogLevel.Information, "Initializing database...");
+            logger.Log(LogLevel.Information, Properties.Resources.InitializingDatabase);
             await context.Database.MigrateAsync();
-            logger.LogInformation("Database ready!");
+            logger.LogInformation(Properties.Resources.DatabaseReady);
         }
     }
 }

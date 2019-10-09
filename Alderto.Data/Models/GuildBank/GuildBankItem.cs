@@ -26,13 +26,13 @@ namespace Alderto.Data.Models.GuildBank
         /// Description of the item.
         /// </summary>
         [MaxLength(280)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Path to the image to be displayed in the bank.
         /// </summary>
         [MaxLength(140)]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         /// <summary>
         /// Monetary value per unit.
@@ -48,7 +48,17 @@ namespace Alderto.Data.Models.GuildBank
         /// Guild bank object.
         /// </summary>
         [ForeignKey(nameof(GuildBankId))]
-        public virtual GuildBank GuildBank { get; set; }
+        public virtual GuildBank? GuildBank { get; set; }
+
+#nullable disable
+        public GuildBankItem() { }
+#nullable restore
+        public GuildBankItem(int id, int bankId, string name)
+        {
+            Id = id;
+            GuildBankId = bankId;
+            Name = name;
+        }
 
         public new GuildBankItem MemberwiseClone()
         {

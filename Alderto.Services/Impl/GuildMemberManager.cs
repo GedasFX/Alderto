@@ -66,7 +66,7 @@ namespace Alderto.Services.Impl
         /// <param name="memberId">Discord Member Id</param>
         /// <param name="addIfNonExistent">Set to false if you for whatever reason do not wish to add the member to the database.</param>
         /// <returns>DbContext tracked <see cref="GuildMember"/>, or null, if <see cref="addIfNonExistent"/> was set to false.</returns>
-        public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong memberId, bool addIfNonExistent = true)
+        public async Task<GuildMember?> GetGuildMemberAsync(ulong guildId, ulong memberId, bool addIfNonExistent = true)
         {
             var member = await _context.GuildMembers.FindAsync(guildId, memberId);
 
@@ -84,7 +84,7 @@ namespace Alderto.Services.Impl
             return member;
         }
 
-        public Task<GuildMember> GetGuildMemberAsync(IGuildUser user, bool addIfNonExistent = true)
+        public Task<GuildMember?> GetGuildMemberAsync(IGuildUser user, bool addIfNonExistent = true)
         {
             return GetGuildMemberAsync(user.GuildId, user.Id, addIfNonExistent);
         }
@@ -105,7 +105,7 @@ namespace Alderto.Services.Impl
                 .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.MemberId);
         }
 
-        public async Task AcceptMemberAsync(IGuildUser user, string nickname = null, IRole role = null, ulong recruiterId = 0)
+        public async Task AcceptMemberAsync(IGuildUser user, string? nickname = null, IRole? role = null, ulong recruiterId = 0)
         {
             if (nickname != null)
                 await user.ModifyAsync(u => u.Nickname = nickname);
@@ -115,7 +115,7 @@ namespace Alderto.Services.Impl
 
             if (recruiterId != 0)
             {
-                await AddRecruitAsync(await GetGuildMemberAsync(user), recruiterId, DateTimeOffset.UtcNow);
+                await AddRecruitAsync((await GetGuildMemberAsync(user))!, recruiterId, DateTimeOffset.UtcNow);
             }
         }
     }

@@ -90,7 +90,7 @@ namespace Alderto.Bot.Lua
 
             if (/* guild.PremiumUntil != null */ /* premium feature. For now free */ true)
             {
-                foreach (var cmd in guild.CustomCommands)
+                foreach (var cmd in guild.CustomCommands!)
                 {
                     await RegisterCommand($"_{guildId}_{cmd.TriggerKeyword}", cmd.LuaCode);
                 }

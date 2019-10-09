@@ -18,10 +18,10 @@ namespace Alderto.Bot.Extensions
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns></returns>
         public static async Task ReplyEmbedAsync<T>(this ModuleBase<T> module,
-            string description = null,
+            string? description = null,
             Color color = default,
-            IUser author = null,
-            Action<EmbedBuilder> extra = null) where T : class, ICommandContext
+            IUser? author = null,
+            Action<EmbedBuilder>? extra = null) where T : class, ICommandContext
         {
             var embed = new EmbedBuilder().WithDefault(description, color, author ?? module.Context.Message.Author, extra).Build();
             await module.Context.Channel.SendMessageAsync(embed: embed);
@@ -36,8 +36,8 @@ namespace Alderto.Bot.Extensions
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns></returns>
         public static Task ReplySuccessEmbedAsync<T>(this ModuleBase<T> module,
-            string description = null,
-            Action<EmbedBuilder> extra = null) where T : class, ICommandContext
+            string? description = null,
+            Action<EmbedBuilder>? extra = null) where T : class, ICommandContext
         {
             return ReplyEmbedAsync(module, description, EmbedColor.Success, extra: extra);
         }
@@ -51,8 +51,8 @@ namespace Alderto.Bot.Extensions
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns></returns>
         public static Task ReplyErrorEmbedAsync<T>(this ModuleBase<T> module,
-            string description = null,
-            Action<EmbedBuilder> extra = null) where T : class, ICommandContext
+            string? description = null,
+            Action<EmbedBuilder>? extra = null) where T : class, ICommandContext
         {
             return ReplyEmbedAsync(module, description, EmbedColor.Error, extra: extra);
         }

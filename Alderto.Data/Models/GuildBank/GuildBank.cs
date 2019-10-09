@@ -11,7 +11,7 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [Key]
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Discord Guild Id.
         /// </summary>
@@ -37,17 +37,19 @@ namespace Alderto.Data.Models.GuildBank
         /// Guild, referenced by <see cref="GuildId"/>.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         /// <summary>
         /// A collection of items in the bank.
         /// </summary>
-        public virtual ICollection<GuildBankItem> Contents { get; set; }
+        public virtual ICollection<GuildBankItem>? Contents { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
         /// </summary>
+#nullable disable
         public GuildBank() { }
+#nullable restore
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildBank"/>, with <see cref="GuildId"/>) property set.
@@ -62,7 +64,7 @@ namespace Alderto.Data.Models.GuildBank
 
         public new GuildBank MemberwiseClone()
         {
-            return (GuildBank) base.MemberwiseClone();
+            return (GuildBank)base.MemberwiseClone();
         }
     }
 }

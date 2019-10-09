@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Alderto.Web.Helpers
 {
-    public class DiscordApi
+    public static class DiscordApi
     {
         /// <summary>
         /// Generates a <see cref="WebRequest"/> to the Discord API.
@@ -18,10 +18,10 @@ namespace Alderto.Web.Helpers
         /// <param name="authHeader">Authorization header. Use $"Bearer {token}" for users or $"Bot {token}" for bots.</param>
         /// <param name="jsonData">Data to send. Is needed for POST requests.</param>
         /// <returns></returns>
-        public static async Task<WebRequest> CreateRequestAsync(string path, string method = "GET", string authHeader = null, string jsonData = null)
+        public static async Task<WebRequest> CreateRequestAsync(string path, string method = "GET", string? authHeader = null, string? jsonData = null)
         {
             // First create the request.
-            var req = WebRequest.Create("https://discordapp.com/api" + path);
+            var req = WebRequest.Create(new Uri("https://discordapp.com/api" + path));
 
             // Apply the default headers.
             req.Method = method;
@@ -50,7 +50,7 @@ namespace Alderto.Web.Helpers
         /// <param name="authHeader">Authorization header. Use $"Bearer {token}" for users or $"Bot {token}" for bots.</param>
         /// <param name="jsonData">Data to send. Is needed for POST requests.</param>
         /// <returns>The data from the given API resource. Default if it was unsuccessful.</returns>
-        public static async Task<T> FetchAsync<T>(string path, string method = "GET", string authHeader = null, string jsonData = null)
+        public static async Task<T> FetchAsync<T>(string path, string method = "GET", string? authHeader = null, string? jsonData = null)
         {
             var request = await CreateRequestAsync(path, method, authHeader, jsonData);
 
@@ -64,9 +64,11 @@ namespace Alderto.Web.Helpers
                 using var sr = new StreamReader(stream);
                 return JsonConvert.DeserializeObject<T>(await sr.ReadToEndAsync());
             }
-            catch (Exception)
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch
+#pragma warning restore CA1031 // Do not catch general exception types
             {
-                return default;
+                return default!;
             }
         }
 

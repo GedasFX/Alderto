@@ -6,6 +6,7 @@ using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services.Exceptions.BadRequest;
+using Alderto.Services.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
@@ -21,7 +22,7 @@ namespace Alderto.Services.Impl
             _transactions = transactions;
         }
 
-        private IQueryable<GuildBank> FetchGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        private IQueryable<GuildBank> FetchGuildBanks(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>>? options = null)
         {
             var query = _context.GuildBanks as IQueryable<GuildBank>;
             if (options != null)
@@ -29,23 +30,23 @@ namespace Alderto.Services.Impl
             return query.Where(b => b.GuildId == guildId);
         }
 
-        public Task<GuildBank> GetGuildBankAsync(ulong guildId, string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        public async Task<GuildBank?> GetGuildBankAsync(ulong guildId, string name, Func<IQueryable<GuildBank>, IQueryable<GuildBank>>? options = null)
         {
-            return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
+            return await FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Name == name);
         }
-        public Task<GuildBank> GetGuildBankAsync(ulong guildId, int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
+        public async Task<GuildBank?> GetGuildBankAsync(ulong guildId, int id, Func<IQueryable<GuildBank>, IQueryable<GuildBank>>? options = null)
         {
-            return FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Id == id);
-        }
-
-        public Task<List<GuildBank>> GetGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>> options = null)
-        {
-            return FetchGuildBanks(guildId, options).ToListAsync();
+            return await FetchGuildBanks(guildId, options).SingleOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, string bankName, ulong? moderatorRoleId = null, ulong? logChannelId = null)
+        public async Task<List<GuildBank>> GetGuildBanksAsync(ulong guildId, Func<IQueryable<GuildBank>, IQueryable<GuildBank>>? options = null)
         {
-            if (string.IsNullOrWhiteSpace(bankName))
+            return await FetchGuildBanks(guildId, options).ToListAsync();
+        }
+
+        public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, GuildBank bank)
+        {
+            if (string.IsNullOrWhiteSpace(bank.Name))
                 throw new NameCannotBeNullException();
 
             // Ensure foreign key constraint is not violated.
@@ -57,11 +58,6 @@ namespace Alderto.Services.Impl
             }
 
             // Add the bank
-            var bank = new GuildBank(guildId, bankName)
-            {
-                LogChannelId = logChannelId,
-                ModeratorRoleId = moderatorRoleId
-            };
             _context.GuildBanks.Add(bank);
 
             // Log the creation of the bank
@@ -83,8 +79,11 @@ namespace Alderto.Services.Impl
             await UpdateGuildBankAsync(await GetGuildBankAsync(guildId, id), adminId, changes);
         }
 
-        private async Task UpdateGuildBankAsync(GuildBank bank, ulong adminId, Action<GuildBank> changes)
+        private async Task UpdateGuildBankAsync(GuildBank? bank, ulong adminId, Action<GuildBank> changes)
         {
+            if (bank == null)
+                throw new BankNotFoundException();
+
             // Take a snapshot of the bank pre changes.
             var initialBank = bank.MemberwiseClone();
 
@@ -110,8 +109,11 @@ namespace Alderto.Services.Impl
         {
             await RemoveGuildBankAsync(await GetGuildBankAsync(guildId, id, b => b.Include(e => e.Contents)), adminId);
         }
-        private async Task RemoveGuildBankAsync(GuildBank bank, ulong adminId)
+        private async Task RemoveGuildBankAsync(GuildBank? bank, ulong adminId)
         {
+            if (bank == null)
+                throw new BankNotFoundException();
+
             _context.GuildBanks.Remove(bank);
             await _transactions.LogBankDeleteAsync(bank, adminId);
             await _context.SaveChangesAsync();

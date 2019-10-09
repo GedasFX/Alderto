@@ -24,6 +24,8 @@ namespace Alderto.Web.Controllers.Guild.Bank
             _client = client;
         }
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+
         [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
@@ -51,15 +53,16 @@ namespace Alderto.Web.Controllers.Guild.Bank
             GuildBank bank)
         {
             // Ensure user has admin rights 
-            if (!User.IsDiscordAdminAsync(_client, guildId))
+            if (!_client.ValidateGuildAdmin(User.GetId(), guildId))
                 return Forbid(ErrorMessages.UserNotDiscordAdmin);
 
-            if (await _bank.GetGuildBankAsync(guildId, bank.Name) != null)
+
+            if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
                 return BadRequest(ErrorMessages.BankNameAlreadyExists);
 
             try
             {
-                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank.Name, bank.ModeratorRoleId, bank.LogChannelId);
+                var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank);
                 return Content(new ApiGuildBank(b) { CanModify = true });
             }
             catch (HttpException e)

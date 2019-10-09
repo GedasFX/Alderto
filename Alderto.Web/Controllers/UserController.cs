@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Alderto.Services.Exceptions;
 using Alderto.Web.Models.Discord;
@@ -26,7 +27,7 @@ namespace Alderto.Web.Controllers
                 return BadRequest(ErrorMessages.PayloadOver100);
 
             // _bot.GetGuild(ulong id) returns null if bot is currently not connected to that guild.
-            var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuild(ulong.Parse(userGuild.Id)) != null);
+            var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuild(ulong.Parse(userGuild.Id, CultureInfo.InvariantCulture)) != null);
             return Content(mutualGuilds);
         }
     }

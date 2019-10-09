@@ -33,31 +33,33 @@ namespace Alderto.Data.Models
         ///     return 3
         /// end
         /// </example>
-        [MaxLength(2000)]
+        [MaxLength(2000), Required]
         public string LuaCode { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/>, which owns and can run this command.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="CustomCommand"/>.
         /// </summary>
-        public CustomCommand()
-        { 
-        }
+#nullable disable
+        public CustomCommand() { }
+#nullable restore
 
         /// <summary>
         /// Initializes a new instance of <see cref="CustomCommand"/>, with primary key (<see cref="GuildId"/> and <see cref="TriggerKeyword"/>) set.
         /// </summary>
         /// <param name="guildId"><see cref="GuildId"/> property.</param>
         /// <param name="triggerKeyword"><see cref="TriggerKeyword"/> property.</param>
-        public CustomCommand(ulong guildId, string triggerKeyword)
+        /// <param name="luaCode"><see cref="LuaCode"/> property.</param>
+        public CustomCommand(ulong guildId, string triggerKeyword, string luaCode)
         {
             GuildId = guildId;
             TriggerKeyword = triggerKeyword;
+            LuaCode = luaCode;
         }
     }
 }

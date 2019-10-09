@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
+using Alderto.Services.Exceptions.NotFound;
 using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,8 @@ namespace Alderto.Bot.Modules
         {
             var bank = await _guildBankManager.GetGuildBankAsync(Context.Guild.Id, bankName,
                 b => b.Include(g => g.Contents));
+            if (bank == null)
+                throw new BankNotFoundException();
 
             var res = bank.Contents.Aggregate(seed: "", (current, item) => current + $"{item.Name} {item.Description}\n");
             await this.ReplySuccessEmbedAsync(res);

@@ -7,6 +7,7 @@
     <StartupObject>Alderto.Bot.Program</StartupObject>
     <Configurations>Debug;Release</Configurations>
     <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|AnyCPU'">

@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using Alderto.Web.Helpers;
+﻿using System;
+using System.Globalization;
+using System.Security.Claims;
 using Discord.WebSocket;
 
 namespace Alderto.Web.Extensions
@@ -16,6 +16,9 @@ namespace Alderto.Web.Extensions
         /// <returns>True if user was confirmed to be admin of a given guild.</returns>
         public static bool IsDiscordAdminAsync(this ClaimsPrincipal user, DiscordSocketClient client, ulong guildId)
         {
+            if (client == null)
+                throw new ArgumentNullException(nameof(client));
+
             return client.GetGuild(guildId).GetUser(user.GetId()).GuildPermissions.Administrator;
         }
 
@@ -36,7 +39,7 @@ namespace Alderto.Web.Extensions
         /// <returns>Discord user id.</returns>
         public static ulong GetId(this ClaimsPrincipal user)
         {
-            return ulong.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return ulong.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value, CultureInfo.InvariantCulture);
         }
     }
 }

@@ -15,6 +15,8 @@ namespace Alderto.Web.Controllers.Guild.Channel
             _msgManager = msgManager;
         }
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+
         [HttpGet]
         public async Task<IActionResult> ListMessages(ulong guildId)
         {
@@ -30,7 +32,9 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage(ulong guildId, [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))] ApiMessage message)
+        public async Task<IActionResult> CreateMessage(ulong guildId,
+            [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))]
+            ApiMessage message)
         {
             //if (message.ChannelId == 0)
             //{

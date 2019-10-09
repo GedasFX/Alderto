@@ -8,7 +8,6 @@ using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
@@ -29,18 +28,26 @@ namespace Alderto.Web.Controllers.Guild.Bank
         [HttpGet]
         public async Task<IActionResult> ListBankItems(ulong guildId, int bankId)
         {
-            var userId = User.GetId();
-            var bank = await _bank.GetGuildBankAsync(guildId, bankId, o => o.Include(prop => prop.Contents));
-            return Content(new ApiGuildBank(bank).Contents);
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            if (bank == null)
+                throw new BankNotFoundException();
+
+            var items = await _items.GetBankItemsAsync(bank);
+            return Content(items);
         }
 
         [HttpGet("{itemId}")]
         public async Task<IActionResult> GetBankItem(ulong guildId, int bankId, int itemId)
         {
-            return Content("Placeholder");
-            var userId = User.GetId();
-            var bank = await _bank.GetGuildBankAsync(guildId, bankId, o => o.Include(prop => prop.Contents));
-            return Content(new ApiGuildBank(bank).Contents);
+            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            if (bank == null)
+                throw new BankNotFoundException();
+
+            var item = await _items.GetBankItemAsync(bank, itemId);
+            if (item == null)
+                throw new BankItemNotFoundException();
+
+            return Content(item);
         }
 
         [HttpPost]
@@ -50,7 +57,10 @@ namespace Alderto.Web.Controllers.Guild.Bank
             GuildBankItem item)
         {
             var userId = User.GetId();
+
             var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            if (bank == null)
+                throw new BankNotFoundException();
 
             var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
@@ -68,12 +78,16 @@ namespace Alderto.Web.Controllers.Guild.Bank
             GuildBankItem item)
         {
             var userId = User.GetId();
+
             var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            if (bank == null)
+                throw new BankNotFoundException();
+
             var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            await _items.UpdateBankItemAsync(itemId, userId, i =>
+            await _items.UpdateBankItemAsync(bank, itemId, userId, i =>
             {
                 i.Name = item.Name;
                 i.Description = item.Description;
@@ -89,13 +103,17 @@ namespace Alderto.Web.Controllers.Guild.Bank
         public async Task<IActionResult> RemoveBankItem(ulong guildId, int bankId, int itemId)
         {
             var userId = User.GetId();
+
             var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            if (bank == null)
+                throw new BankNotFoundException();
+
             var errorResult = ValidateWriteAccess(bank, userId);
             if (errorResult != null)
                 return errorResult;
 
-            await _items.RemoveBankItemAsync(itemId, userId);
-            return Ok();
+            await _items.RemoveBankItemAsync(bank, itemId, userId);
+            return NoContent();
         }
 
         /// <summary>
@@ -104,12 +122,8 @@ namespace Alderto.Web.Controllers.Guild.Bank
         /// <param name="bank">Bank to check access of.</param>
         /// <param name="userId">Id of user.</param>
         /// <returns>Corresponding HTTP error result. null if user has write access.</returns>
-        private IActionResult ValidateWriteAccess(GuildBank bank, ulong userId)
+        private IActionResult? ValidateWriteAccess(GuildBank bank, ulong userId)
         {
-            // First get the bank.
-            if (bank == null)
-                throw new BankNotFoundException();
-
             // Get the guild and check if it is present.
             var guild = _client.GetGuild(bank.GuildId);
             if (guild == null)

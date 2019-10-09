@@ -24,11 +24,7 @@ namespace Alderto.Tests
         [Fact]
         public async Task TestExecution()
         {
-            await _context.CustomCommands.AddAsync(new CustomCommand
-            {
-                GuildId = 1,
-                TriggerKeyword = "test",
-                LuaCode = @"
+            await _context.CustomCommands.AddAsync(new CustomCommand(1, "test", @"
 if (args[0] == '_1_test') then
     arg1 = tonumber(args[1])
     if (arg1 > tonumber(args[2])) then
@@ -38,15 +34,15 @@ if (args[0] == '_1_test') then
     end
 else 
     return 3
-end
-"
-            });
+end"
+            ));
+
             await _context.Guilds.AddAsync(new Guild(1));
             await _context.SaveChangesAsync();
 
             await _provider.ReloadCommands(1);
 
-            var cmd = await _provider.RunCommandAsync(guildId: 1, cmdName: "test", null, "4", "2");
+            var cmd = await _provider.RunCommandAsync(guildId: 1, cmdName: "test", null!, "4", "2");
             Assert.Equal(expected: 4, (long)cmd[0]);
         }
     }

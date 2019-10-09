@@ -11,26 +11,27 @@ namespace Alderto.Services
         /// <summary>
         /// Gets the bank item with from the given primary key.
         /// </summary>
+        /// <param name="bank">Bank the item is part of.</param>
         /// <param name="itemId">Primary key of the item.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>Item represented by the primary key.</returns>
-        Task<GuildBankItem> GetBankItemAsync(int itemId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
+        Task<GuildBankItem?> GetBankItemAsync(GuildBank bank, int itemId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>>? options = null);
 
         /// <summary>
         /// Gets the bank item with from the given bank with the specified name.
         /// </summary>
-        /// <param name="bankId">Primary key of the bank.</param>
+        /// <param name="bank">Bank the item is part of.</param>
         /// <param name="itemName">Name of the item.</param>
         /// <param name="options">Additional includes.</param>
-        Task<GuildBankItem> GetBankItemAsync(int bankId, string itemName, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
+        Task<GuildBankItem?> GetBankItemAsync(GuildBank bank, string itemName, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>>? options = null);
 
         /// <summary>
         /// Fetches contents of the bank.
         /// </summary>
-        /// <param name="bankId">Id of bank to get contents of.</param>
+        /// <param name="bank">Bank the item is part of.</param>
         /// <param name="options">Additional includes.</param>
         /// <returns>Bank contents.</returns>
-        Task<List<GuildBankItem>> GetGuildBankContentsAsync(int bankId, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>> options = null);
+        Task<List<GuildBankItem>> GetBankItemsAsync(GuildBank bank, Func<IQueryable<GuildBankItem>, IQueryable<GuildBankItem>>? options = null);
 
         /// <summary>
         /// Creates a new item in a given bank.
@@ -44,11 +45,12 @@ namespace Alderto.Services
         /// <summary>
         /// Updates an existing item in the bank.
         /// </summary>
+        /// <param name="bank">Bank in which to update the item.</param>
         /// <param name="itemId">Id of item to update.</param>
         /// <param name="adminId">Id of user, who administered the transaction.</param>
         /// <param name="transactorId">Id of user, who initiated the transaction.</param>
         /// <param name="changes">Changes to apply to the item.</param>
-        Task UpdateBankItemAsync(int itemId, ulong adminId, Action<GuildBankItem> changes, ulong? transactorId = null);
+        Task UpdateBankItemAsync(GuildBank bank, int itemId, ulong adminId, Action<GuildBankItem> changes, ulong? transactorId = null);
 
         /// <summary>
         /// Updates the quantity of an item.
@@ -57,13 +59,13 @@ namespace Alderto.Services
         /// <param name="adminId">Id of user, who administered the transaction.</param>
         /// <param name="deltaQuantity">Item amount changed.</param>
         /// <param name="transactorId">Id of user, who initiated the transaction. Defaults to <see cref="adminId"/></param>
-        Task UpdateBankItemQuantityAsync(int itemId, ulong adminId, double deltaQuantity, ulong? transactorId = null);
+        Task UpdateBankItemQuantityAsync(GuildBank bank, int itemId, ulong adminId, double deltaQuantity, ulong? transactorId = null);
 
         /// <summary>
         /// Removes an item from the bank.
         /// </summary>
         /// <param name="itemId">Id of item to remove.</param>
         /// <param name="moderatorId">Id of user, who removed the item.</param>
-        Task RemoveBankItemAsync(int itemId, ulong moderatorId);
+        Task RemoveBankItemAsync(GuildBank bank, int itemId, ulong moderatorId);
     }
 }

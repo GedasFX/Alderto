@@ -2,14 +2,14 @@
 {
     public class ErrorMessage
     {
-        public int HttpCode { get; set; }
-        public int InternalErrorCode { get; set; }
+        public int Status { get; set; }
+        public int Code { get; set; }
         public string Message { get; set; }
 
-        public ErrorMessage(int httpCode, int internalCode, string message)
+        public ErrorMessage(int status, int internalCode, string message)
         {
-            HttpCode = httpCode;
-            InternalErrorCode = internalCode;
+            Status = status;
+            Code = internalCode;
             Message = message;
         }
     }
@@ -56,6 +56,12 @@
         public static ErrorMessage BankNotFound { get; } =
             new ErrorMessage(404, 2200, "The specified bank was not found.");
 
+        /// <summary>
+        /// NotFound reason. Used when bot was unable to find the bank item.
+        /// </summary>
+        public static ErrorMessage BankItemNotFound { get; } =
+            new ErrorMessage(404, 2201, "The specified bank item was not found.");
+
         // === BadRequest ===
 
         /// <summary>
@@ -91,7 +97,7 @@
             new ErrorMessage(400, 3300, "Name cannot be empty.");
 
 
-        public static ErrorMessage FromCode(int code)
+        public static ErrorMessage? FromCode(int code)
         {
             return code switch
             {
@@ -101,6 +107,7 @@
                 2101 => UserNotFound,
                 2102 => ChannelNotFound,
                 2200 => BankNotFound,
+                2201 => BankItemNotFound,
                 3000 => MissingChannelAccess,
                 3001 => MissingWritePermissions,
                 3100 => PayloadOver100,

@@ -19,14 +19,16 @@ namespace Alderto.Data
 
         public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
 
+#nullable disable
         public AldertoDbContext() { }
         public AldertoDbContext(DbContextOptions options) : base(options) { }
+#nullable restore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Guild>()
                 .HasOne(g => g.Configuration)
-                .WithOne(c => c.Guild)
+                .WithOne(c => c!.Guild!)
                 .HasForeignKey<GuildConfiguration>(c => c.GuildId);
 
             modelBuilder.Entity<GuildMember>()

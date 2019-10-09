@@ -20,7 +20,7 @@ namespace Alderto.Bot
         /// <param name="botToken">Token of the bot.</param>
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddDiscordSocketClient(this IServiceCollection services,
-            string botToken, Action<DiscordSocketConfig> config = null) =>
+            string botToken, Action<DiscordSocketConfig>? config = null) =>
             services.AddSingleton<DiscordSocketClient, DiscordSocketClientWrapper>()
                 .Configure<DiscordSocketConfigWrapper>(localConfig =>
                 {
@@ -30,7 +30,7 @@ namespace Alderto.Bot
 
         private class DiscordSocketConfigWrapper : DiscordSocketConfig
         {
-            public string BotToken { get; set; }
+            public string? BotToken { get; set; }
         }
         private class DiscordSocketClientWrapper : DiscordSocketClient
         {
@@ -48,7 +48,7 @@ namespace Alderto.Bot
                     return Task.CompletedTask;
                 };
 
-                Run(config.Value.BotToken).ConfigureAwait(false);
+                Run(config.Value.BotToken!).ConfigureAwait(false);
             }
 
             private async Task Run(string token)
@@ -64,7 +64,7 @@ namespace Alderto.Bot
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddCommandService(this IServiceCollection services,
-            Action<CommandServiceConfig> config = null) =>
+            Action<CommandServiceConfig>? config = null) =>
             services.AddSingleton<CommandService, CommandServiceWrapper>().Configure(config);
 
         private class CommandServiceWrapper : CommandService

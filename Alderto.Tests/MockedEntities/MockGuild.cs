@@ -8,6 +8,7 @@ namespace Alderto.Tests.MockedEntities
 {
     public class MockGuild : IGuild
     {
+#nullable disable
         public Task DeleteAsync(RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -275,5 +276,6 @@ namespace Alderto.Tests.MockedEntities
         public IReadOnlyCollection<GuildEmote> Emotes { get; set; }
         public IReadOnlyCollection<string> Features { get; set; }
         public IReadOnlyCollection<IRole> Roles { get; set; }
+#nullable restore
     }
 }

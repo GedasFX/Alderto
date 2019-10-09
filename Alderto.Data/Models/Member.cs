@@ -16,26 +16,24 @@ namespace Alderto.Data.Models
         /// Last known username of the user. Max Length: 32 (Discord limitation)
         /// </summary>
         [MaxLength(32)]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         /// <summary>
         /// Last known discriminator of the user. Is always a length of 4.
         /// </summary>
         /// <example>0004 or 1234</example>
         [MinLength(4), MaxLength(4)]
-        public string Discriminator { get; set; }
+        public string? Discriminator { get; set; }
 
         /// <summary>
         /// A collection of guilds the user is in.
         /// </summary>
-        public virtual IEnumerable<GuildMember> GuildMembers { get; set; }
+        public virtual IEnumerable<GuildMember>? GuildMembers { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="Member"/>.
         /// </summary>
-        public Member()
-        {
-        }
+        public Member() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildConfiguration"/>, with primary key (<see cref="Id"/>) set.

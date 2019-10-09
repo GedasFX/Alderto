@@ -15,7 +15,7 @@ namespace Alderto.Data.Models
         public ulong ChannelId { get; set; }
 
         [ForeignKey(nameof(GuildId))]
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         public GuildManagedMessage() { }
         public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId)
