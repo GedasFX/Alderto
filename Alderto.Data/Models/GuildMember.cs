@@ -56,9 +56,10 @@ namespace Alderto.Data.Models
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.
+        /// For use by Entity Framework.
         /// </summary>
 #nullable disable
-        public GuildMember() { }
+        private GuildMember() { }
 #nullable restore
 
         /// <summary>

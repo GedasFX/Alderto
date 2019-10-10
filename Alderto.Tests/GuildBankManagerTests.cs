@@ -28,7 +28,7 @@ namespace Alderto.Tests
 
             var bank = await _bank.CreateGuildBankAsync(1, 1, new GuildBank(1, "bank"));
 
-            var i = await _bankItems.CreateBankItemAsync(bank, new GuildBankItem { Name = "item", Description = "d", Value = -0.3, Quantity = -1.6 }, 1);
+            var i = await _bankItems.CreateBankItemAsync(bank, new GuildBankItem("item") { Description = "d", Value = -0.3, Quantity = -1.6 }, 1);
 
             item = (await _bankItems.GetBankItemAsync(bank, i.Id))!;
             Assert.Equal("d", item.Description);
@@ -51,7 +51,7 @@ namespace Alderto.Tests
             Assert.NotEqual(0, b.Id);
             Assert.Equal(1u, b.GuildId);
 
-            var item = await _bankItems.CreateBankItemAsync(b, new GuildBankItem { Name = "bb", Description = "cc" }, 1);
+            var item = await _bankItems.CreateBankItemAsync(b, new GuildBankItem("bb") { Description = "cc" }, 1);
             await _bank.UpdateGuildBankAsync(1, "main", 1, bb =>
             {
                 bb.GuildId = 2;

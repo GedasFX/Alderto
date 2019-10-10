@@ -40,8 +40,9 @@ namespace Alderto.Data.Models
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="Guild"/>.
+        /// For use by Entity Framework.
         /// </summary>
-        public Guild() { }
+        private Guild() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Guild"/>, with primary key <see cref="Id"/> set.

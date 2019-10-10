@@ -23,6 +23,16 @@ namespace Alderto.Data.Models.GuildBank
         public string Name { get; set; }
 
         /// <summary>
+        /// Monetary value per unit.
+        /// </summary>
+        public double Value { get; set; }
+
+        /// <summary>
+        /// Quantity of the item in the bank.
+        /// </summary>
+        public double Quantity { get; set; }
+
+        /// <summary>
         /// Description of the item.
         /// </summary>
         [MaxLength(280)]
@@ -35,34 +45,34 @@ namespace Alderto.Data.Models.GuildBank
         public string? ImageUrl { get; set; }
 
         /// <summary>
-        /// Monetary value per unit.
-        /// </summary>
-        public double Value { get; set; }
-
-        /// <summary>
-        /// Quantity of the item in the bank.
-        /// </summary>
-        public double Quantity { get; set; }
-
-        /// <summary>
         /// Guild bank object.
         /// </summary>
         [ForeignKey(nameof(GuildBankId))]
         public virtual GuildBank? GuildBank { get; set; }
 
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="GuildBankItem"/>.
+        /// For use by Entity Framework.
+        /// </summary>
 #nullable disable
-        public GuildBankItem() { }
+        private GuildBankItem() { }
 #nullable restore
+
+        public GuildBankItem(string name)
+        {
+            Name = name;
+        }
+
         public GuildBankItem(int id, int bankId, string name)
+            : this(name)
         {
             Id = id;
             GuildBankId = bankId;
-            Name = name;
         }
 
         public new GuildBankItem MemberwiseClone()
         {
-            return (GuildBankItem) base.MemberwiseClone();
+            return (GuildBankItem)base.MemberwiseClone();
         }
     }
 }

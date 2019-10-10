@@ -231,9 +231,9 @@ namespace Alderto.Web
             await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
             var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
 
-            logger.Log(LogLevel.Information, Properties.Resources.InitializingDatabase);
+            logger.LogInformation("Initializing Database...");
             await context.Database.MigrateAsync();
-            logger.LogInformation(Properties.Resources.DatabaseReady);
+            logger.LogInformation("Database Ready!");
         }
     }
 }

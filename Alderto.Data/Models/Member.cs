@@ -32,8 +32,9 @@ namespace Alderto.Data.Models
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="Member"/>.
+        /// For use by Entity Framework.
         /// </summary>
-        public Member() { }
+        private Member() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildConfiguration"/>, with primary key (<see cref="Id"/>) set.

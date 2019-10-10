@@ -11,16 +11,16 @@ namespace Alderto.Web.Models.Bank
             set => base.GuildBank = value;
         }
 
-        public ApiGuildBankItem(GuildBankItem guildBankItem)
+        public ApiGuildBankItem(GuildBankItem item)
+            : base(item.Id, item.GuildBankId, item.Name)
         {
-            GuildBank = guildBankItem.GuildBank;
-            Description = guildBankItem.Description;
-            GuildBankId = guildBankItem.GuildBankId;
-            ImageUrl = guildBankItem.ImageUrl;
-            Id = guildBankItem.Id;
-            Name = guildBankItem.Name;
-            Quantity = guildBankItem.Quantity;
-            Value = guildBankItem.Value;
+            GuildBank = item.GuildBank;
+
+            Quantity = item.Quantity;
+            Value = item.Value;
+
+            Description = item.Description;
+            ImageUrl = item.ImageUrl;
         }
     }
 }

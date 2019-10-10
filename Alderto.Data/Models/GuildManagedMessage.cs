@@ -17,7 +17,11 @@ namespace Alderto.Data.Models
         [ForeignKey(nameof(GuildId))]
         public virtual Guild? Guild { get; set; }
 
-        public GuildManagedMessage() { }
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="GuildManagedMessage"/>.
+        /// For use by Entity Framework.
+        /// </summary>
+        private GuildManagedMessage() { }
         public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId)
         {
             GuildId = guildId;

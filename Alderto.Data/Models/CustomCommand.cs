@@ -44,9 +44,10 @@ namespace Alderto.Data.Models
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="CustomCommand"/>.
+        /// For use by Entity Framework.
         /// </summary>
 #nullable disable
-        public CustomCommand() { }
+        private CustomCommand() { }
 #nullable restore
 
         /// <summary>

@@ -89,7 +89,7 @@ namespace Alderto.Data.Models
         /// Initializes a new instance of <see cref="GuildConfiguration"/>, with configuration defaults
         /// </summary>
 #nullable disable
-        public GuildConfiguration() { }
+        private GuildConfiguration() { }
 #nullable restore
     }
 }

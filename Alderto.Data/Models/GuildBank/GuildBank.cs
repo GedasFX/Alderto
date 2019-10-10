@@ -18,15 +18,15 @@ namespace Alderto.Data.Models.GuildBank
         public ulong GuildId { get; set; }
 
         /// <summary>
-        /// Id of channel to log changes to the bank to.
-        /// </summary>
-        public ulong? LogChannelId { get; set; }
-
-        /// <summary>
         /// Name of the bank.
         /// </summary>
         [MaxLength(32), Required]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Id of channel to log changes to the bank to.
+        /// </summary>
+        public ulong? LogChannelId { get; set; }
 
         /// <summary>
         /// Id of role, which allows to modify contents of the bank.
@@ -46,9 +46,10 @@ namespace Alderto.Data.Models.GuildBank
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
+        /// For use by Entity Framework.
         /// </summary>
 #nullable disable
-        public GuildBank() { }
+        private GuildBank() { }
 #nullable restore
 
         /// <summary>
