@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Lua;
+using Alderto.Bot.Lua.Exceptions;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Tests.MockedEntities;
@@ -44,6 +45,9 @@ end"
 
             var cmd = await _provider.RunCommandAsync(guildId: 1, cmdName: "test", null!, "4", "2");
             Assert.Equal(expected: 4, (long)cmd[0]);
+
+            await Assert.ThrowsAsync<LuaCommandNotFoundException>(async () =>
+                await _provider.RunCommandAsync(guildId: 1, cmdName: "not found", null!, "4", "2"));
         }
     }
 }
