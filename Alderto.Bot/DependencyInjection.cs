@@ -21,7 +21,7 @@ namespace Alderto.Bot
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddDiscordSocketClient(this IServiceCollection services,
             string botToken, Action<DiscordSocketConfig>? config = null) =>
-            services.AddSingleton<DiscordSocketClient, DiscordSocketClientWrapper>()
+            services.AddSingleton<IDiscordClient, DiscordSocketClientWrapper>()
                 .Configure<DiscordSocketConfigWrapper>(localConfig =>
                 {
                     localConfig.BotToken = botToken;
@@ -69,18 +69,18 @@ namespace Alderto.Bot
 
         private class CommandServiceWrapper : CommandService
         {
-            public CommandServiceWrapper(DiscordSocketClient client, ILogger<CommandService> logger,
+            public CommandServiceWrapper(IDiscordClient client, ILogger<CommandService> logger,
                 IOptions<CommandServiceConfig> cmdServiceConfig, IConfiguration config) : base(cmdServiceConfig.Value)
             {
                 if (ulong.TryParse(config["LoggingChannelId"], out var loggingChannelId))
                 {
+                    var channel = (IMessageChannel)client.GetChannelAsync(loggingChannelId).Result;
                     Log += async message =>
                     {
                         if (message.Exception is CommandException commandException)
                         {
-                            await ((IMessageChannel)client.GetChannel(loggingChannelId))
-                                .SendMessageAsync(
-                                    $"```{commandException.Message}\n{commandException.InnerException}```");
+                            await channel.SendMessageAsync(
+                                $"```{commandException.Message}\n{commandException.InnerException}```");
                         }
                     };
                 }

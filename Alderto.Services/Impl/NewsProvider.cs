@@ -12,9 +12,9 @@ namespace Alderto.Services.Impl
     {
         private readonly ISocketMessageChannel _channel;
 
-        public NewsProvider(DiscordSocketClient client, IOptions<DependencyInjection.NewsProviderOptions> options)
+        public NewsProvider(IDiscordClient client, IOptions<DependencyInjection.NewsProviderOptions> options)
         {
-            _channel = (ISocketMessageChannel)client.GetChannel(options.Value.NewsChannelId);
+            _channel = (ISocketMessageChannel)client.GetChannelAsync(options.Value.NewsChannelId).Result;
         }
 
         public async Task<IEnumerable<IMessage>> GetLatestNewsAsync(int count)

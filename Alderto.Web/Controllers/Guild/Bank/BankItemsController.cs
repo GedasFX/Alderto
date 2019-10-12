@@ -6,7 +6,7 @@ using Alderto.Services.Exceptions.NotFound;
 using Alderto.Services.Exceptions.Forbid;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
-using Discord.WebSocket;
+using Discord;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild.Bank
@@ -16,9 +16,9 @@ namespace Alderto.Web.Controllers.Guild.Bank
     {
         private readonly IGuildBankItemsManager _items;
         private readonly IGuildBankManager _bank;
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
 
-        public BankItemsController(IGuildBankItemsManager items, IGuildBankManager bank, DiscordSocketClient client)
+        public BankItemsController(IGuildBankItemsManager items, IGuildBankManager bank, IDiscordClient client)
         {
             _items = items;
             _bank = bank;
@@ -62,7 +62,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             if (bank == null)
                 throw new BankNotFoundException();
 
-            if (!ValidateWriteAccess(bank, userId))
+            if (!await ValidateWriteAccess(bank, userId))
                 throw new UserNotGuildModeratorException();
 
             var createdBank = await _items.CreateBankItemAsync(bank, item, userId);
@@ -82,7 +82,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             if (bank == null)
                 throw new BankNotFoundException();
 
-            if (!ValidateWriteAccess(bank, userId))
+            if (!await ValidateWriteAccess(bank, userId))
                 throw new UserNotGuildModeratorException();
 
             await _items.UpdateBankItemAsync(bank, itemId, userId, i =>
@@ -106,7 +106,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             if (bank == null)
                 throw new BankNotFoundException();
 
-            if (!ValidateWriteAccess(bank, userId))
+            if (!await ValidateWriteAccess(bank, userId))
                 throw new UserNotGuildModeratorException();
 
             await _items.RemoveBankItemAsync(bank, itemId, userId);
@@ -119,20 +119,20 @@ namespace Alderto.Web.Controllers.Guild.Bank
         /// <param name="bank">Bank to check access of.</param>
         /// <param name="userId">Id of user.</param>
         /// <returns>Corresponding HTTP error result. null if user has write access.</returns>
-        private bool ValidateWriteAccess(GuildBank bank, ulong userId)
+        private async Task<bool> ValidateWriteAccess(GuildBank bank, ulong userId)
         {
             // Get the guild and check if it is present.
-            var guild = _client.GetGuild(bank.GuildId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
             if (guild == null)
                 throw new GuildNotFoundException();
 
             // Check if user even exists in the guild.
-            var user = guild.GetUser(userId);
+            var user = await guild.GetUserAsync(userId);
             if (user == null)
                 throw new UserNotFoundException();
 
             // Check if user has write access to the bank.
-            return user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
+            return user.RoleIds.Any(r => r == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
         }
     }
 }

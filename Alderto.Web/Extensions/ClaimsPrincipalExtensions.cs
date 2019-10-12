@@ -8,21 +8,6 @@ namespace Alderto.Web.Extensions
     public static class ClaimsPrincipalExtensions
     {
         /// <summary>
-        /// Contacts the Discord API to verify that the user is administrator of a given guild.
-        /// </summary>
-        /// <param name="user">Claims Principal.</param>
-        /// <param name="client">Discord client to check admin status of.</param>
-        /// <param name="guildId">The Id of guild to check if user is admin of.</param>
-        /// <returns>True if user was confirmed to be admin of a given guild.</returns>
-        public static bool IsDiscordAdminAsync(this ClaimsPrincipal user, DiscordSocketClient client, ulong guildId)
-        {
-            if (client == null)
-                throw new ArgumentNullException(nameof(client));
-
-            return client.GetGuild(guildId).GetUser(user.GetId()).GuildPermissions.Administrator;
-        }
-
-        /// <summary>
         /// Gets the discord Token claim of the user.
         /// </summary>
         /// <param name="user">Claims Principal.</param>

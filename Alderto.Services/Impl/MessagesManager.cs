@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
@@ -7,17 +6,16 @@ using Alderto.Data.Models;
 using Alderto.Services.Exceptions.BadRequest;
 using Alderto.Services.Exceptions.NotFound;
 using Discord;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
 {
     public class MessagesManager : IMessagesManager
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
         private readonly AldertoDbContext _context;
 
-        public MessagesManager(DiscordSocketClient client, AldertoDbContext context)
+        public MessagesManager(IDiscordClient client, AldertoDbContext context)
         {
             _client = client;
             _context = context;
@@ -31,12 +29,12 @@ namespace Alderto.Services.Impl
         public async Task<IMessage> GetMessageAsync(ulong guildId, ulong messageId)
         {
             var msg = await GetManagedMessage(guildId, messageId);
-            return await GetDiscordChannel(guildId, msg.ChannelId).GetMessageAsync(messageId);
+            return await (await GetDiscordChannel(guildId, msg.ChannelId)).GetMessageAsync(messageId);
         }
 
         public async Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, string message)
         {
-            var discordMessage = await GetDiscordChannel(guildId, channelId).SendMessageAsync(message);
+            var discordMessage = await (await GetDiscordChannel(guildId, channelId)).SendMessageAsync(message);
 
             _context.GuildManagedMessages.Add(new GuildManagedMessage(guildId, channelId, discordMessage.Id));
             await _context.SaveChangesAsync();
@@ -76,13 +74,13 @@ namespace Alderto.Services.Impl
             return _context.GuildManagedMessages.SingleOrDefaultAsync(message => message.GuildId == guildId && message.MessageId == messageId) ?? throw new MessageNotFoundException();
         }
 
-        private IMessageChannel GetDiscordChannel(ulong guildId, ulong channelId)
+        private async Task<IMessageChannel> GetDiscordChannel(ulong guildId, ulong channelId)
         {
-            var guild = _client.GetGuild(guildId);
+            var guild = await _client.GetGuildAsync(guildId);
             if (guild == null)
                 throw new GuildNotFoundException();
 
-            var channel = guild.GetChannel(channelId);
+            var channel = await guild.GetChannelAsync(channelId);
             if (channel == null)
                 throw new ChannelNotFoundException();
 
@@ -99,7 +97,7 @@ namespace Alderto.Services.Impl
 
         private async Task<IUserMessage> GetDiscordBotMessageAsync(ulong guildId, ulong channelId, ulong messageId)
         {
-            var channel = GetDiscordChannel(guildId, channelId);
+            var channel = await GetDiscordChannel(guildId, channelId);
 
             var message = await channel.GetMessageAsync(messageId);
             if (message == null)

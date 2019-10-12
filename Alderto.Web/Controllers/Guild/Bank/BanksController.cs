@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
 using Alderto.Services.Exceptions;
+using Alderto.Services.Exceptions.BadRequest;
+using Alderto.Services.Exceptions.Forbid;
 using Alderto.Services.Exceptions.NotFound;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
-using Discord.WebSocket;
+using Discord;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +18,9 @@ namespace Alderto.Web.Controllers.Guild.Bank
     public class BanksController : ApiControllerBase
     {
         private readonly IGuildBankManager _bank;
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
 
-        public BanksController(IGuildBankManager bank, DiscordSocketClient client)
+        public BanksController(IGuildBankManager bank, IDiscordClient client)
         {
             _bank = bank;
             _client = client;
@@ -29,12 +31,17 @@ namespace Alderto.Web.Controllers.Guild.Bank
         [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
-            var user = _client.GetGuild(guildId)?.GetUser(User.GetId());
+            var guild = await _client.GetGuildAsync(guildId);
+            if (guild == null)
+                throw new GuildNotFoundException();
+
+            var user = await guild.GetUserAsync(User.GetId());
             if (user == null)
-                return NotFound();
+                throw new UserNotFoundException();
 
             var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
             var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b, user) });
+
             return Content(outBanks);
         }
 
@@ -54,15 +61,17 @@ namespace Alderto.Web.Controllers.Guild.Bank
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
             GuildBank bank)
         {
-            // Ensure user has admin rights 
-            if (!_client.ValidateGuildAdmin(User.GetId(), guildId))
-                return Forbid(ErrorMessages.UserNotGuildAdmin);
+            var userId = User.GetId();
 
+            // Ensure user has admin rights 
+            if (!await _client.ValidateGuildAdmin(userId, guildId))
+                throw new UserNotGuildAdminException();
 
             if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
-                return BadRequest(ErrorMessages.BankNameAlreadyExists);
+                throw new BankNameAlreadyExistsException();
 
-            var b = await _bank.CreateGuildBankAsync(guildId, User.GetId(), bank);
+            var b = await _bank.CreateGuildBankAsync(guildId, userId, bank);
+
             return Content(new ApiGuildBank(b) { CanModify = true });
         }
 
@@ -71,36 +80,42 @@ namespace Alderto.Web.Controllers.Guild.Bank
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
             GuildBank bank)
         {
-            if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotGuildAdmin);
+            var userId = User.GetId();
+
+            // Ensure user has admin rights 
+            if (!await _client.ValidateGuildAdmin(userId, guildId))
+                throw new UserNotGuildAdminException();
 
             // If not renaming this would always return itself. Check for id difference instead.
             var dbBank = await _bank.GetGuildBankAsync(guildId, bank.Name);
             if (dbBank != null && dbBank.Id != bankId)
-                return BadRequest(ErrorMessages.BankNameAlreadyExists);
+                throw new BankNameAlreadyExistsException();
 
-            await _bank.UpdateGuildBankAsync(guildId, bankId, User.GetId(), b =>
+            await _bank.UpdateGuildBankAsync(guildId, bankId, userId, b =>
             {
                 b.Name = bank.Name;
                 b.LogChannelId = bank.LogChannelId;
                 b.ModeratorRoleId = bank.ModeratorRoleId;
             });
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{bankId}")]
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
-            if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotGuildAdmin);
+            var userId = User.GetId();
 
-            await _bank.RemoveGuildBankAsync(guildId, bankId, User.GetId());
+            // Ensure user has admin rights 
+            if (!await _client.ValidateGuildAdmin(userId, guildId))
+                throw new UserNotGuildAdminException();
+
+            await _bank.RemoveGuildBankAsync(guildId, bankId, userId);
 
             return NoContent();
         }
 
-        private static bool ValidateModifyAccess(GuildBank bank, SocketGuildUser user) =>
-            user.Roles.Any(r => r.Id == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
+        private static bool ValidateModifyAccess(GuildBank bank, IGuildUser user) =>
+            user.RoleIds.Any(r => r == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
     }
 }

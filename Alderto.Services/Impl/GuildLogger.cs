@@ -9,9 +9,9 @@ namespace Alderto.Services.Impl
 {
     public class GuildLogger : IGuildLogger
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
 
-        public GuildLogger(DiscordSocketClient client)
+        public GuildLogger(IDiscordClient client)
         {
             _client = client;
         }
@@ -22,10 +22,10 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var admin = guild.GetUser(modId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var admin = await guild.GetUserAsync(modId);
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)
@@ -56,10 +56,10 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
-            var admin = guild.GetUser(modId);
+            var admin = await guild.GetUserAsync(modId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)
@@ -101,11 +101,11 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
-            var admin = guild.GetUser(modId);
-            var transactor = guild.GetUser(transactorId ?? modId);
+            var admin = await guild.GetUserAsync(modId);
+            var transactor = await guild.GetUserAsync(transactorId ?? modId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(transactor)
@@ -127,10 +127,10 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var admin = guild.GetUser(modId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var admin = await guild.GetUserAsync(modId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)
@@ -155,10 +155,10 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var admin = guild.GetUser(modId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var admin = await guild.GetUserAsync(modId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)
@@ -178,15 +178,15 @@ namespace Alderto.Services.Impl
             if (newBank.LogChannelId == null && oldBank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(oldBank.GuildId);
-            var admin = guild.GetUser(modId);
+            var guild = await _client.GetGuildAsync(oldBank.GuildId);
+            var admin = await guild.GetUserAsync(modId);
 
             // Special case: Log channel change in old channel and log other changes in the updated channel.
             // Ensure that old bank has a log channel.
             // Ensure that the log channel ids differ.
             if (oldBank.LogChannelId != null && oldBank.LogChannelId != newBank.LogChannelId)
             {
-                var c = (ISocketMessageChannel)guild.GetChannel((ulong)oldBank.LogChannelId);
+                var c = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)oldBank.LogChannelId);
                 var comment = newBank.LogChannelId == null
                     ? $"Log channel for bank **{oldBank.Name}** was removed."
                     : $"Log channel for bank **{oldBank.Name}** was changed to <#{newBank.LogChannelId}>.";
@@ -204,7 +204,7 @@ namespace Alderto.Services.Impl
             if (newBank.LogChannelId == null)
                 return;
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)newBank.LogChannelId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)newBank.LogChannelId);
 
             // There is only one value to edit.
             if (oldBank.Name != newBank.Name)
@@ -225,10 +225,10 @@ namespace Alderto.Services.Impl
             if (bank.LogChannelId == null)
                 return;
 
-            var guild = _client.GetGuild(bank.GuildId);
-            var admin = guild.GetUser(modId);
+            var guild = await _client.GetGuildAsync(bank.GuildId);
+            var channel = (ISocketMessageChannel)await guild.GetChannelAsync((ulong)bank.LogChannelId);
 
-            var channel = (ISocketMessageChannel)guild.GetChannel((ulong)bank.LogChannelId);
+            var admin = await guild.GetUserAsync(modId);
 
             var logMessage = new EmbedBuilder()
                 .WithAuthor(admin)

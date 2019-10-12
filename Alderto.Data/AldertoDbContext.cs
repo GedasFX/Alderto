@@ -20,7 +20,6 @@ namespace Alderto.Data
         public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
 
 #nullable disable
-        public AldertoDbContext() { }
         public AldertoDbContext(DbContextOptions options) : base(options) { }
 #nullable restore
 
