@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OAuth.Disco
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02292DA8-3661-4E82-97D3-B6362CD09355}"
 	ProjectSection(SolutionItems) = preProject
-		RuleSet1.ruleset = RuleSet1.ruleset
+		Custom Ruleset.ruleset = Custom Ruleset.ruleset
 	EndProjectSection
 EndProject
 Global
