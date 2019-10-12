@@ -171,7 +171,7 @@ namespace Alderto.Web
                             context.Response.OnStarting(() =>
                     {
                         context.Response.ContentType = "application/json";
-                        context.Response.StatusCode = (apiException.ErrorCode / 1000) switch
+                        context.Response.StatusCode = (apiException.Error.Code / 1000) switch
                         {
                             1 => StatusCodes.Status403Forbidden,
                             2 => StatusCodes.Status404NotFound,
@@ -183,7 +183,7 @@ namespace Alderto.Web
                     });
 
                             await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(ErrorMessages.FromCode(apiException.ErrorCode)));
+                                JsonSerializer.Serialize(apiException.Error));
                         }
                         else if (e is HttpException discordException)
                         {

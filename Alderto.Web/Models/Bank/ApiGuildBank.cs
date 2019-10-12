@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Alderto.Data.Models.GuildBank;
 
@@ -20,14 +19,8 @@ namespace Alderto.Web.Models.Bank
 
         public IEnumerable<ApiGuildBankItem>? Contents { get; set; }
 
-#nullable disable
-        public ApiGuildBank() { }
-#nullable restore
         public ApiGuildBank(GuildBank guildBank)
         {
-            if (guildBank == null)
-                throw new ArgumentNullException(nameof(guildBank));
-
             Id = guildBank.Id;
 
             GuildId = guildBank.GuildId;

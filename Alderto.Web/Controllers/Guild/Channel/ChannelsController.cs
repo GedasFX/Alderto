@@ -21,7 +21,7 @@ namespace Alderto.Web.Controllers.Guild.Channel
         public IActionResult Channels(ulong guildId)
         {
             if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotGuildAdmin);
 
             return Content(_client.GetGuild(guildId).TextChannels.Select(c => new ApiGuildChannel(c.Id, c.Name)));
         }

@@ -56,7 +56,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         {
             // Ensure user has admin rights 
             if (!_client.ValidateGuildAdmin(User.GetId(), guildId))
-                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotGuildAdmin);
 
 
             if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
@@ -72,7 +72,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             GuildBank bank)
         {
             if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotGuildAdmin);
 
             // If not renaming this would always return itself. Check for id difference instead.
             var dbBank = await _bank.GetGuildBankAsync(guildId, bank.Name);
@@ -93,7 +93,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
         {
             if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotGuildAdmin);
 
             await _bank.RemoveGuildBankAsync(guildId, bankId, User.GetId());
 

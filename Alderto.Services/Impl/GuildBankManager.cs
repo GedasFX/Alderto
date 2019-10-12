@@ -57,6 +57,9 @@ namespace Alderto.Services.Impl
                 _context.Guilds.Add(guild);
             }
 
+            // Ensure the added bank's guild id is correct.
+            bank.GuildId = guildId;
+
             // Add the bank
             _context.GuildBanks.Add(bank);
 

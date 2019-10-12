@@ -21,7 +21,7 @@ namespace Alderto.Web.Controllers.Guild
         public IActionResult Roles(ulong guildId)
         {
             if (!User.IsDiscordAdminAsync(_client, guildId))
-                return Forbid(ErrorMessages.UserNotDiscordAdmin);
+                return Forbid(ErrorMessages.UserNotGuildAdmin);
 
             return Content(_client.GetGuild(guildId).Roles.Select(c => new ApiGuildRole(c.Id, c.Name)));
         }
