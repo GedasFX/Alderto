@@ -47,7 +47,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             if (item == null)
                 throw new BankItemNotFoundException();
 
-            return Content(item);
+            return Content(new ApiGuildBankItem(item));
         }
 
         [HttpPost]

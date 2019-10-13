@@ -36,8 +36,7 @@ namespace Alderto.Tests
         [Fact]
         public async Task Timely()
         {
-            var user = Dummies.Alice;
-            var member = (await _guildMemberManager.GetGuildMemberAsync(user))!;
+            var member = (await _guildMemberManager.GetGuildMemberAsync(Dummies.Alice))!;
 
             // At the start, the currency count should be 0.
             Assert.Equal(expected: 0, member.CurrencyCount);

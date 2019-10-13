@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.Exceptions;
 using Alderto.Services.Exceptions.BadRequest;
 using Alderto.Services.Exceptions.Forbid;
 using Alderto.Services.Exceptions.NotFound;
@@ -53,7 +52,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             if (bank == null)
                 throw new BankNotFoundException();
 
-            return Content(bank);
+            return Content(new ApiGuildBank(bank));
         }
 
         [HttpPost]

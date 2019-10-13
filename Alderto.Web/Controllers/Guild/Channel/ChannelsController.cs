@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions;
 using Alderto.Services.Exceptions.Forbid;
 using Alderto.Services.Exceptions.NotFound;
 using Alderto.Web.Extensions;
@@ -21,7 +20,7 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpGet]
-        public async Task<IActionResult> Channels(ulong guildId)
+        public async Task<IActionResult> ListChannels(ulong guildId)
         {
             if (!await _client.ValidateGuildAdmin(User.GetId(), guildId))
                 throw new UserNotGuildAdminException();

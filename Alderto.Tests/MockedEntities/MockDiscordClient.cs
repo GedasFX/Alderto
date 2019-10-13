@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 
@@ -9,6 +12,14 @@ namespace Alderto.Tests.MockedEntities
 {
     public class MockDiscordClient : IDiscordClient
     {
+        private readonly IGuild[] _guilds = new IGuild[2];
+
+        public MockDiscordClient()
+        {
+            _guilds[0] = Dummies.GuildA;
+            _guilds[1] = Dummies.GuildB;
+        }
+
         public void Dispose()
         {
             throw new System.NotImplementedException();
@@ -56,12 +67,12 @@ namespace Alderto.Tests.MockedEntities
 
         public Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(_guilds.SingleOrDefault(o => o.Id == id));
         }
 
         public Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult<IReadOnlyCollection<IGuild>>(_guilds);
         }
 
         public Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)

@@ -15,8 +15,6 @@ namespace Alderto.Web.Controllers.Guild.Channel
             _msgManager = msgManager;
         }
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-
         [HttpGet]
         public async Task<IActionResult> ListMessages(ulong guildId)
         {
@@ -59,14 +57,14 @@ namespace Alderto.Web.Controllers.Guild.Channel
         }
 
         [HttpPatch("{messageId}")]
-        public async Task<IActionResult> UpdateMessage(ulong guildId, ulong messageId, [Bind(nameof(ApiMessage.Contents))] ApiMessage message)
+        public async Task<IActionResult> EditMessage(ulong guildId, ulong messageId, [Bind(nameof(ApiMessage.Contents))] ApiMessage message)
         {
             await _msgManager.EditMessageAsync(guildId, messageId, message.Contents);
             return Ok();
         }
 
         [HttpDelete("{messageId}")]
-        public async Task<IActionResult> DeleteMessage(ulong guildId, ulong messageId)
+        public async Task<IActionResult> RemoveMessage(ulong guildId, ulong messageId)
         {
             await _msgManager.RemoveMessageAsync(guildId, messageId);
             return NoContent();

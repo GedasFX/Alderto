@@ -40,6 +40,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Bot.Lua\Alderto.Bot.Lua.csproj" />
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
+    <ProjectReference Include="..\Alderto.Web\Alderto.Web.csproj" />
   </ItemGroup>
 
 </Project>
