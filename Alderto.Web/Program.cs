@@ -11,8 +11,6 @@ namespace Alderto.Web
             CreateWebHostBuilder(args).Build().Run();
         }
 
-
-        [return:NotNull]
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)

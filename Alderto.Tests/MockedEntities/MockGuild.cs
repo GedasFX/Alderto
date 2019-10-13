@@ -96,7 +96,7 @@ namespace Alderto.Tests.MockedEntities
 
         public Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IGuildChannel>(_channels.SingleOrDefault(o => o.Id == id));
         }
 
         public Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)

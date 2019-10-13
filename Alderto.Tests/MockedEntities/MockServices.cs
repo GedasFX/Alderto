@@ -23,6 +23,7 @@ namespace Alderto.Tests.MockedEntities
                 .AddSingleton<IDiscordClient, MockDiscordClient>()
                 .AddLuaCommandHandler()
                 .AddBotManagers()
+                .AddMessagesManager()
                 .BuildServiceProvider();
         }
     }
