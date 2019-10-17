@@ -1,4 +1,4 @@
-﻿namespace Alderto.Services.Exceptions.BadRequest
+﻿namespace Alderto.Services.Exceptions
 {
     public class BankNameAlreadyExistsException : ApiException
     {

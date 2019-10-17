@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions.Forbid;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models;
 using Discord;

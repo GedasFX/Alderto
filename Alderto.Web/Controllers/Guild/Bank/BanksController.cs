@@ -2,9 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.Exceptions.BadRequest;
-using Alderto.Services.Exceptions.Forbid;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord;

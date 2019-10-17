@@ -1,17 +1,13 @@
 ﻿using Xunit;
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Alderto.Data.Models;
-using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Alderto.Tests.Extensions;
 using Alderto.Tests.MockedEntities;
 using Alderto.Web.Models;
-using Alderto.Web.Models.Bank;
-using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +43,7 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
             await Assert.ThrowsAsync<MessageNotFoundException>(async () =>
                 await _controller.CreateMessage(Dummies.GuildA.Id, new ApiMessage { ChannelId = 1, Id = 1000 }));
             
-            // Impossible to test due to inability to create mocked entities, even with moq.
+            // Impossible to test due to inability to create mocked entities (IAsyncEnumerable duality), even with moq.
         }
     }
 }

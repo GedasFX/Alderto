@@ -1,4 +1,4 @@
-﻿namespace Alderto.Services.Exceptions.Forbid
+﻿namespace Alderto.Services.Exceptions
 {
     public class UserNotGuildModeratorException : ApiException
     {

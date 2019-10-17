@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services.Exceptions.BadRequest;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
