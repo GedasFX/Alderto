@@ -19,7 +19,7 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// Name of the item.
         /// </summary>
-        [MaxLength(70)]
+        [MaxLength(70), Required]
         public string Name { get; set; }
 
         /// <summary>

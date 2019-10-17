@@ -28,8 +28,7 @@ namespace Alderto.Services.Impl
 
         public async Task<IMessage> GetMessageAsync(ulong guildId, ulong messageId)
         {
-            var msg = await GetManagedMessage(guildId, messageId);
-            return await (await GetDiscordChannel(guildId, msg.ChannelId)).GetMessageAsync(messageId);
+            return await GetDiscordBotMessageAsync(await GetManagedMessage(guildId, messageId));
         }
 
         public async Task<IUserMessage> PostMessageAsync(ulong guildId, ulong channelId, string message)
@@ -46,8 +45,11 @@ namespace Alderto.Services.Impl
         {
             var discordMessage = await GetDiscordBotMessageAsync(guildId, channelId, messageId);
 
-            _context.GuildManagedMessages.Add(new GuildManagedMessage(guildId, channelId, messageId));
-            await _context.SaveChangesAsync();
+            if (!await _context.GuildManagedMessages.AnyAsync(m => m.GuildId == guildId && m.MessageId == messageId))
+            {
+                _context.GuildManagedMessages.Add(new GuildManagedMessage(guildId, channelId, messageId));
+                await _context.SaveChangesAsync();
+            }
 
             return discordMessage;
         }
@@ -64,14 +66,19 @@ namespace Alderto.Services.Impl
         {
             var message = await GetDiscordBotMessageAsync(await GetManagedMessage(guildId, messageId));
 
+            var dbMsg = await _context.GuildManagedMessages.FindAsync(guildId, messageId);
+            _context.GuildManagedMessages.Remove(dbMsg);
+            await _context.SaveChangesAsync();
+
             // User can always delete its own posts.
             await message.DeleteAsync();
         }
 
 
-        private Task<GuildManagedMessage> GetManagedMessage(ulong guildId, ulong messageId)
+        private async Task<GuildManagedMessage?> GetManagedMessage(ulong guildId, ulong messageId)
         {
-            return _context.GuildManagedMessages.SingleOrDefaultAsync(message => message.GuildId == guildId && message.MessageId == messageId) ?? throw new MessageNotFoundException();
+            return await _context.GuildManagedMessages.SingleOrDefaultAsync(message =>
+                message.GuildId == guildId && message.MessageId == messageId);
         }
 
         private async Task<IMessageChannel> GetDiscordChannel(ulong guildId, ulong channelId)
@@ -90,8 +97,11 @@ namespace Alderto.Services.Impl
             return msgChannel;
         }
 
-        private Task<IUserMessage> GetDiscordBotMessageAsync(GuildManagedMessage msg)
+        private Task<IUserMessage> GetDiscordBotMessageAsync(GuildManagedMessage? msg)
         {
+            if (msg == null)
+                throw new MessageNotFoundException();
+
             return GetDiscordBotMessageAsync(msg.GuildId, msg.ChannelId, msg.MessageId);
         }
 
@@ -103,7 +113,7 @@ namespace Alderto.Services.Impl
             if (message == null)
                 throw new MessageNotFoundException();
 
-            if (!(message is IUserMessage userMessage))
+            if (!(message is IUserMessage userMessage) || userMessage.Author.Id != _client.CurrentUser.Id)
                 throw new BotNotMessageOwnerException();
 
             return userMessage;

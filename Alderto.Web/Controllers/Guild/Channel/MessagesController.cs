@@ -34,11 +34,6 @@ namespace Alderto.Web.Controllers.Guild.Channel
             [Bind(nameof(ApiMessage.Contents), nameof(ApiMessage.ChannelId), nameof(ApiMessage.Id))]
             ApiMessage message)
         {
-            //if (message.ChannelId == 0)
-            //{
-            //    return NotFound();
-            //}
-
             // If create new message
             if (message.Contents != null)
             {

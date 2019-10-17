@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Alderto.Web
 {
@@ -97,6 +98,7 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvcCore()
+                //.AddApiExplorer()
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.InvalidModelStateResponseFactory = context =>
@@ -115,6 +117,15 @@ namespace Alderto.Web
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
+
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo
+            //    {
+            //        Title = "Alderto Documentation",
+            //        Version = "v1"
+            //    });
+            //});
 
             // === <Bot> ===
             // Add discord socket client
@@ -147,6 +158,13 @@ namespace Alderto.Web
 
                 app.UseHttpsRedirection();
             }
+
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseStaticFiles();
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
+            //}
 
             // Configure api routing.
             app.Map("/api", api =>
