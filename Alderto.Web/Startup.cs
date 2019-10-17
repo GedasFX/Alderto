@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
@@ -98,7 +98,7 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvcCore()
-                //.AddApiExplorer()
+                .AddApiExplorer()
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.InvalidModelStateResponseFactory = context =>
@@ -118,14 +118,14 @@ namespace Alderto.Web
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
 
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo
-            //    {
-            //        Title = "Alderto Documentation",
-            //        Version = "v1"
-            //    });
-            //});
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Alderto Documentation",
+                    Version = "v1"
+                });
+            });
 
             // === <Bot> ===
             // Add discord socket client
@@ -159,16 +159,16 @@ namespace Alderto.Web
                 app.UseHttpsRedirection();
             }
 
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseStaticFiles();
-            //    app.UseSwagger();
-            //    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
-            //}
-
             // Configure api routing.
             app.Map("/api", api =>
             {
+                if (env.IsDevelopment())
+                {
+                    api.UseStaticFiles();
+                    api.UseSwagger();
+                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
+                }
+
                 api.UseRouting();
 
                 api.UseAuthentication();
