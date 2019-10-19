@@ -52,7 +52,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
                 ignoreBackdropClick: true
             });
         (modal.content.onMessageCreated as Subject<IManagedMessage>).subscribe(m => {
-            this.messages.push(m);
+            // Group by is stateless. Simple workaround.
+            this.messages = this.messages.concat([m]);
         });
     }
 
