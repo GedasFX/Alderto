@@ -35,12 +35,12 @@ namespace Alderto.Data.Models
         /// Last known contents of the message.
         /// </summary>
         [MaxLength(2000)]
-        public string? Contents { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// Time and date of when contents was last synced with discord.
         /// </summary>
-        public DateTimeOffset? LastUpdate { get; set; }
+        public DateTimeOffset LastModified { get; set; }
 
         /// <summary>
         /// Guild, which manages this resource.
@@ -54,18 +54,17 @@ namespace Alderto.Data.Models
         /// </summary>
         private GuildManagedMessage() { }
 
-        public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId)
+        public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId, string content,
+            DateTimeOffset? lastUpdate = null, ulong? moderatorRoleId = null)
         {
             GuildId = guildId;
             ChannelId = channelId;
             MessageId = messageId;
-        }
 
-        public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId, string contents, DateTimeOffset? lastUpdate)
-            : this(guildId, channelId, messageId)
-        {
-            Contents = contents;
-            LastUpdate = lastUpdate ?? DateTimeOffset.UtcNow;
+            Content = content;
+            LastModified = lastUpdate ?? DateTimeOffset.UtcNow;
+
+            ModeratorRoleId = moderatorRoleId;
         }
     }
 }

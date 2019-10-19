@@ -21,7 +21,7 @@ namespace Alderto.Web.Controllers.Guild.Channel
         [HttpGet]
         public async Task<IActionResult> ListChannels(ulong guildId)
         {
-            if (!await _client.ValidateGuildAdmin(User.GetId(), guildId))
+            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
                 throw new UserNotGuildAdminException();
 
             var guild = await _client.GetGuildAsync(guildId);

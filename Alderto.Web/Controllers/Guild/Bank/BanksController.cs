@@ -61,7 +61,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
@@ -80,7 +80,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             // If not renaming this would always return itself. Check for id difference instead.
@@ -104,7 +104,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             await _bank.RemoveGuildBankAsync(guildId, bankId, userId);

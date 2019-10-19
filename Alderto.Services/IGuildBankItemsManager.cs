@@ -55,6 +55,7 @@ namespace Alderto.Services
         /// <summary>
         /// Updates the quantity of an item.
         /// </summary>
+        /// <param name="bank">Bank in which to update the item.</param>
         /// <param name="itemId">Id of item to update.</param>
         /// <param name="adminId">Id of user, who administered the transaction.</param>
         /// <param name="deltaQuantity">Item amount changed.</param>
@@ -64,6 +65,7 @@ namespace Alderto.Services
         /// <summary>
         /// Removes an item from the bank.
         /// </summary>
+        /// <param name="bank">Bank in which to update the item.</param>
         /// <param name="itemId">Id of item to remove.</param>
         /// <param name="moderatorId">Id of user, who removed the item.</param>
         Task RemoveBankItemAsync(GuildBank bank, int itemId, ulong moderatorId);

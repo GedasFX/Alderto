@@ -8,6 +8,7 @@ using Alderto.Services.Exceptions;
 using Alderto.Tests.Extensions;
 using Alderto.Tests.MockedEntities;
 using Alderto.Web.Models;
+using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,7 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
         {
             var services = MockServices.ScopedServiceProvider;
 
-            _controller = new MessagesController(services.GetService<IMessagesManager>())
+            _controller = new MessagesController(services.GetService<IMessagesManager>(), services.GetService<IDiscordClient>())
             {
                 ControllerContext = new ControllerContext
                 {
@@ -41,7 +42,7 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
             Assert.Empty(items);
 
             await Assert.ThrowsAsync<MessageNotFoundException>(async () =>
-                await _controller.CreateMessage(Dummies.GuildA.Id, new ApiMessage { ChannelId = 1, Id = 1000 }));
+                await _controller.CreateMessage(Dummies.GuildA.Id, new ApiManagedMessage(new GuildManagedMessage(1, 1, 1000, null!))));
             
             // Impossible to test due to inability to create mocked entities (IAsyncEnumerable duality), even with moq.
         }
