@@ -19,7 +19,7 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpGet]
-        public async Task<IActionResult> Roles(ulong guildId)
+        public async Task<IActionResult> ListRoles(ulong guildId)
         {
             if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
                 throw new UserNotGuildAdminException();

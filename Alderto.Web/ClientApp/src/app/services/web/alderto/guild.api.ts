@@ -4,16 +4,20 @@ import { Observable } from 'rxjs';
 import { IGuildChannel, IGuildRole } from 'src/app/models';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AldertoWebGuildApi {
-  constructor(private readonly http: HttpClient) { }
+    constructor(private readonly http: HttpClient) { }
 
-  public fetchChannels(id: string): Observable<IGuildChannel[]> {
-    return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/channels`);
-  }
+    public fetchChannels(id: string): Observable<IGuildChannel[]> {
+        return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/channels`);
+    }
 
-  public fetchRoles(id: string): Observable<IGuildRole[]> {
-    return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/roles`);
-  }
+    public fetchRoles(id: string): Observable<IGuildRole[]> {
+        return this.http.get<IGuildChannel[]>(`/api/guilds/${id}/roles`);
+    }
+
+    public fetchUserRoles(id: string, userId: string = null) {
+        return this.http.get<string[]>(`/api/guilds/${id}/users/${userId !== null ? userId : "@me"}`);
+    }
 }

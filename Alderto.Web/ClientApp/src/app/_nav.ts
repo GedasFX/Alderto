@@ -63,6 +63,11 @@ export const guildNav: INavData =
       name: 'Bank',
       icon: 'fa fa-bank',
       url: '/guild/:id/bank',
+    },
+    {
+      name: 'Messages',
+      icon: 'fa fa-letter',
+      url: '/guild/:id/message',
     }
   ]
 };

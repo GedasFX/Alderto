@@ -47,7 +47,7 @@ namespace Alderto.Services.Impl
         public async Task<GuildBankItem> CreateBankItemAsync(GuildBank bank, GuildBankItem item, ulong adminId)
         {
             if (item.Name == null)
-                throw new NameCannotBeNullException();
+                throw new NameNotProvidedException();
 
             // Ensure item is in the correct bank.
             item.GuildBankId = bank.Id;

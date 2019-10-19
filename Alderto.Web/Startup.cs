@@ -98,6 +98,7 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvcCore()
+                .AddDataAnnotations()
                 .AddApiExplorer()
                 .ConfigureApiBehaviorOptions(options =>
                 {

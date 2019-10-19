@@ -46,7 +46,7 @@ namespace Alderto.Services.Impl
         public async Task<GuildBank> CreateGuildBankAsync(ulong guildId, ulong adminId, GuildBank bank)
         {
             if (string.IsNullOrWhiteSpace(bank.Name))
-                throw new NameCannotBeNullException();
+                throw new NameNotProvidedException();
 
             // Ensure foreign key constraint is not violated.
             var guild = await _context.Guilds.FindAsync(guildId);

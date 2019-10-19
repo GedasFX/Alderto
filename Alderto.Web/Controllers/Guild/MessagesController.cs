@@ -60,7 +60,7 @@ namespace Alderto.Web.Controllers.Guild
                 return Content(new ApiManagedMessage(msg));
             }
 
-            return BadRequest();
+            throw new ContentNotProvidedException();
         }
 
         [HttpPatch("{messageId}")]

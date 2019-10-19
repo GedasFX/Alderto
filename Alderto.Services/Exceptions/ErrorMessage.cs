@@ -109,8 +109,14 @@ namespace Alderto.Services.Exceptions
         /// <summary>
         /// BadRequest reason. Used when received name was empty.
         /// </summary>
-        public static ErrorMessage NameCannotBeNull { get; } =
+        public static ErrorMessage NameNotProvided { get; } =
             new ErrorMessage(400, 3300, "Name cannot be empty.");
+
+        /// <summary>
+        /// BadRequest reason. Used when received content was empty.
+        /// </summary>
+        public static ErrorMessage ContentNotProvided { get; } =
+            new ErrorMessage(400, 3301, "Content cannot be empty.");
 
         /// <summary>
         /// BadRequest reason. Used when received name was empty.
@@ -120,29 +126,36 @@ namespace Alderto.Services.Exceptions
 
         public static ErrorMessage ChannelNotMessageChannel { get; } =
             new ErrorMessage(400, 3401, "The specified channel is not a message channel.");
-        
 
-
+        /// <summary>
+        /// Converts a internal code to ErrorMessage.
+        /// </summary>
+        /// <param name="code">Code to get error message from.</param>
+        /// <returns>The error message associated to the code.</returns>
         public static ErrorMessage FromCode(int code)
         {
             return code switch
             {
                 1100 => UserNotGuildAdmin,
                 1200 => UserNotGuildModerator,
+
                 2100 => GuildNotFound,
                 2101 => UserNotFound,
                 2102 => ChannelNotFound,
                 2103 => MessageNotFound,
                 2200 => BankNotFound,
                 2201 => BankItemNotFound,
+
                 3000 => MissingChannelAccess,
                 3001 => MissingWritePermissions,
                 3100 => PayloadOver100,
                 3200 => BankNameAlreadyExists,
-                3300 => NameCannotBeNull,
+                3300 => NameNotProvided,
+                3301 => ContentNotProvided,
                 3400 => BotNotMessageOwner,
                 3401 => ChannelNotMessageChannel,
-                _ => throw new ArgumentException($"Provided internal {nameof(code)} was not found.")
+
+                _ => throw new ArgumentException("Provided internal error code was not found.")
             };
         }
     }

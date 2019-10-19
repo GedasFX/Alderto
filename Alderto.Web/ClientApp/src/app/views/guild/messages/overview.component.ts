@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { IGuildBank, IGuildBankItem } from 'src/app/models';
-import { AldertoWebBankApi, NavigationService, GuildService } from 'src/app/services';
+import { IManagedMessage } from 'src/app/models';
+import { AldertoWebMessageApi, GuildService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 
@@ -13,40 +13,29 @@ import { MessageEditComponent } from './modals/message-edit.component';
     styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-    public guildBanks: IGuildBank[] = [];
-    public bankValues = {};
+    public messages: IManagedMessage[];
 
-    public isAdmin: boolean;
+    public userIsAdmin: boolean = false;
 
     private subscriptions: Subscription[] = [];
 
     constructor(
-        private readonly bankApi: AldertoWebBankApi,
-        private readonly nav: NavigationService,
+        private readonly messageApi: AldertoWebMessageApi,
         private readonly guild: GuildService,
         private readonly modal: BsModalService) {
     }
 
-    public updateValue(bank: IGuildBank): number {
-        if (bank.contents == null) {
-            this.bankValues[bank.id] = 0;
-            return 0;
-        }
-
-        this.bankValues[bank.id] = bank.contents.reduce((acc, current) => acc + current.quantity * current.value, 0);
-        return this.bankValues[bank.id];
-    }
-
-
     public ngOnInit(): void {
-        this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
-            if (g !== undefined)
-                this.isAdmin = g.isAdmin;
-        }));
-        this.bankApi.fetchBanks(this.nav.getCurrentGuildId()).subscribe(banks => {
-            this.guildBanks = banks;
-            this.guildBanks.forEach(b => this.updateValue(b));
-        });
+        this.subscriptions.push(
+            this.guild.currentGuild$.subscribe(g => {
+                if (g !== undefined) {
+                    this.userIsAdmin = g.userIsAdmin;
+
+                    this.messageApi.fetchMessages(g.id).subscribe(messages => {
+                        this.messages = messages;
+                    });
+                }
+            }));
     }
 
     public ngOnDestroy(): void {
@@ -58,28 +47,34 @@ export class OverviewComponent implements OnInit, OnDestroy {
             {
                 ignoreBackdropClick: true
             });
-        (modal.content.onBankCreated as Subject<IGuildBank>).subscribe(b => {
-            this.guildBanks.push(b);
-            this.bankValues[b.id] = this.updateValue(b);
+        (modal.content.onMessageCreated as Subject<IManagedMessage>).subscribe(b => {
+            this.messages.push(b);
         });
     }
 
-    public openMessageEditModal(bank: IGuildBank): void {
+    public openMessageEditModal(message: IManagedMessage): void {
         this.modal.show(MessageEditComponent,
             {
-                initialState: { bank },
+                initialState: { message },
                 ignoreBackdropClick: true
             });
     }
 
-    public openMessageRemoveModal(bank: IGuildBank): void {
+    public openMessageRemoveModal(message: IManagedMessage): void {
         const modal = this.modal.show(MessageRemoveComponent,
             {
-                initialState: { banks: this.guildBanks, bank },
+                initialState: { messages: this.messages, message },
                 ignoreBackdropClick: true
             });
-        (modal.content.onBankDeleted as Subject<void>).subscribe(() => {
-            this.guildBanks.splice(this.guildBanks.indexOf(bank), 1);
+        (modal.content.onMessageDeleted as Subject<void>).subscribe(() => {
+            this.messages.splice(this.messages.indexOf(message), 1);
         });
+    }
+
+    private groupBy(xs, key) {
+        return xs.reduce((rv, x) => {
+            (rv[x[key]] = rv[x[key]] || []).push(x);
+            return rv;
+        }, {});
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Alderto.Data.Models;
 
 namespace Alderto.Web.Models
@@ -10,11 +11,11 @@ namespace Alderto.Web.Models
         public DateTimeOffset LastModified { get; set; }
 
         public ulong? ModeratorRoleId { get; set; }
+
+        [StringLength(2000)]
         public string? Content { get; set; }
 
-#nullable disable
         private ApiManagedMessage() { }
-#nullable restore
         public ApiManagedMessage(GuildManagedMessage message)
         {
             Id = message.MessageId;
