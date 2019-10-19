@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IManagedMessage } from 'src/app/models';
-import { AldertoWebMessageApi, GuildService } from 'src/app/services';
+import { AldertoWebMessageApi, GuildService, Guild } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 
@@ -14,8 +14,10 @@ import { MessageEditComponent } from './modals/message-edit.component';
 })
 export class OverviewComponent implements OnInit, OnDestroy {
     public messages: IManagedMessage[];
+    public currentGuild: Guild;
+    public channelMap;
 
-    public userIsAdmin: boolean = false;
+    public userIsAdmin: boolean;
 
     private subscriptions: Subscription[] = [];
 
@@ -27,13 +29,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.subscriptions.push(
-            this.guild.currentGuild$.subscribe(g => {
+            this.guild.currentGuild$.subscribe(async g => {
                 if (g !== undefined) {
                     this.userIsAdmin = g.userIsAdmin;
-
-                    this.messageApi.fetchMessages(g.id).subscribe(messages => {
-                        this.messages = messages;
-                    });
+                    this.currentGuild = g;
+                    this.channelMap = (await g.channels).reduce((map, obj) => {
+                        map[obj.id] = obj.name;
+                        return map;
+                    }, {});
+                    this.messages = await this.messageApi.fetchMessages(g.id).toPromise();
                 }
             }));
     }
@@ -47,8 +51,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
             {
                 ignoreBackdropClick: true
             });
-        (modal.content.onMessageCreated as Subject<IManagedMessage>).subscribe(b => {
-            this.messages.push(b);
+        (modal.content.onMessageCreated as Subject<IManagedMessage>).subscribe(m => {
+            this.messages.push(m);
         });
     }
 
@@ -69,12 +73,5 @@ export class OverviewComponent implements OnInit, OnDestroy {
         (modal.content.onMessageDeleted as Subject<void>).subscribe(() => {
             this.messages.splice(this.messages.indexOf(message), 1);
         });
-    }
-
-    private groupBy(xs, key) {
-        return xs.reduce((rv, x) => {
-            (rv[x[key]] = rv[x[key]] || []).push(x);
-            return rv;
-        }, {});
     }
 }

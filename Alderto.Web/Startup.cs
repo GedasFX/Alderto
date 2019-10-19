@@ -202,7 +202,7 @@ namespace Alderto.Web
                     });
 
                             await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(apiException.Error));
+                                JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                         }
                         else if (e is HttpException discordException)
                         {
@@ -220,7 +220,7 @@ namespace Alderto.Web
                                     50001 => ErrorMessages.MissingChannelAccess,
                                     50013 => ErrorMessages.MissingWritePermissions,
                                     _ => throw e
-                                }));
+                                }, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                         }
                         else
                             throw;

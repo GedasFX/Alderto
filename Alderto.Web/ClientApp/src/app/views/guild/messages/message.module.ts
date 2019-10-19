@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from "ngx-bootstrap/modal";
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MessageRoutingModule } from './message.routing';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 import { OverviewComponent } from './overview.component';
 
@@ -21,7 +21,7 @@ import { NgPipesModule } from 'ngx-pipes';
         NgSelectModule,
         ReactiveFormsModule,
         MessageRoutingModule,
-        TooltipModule.forRoot()
+        TabsModule.forRoot()
     ],
     declarations: [
         OverviewComponent,

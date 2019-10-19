@@ -36,9 +36,9 @@ export class BankCreateComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.onBankCreated = new Subject();
-        this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
-            g.channels.then(c => this.channelSelect = c);
-            g.roles.then(r => this.roleSelect = r);
+        this.subscriptions.push(this.guild.currentGuild$.subscribe(async g => {
+            this.channelSelect = await g.channels;
+            this.roleSelect = await g.roles;
         }));
     }
 

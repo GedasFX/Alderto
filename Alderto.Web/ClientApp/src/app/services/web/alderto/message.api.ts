@@ -14,11 +14,11 @@ export class AldertoWebMessageApi {
     }
 
     public createNewMessage(guildId: string, channelId: string, content: string): Observable<IManagedMessage> {
-        return this.http.post<IManagedMessage>(`/api/guilds/${guildId}/messages`, { guildId, channelId, content });
+        return this.http.post<IManagedMessage>(`/api/guilds/${guildId}/messages`, { channelId, content });
     }
 
     public importMessage(guildId: string, channelId: string, messageId: string): Observable<IManagedMessage> {
-        return this.http.post<IManagedMessage>(`/api/guilds/${guildId}/messages`, { guildId, channelId, messageId });
+        return this.http.post<IManagedMessage>(`/api/guilds/${guildId}/messages`, { channelId, id: messageId });
     }
 
     public editMessage(guildId: string, message: IManagedMessage) {

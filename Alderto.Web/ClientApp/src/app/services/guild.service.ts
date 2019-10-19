@@ -100,4 +100,8 @@ export class GuildService {
     public get currentGuildId(): string {
         return this.currentGuild$.getValue().id;
     }
+
+    public get currentGuild(): Guild {
+        return this.currentGuild$.getValue();
+    }
 }
