@@ -37,7 +37,7 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
         {
             _controller.User.SetId(Dummies.Alice.Id);
             var res = await _controller.ListMessages(Dummies.GuildA.Id);
-            var items = (IEnumerable<GuildManagedMessage>)((ObjectResult)res).Value;
+            var items = (IEnumerable<ApiManagedMessage>)((ObjectResult)res).Value;
 
             Assert.Empty(items);
 
