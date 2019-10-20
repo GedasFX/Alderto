@@ -9,8 +9,7 @@ import { MessageRemoveComponent } from './modals/message-remove.component';
 import { MessageEditComponent } from './modals/message-edit.component';
 
 @Component({
-    templateUrl: 'overview.component.html',
-    styleUrls: ['overview.component.scss']
+    templateUrl: 'overview.component.html'
 })
 export class OverviewComponent implements OnInit, OnDestroy {
     public messages: IManagedMessage[];
