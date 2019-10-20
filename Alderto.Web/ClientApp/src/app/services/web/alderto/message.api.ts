@@ -25,7 +25,7 @@ export class AldertoWebMessageApi {
         return this.http.patch(`/api/guilds/${guildId}/messages/${messageId}`, message);
     }
 
-    public removeBank(guildId: string, messageId: number) {
+    public removeMessage(guildId: string, messageId: string) {
         return this.http.delete(`/api/guilds/${guildId}/messages/${messageId}`);
     }
 }

@@ -1,15 +1,16 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h4 class="modal-title">Remove {{ bank.name }}</h4>
+    <h4 class="modal-title">Remove message</h4>
     <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
     <span>
-      Are you sure you wish to remove this bank?<br />
+      Are you sure you wish to remove this message?<br />
       This operation cannot be undone.
     </span>
+    <textarea class="form-control" rows="10" disabled>{{message.content}}</textarea>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.hide();">Cancel</button>
