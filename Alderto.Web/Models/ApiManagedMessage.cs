@@ -8,7 +8,6 @@ namespace Alderto.Web.Models
     {
         public ulong Id { get; set; }
 
-        [Required]
         public ulong ChannelId { get; set; }
         public DateTimeOffset LastModified { get; set; }
 

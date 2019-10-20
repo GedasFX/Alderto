@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("guild/{guildId}/users")]
+    [Route("guilds/{guildId}/users")]
     public class GuildUserController : ApiControllerBase
     {
         private readonly IDiscordClient _client;

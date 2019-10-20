@@ -18,6 +18,6 @@ export class AldertoWebGuildApi {
     }
 
     public fetchUserRoles(id: string, userId: string = null) {
-        return this.http.get<string[]>(`/api/guilds/${id}/users/${userId !== null ? userId : "@me"}`);
+        return this.http.get<string[]>(`/api/guilds/${id}/users/${userId !== null ? userId : "@me"}/roles`);
     }
 }

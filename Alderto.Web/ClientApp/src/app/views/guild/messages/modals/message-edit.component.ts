@@ -58,7 +58,11 @@ export class MessageEditComponent implements OnInit, OnDestroy {
             this.message.id,
             {
                 content: this.formGroup.value.content,
-                moderatorRoleId: this.userIsAdmin ? this.formGroup.value.moderatorRoleId : null
+                moderatorRoleId: this.userIsAdmin
+                    ? this.formGroup.value.moderatorRoleId != null
+                        ? this.formGroup.value.moderatorRoleId
+                        : "0"
+                    : null
             } as IManagedMessage
         ).subscribe(
             () => {

@@ -78,7 +78,8 @@ namespace Alderto.Services.Impl
             }
 
             if (moderatorRoleId != null)
-                dbMsg.ModeratorRoleId = moderatorRoleId;
+                // If edited, check if was edited to not be removed.
+                dbMsg.ModeratorRoleId = moderatorRoleId == 0 ? null : moderatorRoleId;
 
             dbMsg.LastModified = DateTime.UtcNow;
 

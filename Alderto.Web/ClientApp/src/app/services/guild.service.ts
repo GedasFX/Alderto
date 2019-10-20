@@ -55,6 +55,7 @@ export class Guild {
             roleIds.forEach(rid => {
                 this.loadedUserRoles.push(roles.find(i => i.id === rid));
             });
+            r(this.loadedUserRoles);
         });
     }
 

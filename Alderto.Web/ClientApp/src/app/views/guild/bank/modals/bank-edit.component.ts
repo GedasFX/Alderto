@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AldertoWebBankApi, GuildService } from 'src/app/services';
 import { IGuildBank, IGuildChannel, IGuildRole } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
     templateUrl: 'bank-edit.component.html'

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IGuildBankItem, IGuildBank } from 'src/app/models';
-import { GuildService, Guild } from 'src/app/services';
+import { GuildService, Guild, GuildBank, BankService } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 
@@ -9,7 +9,6 @@ import { BankRemoveComponent } from './modals/bank-remove.component';
 import { BankEditComponent } from './modals/bank-edit.component';
 import { BankItemsCreateComponent } from './modals/bank-items-create.component';
 import { BankItemsDetailsComponent } from './modals/bank-items-details.component';
-import { GuildBank, BankService } from '../../../services/bank.service';
 
 @Component({
     templateUrl: 'overview.component.html',
@@ -37,7 +36,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
                     this.userIsAdmin = g.userIsAdmin;
                     this.guildBanks = await this.bankService.getBanks(g);
                 }
-            }));
+            })
+        );
     }
 
     public ngOnDestroy(): void {
@@ -55,15 +55,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
 
     public openBankEditModal(bank: GuildBank): void {
-        const modal = this.modal.show(BankEditComponent,
+        this.modal.show(BankEditComponent,
             {
                 initialState: { bank },
                 ignoreBackdropClick: true
             });
-        (modal.content.onBankEdited as Subject<void>).subscribe(() => {
-            console.log(bank);
-            bank.updateValue();
-        });
     }
 
     public openBankRemoveModal(bank: GuildBank): void {

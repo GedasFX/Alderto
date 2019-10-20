@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IManagedMessage } from 'src/app/models';
-import { AldertoWebMessageApi, GuildService, Guild } from 'src/app/services';
+import { GuildService, Guild, ManagedMessageService, ManagedMessage } from 'src/app/services';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 
@@ -13,7 +13,7 @@ import { MessageEditComponent } from './modals/message-edit.component';
     styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-    public messages: IManagedMessage[];
+    public messages: ManagedMessage[];
     public currentGuild: Guild;
     public channelMap;
 
@@ -22,7 +22,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(
-        private readonly messageApi: AldertoWebMessageApi,
+        private readonly messageService: ManagedMessageService,
         private readonly guild: GuildService,
         private readonly modal: BsModalService) {
     }
@@ -37,9 +37,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
                         map[obj.id] = obj.name;
                         return map;
                     }, {});
-                    this.messages = await this.messageApi.fetchMessages(g.id).toPromise();
+                    this.messages = await this.messageService.getMessages(g);
                 }
-            }));
+            })
+        );
     }
 
     public ngOnDestroy(): void {
@@ -53,11 +54,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
             });
         (modal.content.onMessageCreated as Subject<IManagedMessage>).subscribe(m => {
             // Group by is stateless. Simple workaround.
-            this.messages = this.messages.concat([m]);
+            this.messages = this.messages.concat([new ManagedMessage(m, this.currentGuild)]);
         });
     }
 
-    public openMessageEditModal(message: IManagedMessage): void {
+    public openMessageEditModal(message: ManagedMessage): void {
         this.modal.show(MessageEditComponent,
             {
                 initialState: { message },
@@ -65,7 +66,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
             });
     }
 
-    public openMessageRemoveModal(message: IManagedMessage): void {
+    public openMessageRemoveModal(message: ManagedMessage): void {
         const modal = this.modal.show(MessageRemoveComponent,
             {
                 initialState: { message },
