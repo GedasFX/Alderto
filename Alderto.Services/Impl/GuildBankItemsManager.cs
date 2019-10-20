@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services.Exceptions.BadRequest;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
@@ -48,7 +47,7 @@ namespace Alderto.Services.Impl
         public async Task<GuildBankItem> CreateBankItemAsync(GuildBank bank, GuildBankItem item, ulong adminId)
         {
             if (item.Name == null)
-                throw new NameCannotBeNullException();
+                throw new NameNotProvidedException();
 
             // Ensure item is in the correct bank.
             item.GuildBankId = bank.Id;

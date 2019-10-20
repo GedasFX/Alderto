@@ -2,9 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.Exceptions.BadRequest;
-using Alderto.Services.Exceptions.Forbid;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.Bank;
 using Discord;
@@ -39,7 +37,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
                 throw new UserNotFoundException();
 
             var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
-            var outBanks = banks.Select(b => new ApiGuildBank(b) { CanModify = ValidateModifyAccess(b, user) });
+            var outBanks = banks.Select(b => new ApiGuildBank(b));
 
             return Content(outBanks);
         }
@@ -58,20 +56,24 @@ namespace Alderto.Web.Controllers.Guild.Bank
         [HttpPost]
         public async Task<IActionResult> CreateBank(ulong guildId,
             [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
-            GuildBank bank)
+            ApiGuildBank bank)
         {
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
                 throw new BankNameAlreadyExistsException();
 
-            var b = await _bank.CreateGuildBankAsync(guildId, userId, bank);
+            var b = await _bank.CreateGuildBankAsync(guildId, userId, new GuildBank(guildId, bank.Name)
+            {
+                LogChannelId = bank.LogChannelId,
+                ModeratorRoleId = bank.ModeratorRoleId
+            });
 
-            return Content(new ApiGuildBank(b) { CanModify = true });
+            return Content(new ApiGuildBank(b));
         }
 
         [HttpPatch("{bankId}")]
@@ -82,7 +84,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             // If not renaming this would always return itself. Check for id difference instead.
@@ -106,15 +108,12 @@ namespace Alderto.Web.Controllers.Guild.Bank
             var userId = User.GetId();
 
             // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdmin(userId, guildId))
+            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
                 throw new UserNotGuildAdminException();
 
             await _bank.RemoveGuildBankAsync(guildId, bankId, userId);
 
             return NoContent();
         }
-
-        private static bool ValidateModifyAccess(GuildBank bank, IGuildUser user) =>
-            user.RoleIds.Any(r => r == bank.ModeratorRoleId) || user.GuildPermissions.Administrator;
     }
 }

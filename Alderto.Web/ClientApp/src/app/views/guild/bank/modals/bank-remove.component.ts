@@ -8,40 +8,39 @@ import { Subject } from 'rxjs';
 
 
 @Component({
-  selector: 'app-bank-create',
-  templateUrl: 'bank-remove.component.html'
+    templateUrl: 'bank-remove.component.html'
 })
 export class BankRemoveComponent implements OnInit, OnDestroy {
-  // Input
-  public bank: IGuildBank;
+    // Input
+    public bank: IGuildBank;
 
-  public onBankDeleted: Subject<void>;
+    public onBankDeleted: Subject<void>;
 
-  constructor(
-    private readonly bankApi: AldertoWebBankApi,
-    private readonly guild: GuildService,
-    private readonly toastr: ToastrService,
-    public readonly modal: BsModalRef) {
-  }
+    constructor(
+        private readonly bankApi: AldertoWebBankApi,
+        private readonly guild: GuildService,
+        private readonly toastr: ToastrService,
+        public readonly modal: BsModalRef) {
+    }
 
-  public ngOnInit(): void {
-    this.onBankDeleted = new Subject();
-  }
+    public ngOnInit(): void {
+        this.onBankDeleted = new Subject();
+    }
 
-  public ngOnDestroy(): void {
-    this.onBankDeleted.complete();
-  }
+    public ngOnDestroy(): void {
+        this.onBankDeleted.complete();
+    }
 
-  public onDeleteConfirmed() {
-    this.bankApi.removeBank(this.guild.currentGuild$.getValue().id, this.bank.id).subscribe(() => {
-      this.onBankDeleted.next();
-      this.toastr.success(`Successfully removed bank <b>${this.bank.name}</b>`, null, { enableHtml: true });
-    },
-      (err: HttpErrorResponse) => {
-        this.toastr.error(err.error.message, 'Could not remove the bank');
-      },
-      () => {
-        this.modal.hide();
-      });
-  }
+    public onDeleteConfirmed() {
+        this.bankApi.removeBank(this.guild.currentGuildId, this.bank.id).subscribe(() => {
+            this.onBankDeleted.next();
+            this.toastr.success(`Successfully removed bank <b>${this.bank.name}</b>`, null, { enableHtml: true });
+        },
+            (err: HttpErrorResponse) => {
+                this.toastr.error(err.error.message, 'Could not remove the bank');
+            },
+            () => {
+                this.modal.hide();
+            });
+    }
 }

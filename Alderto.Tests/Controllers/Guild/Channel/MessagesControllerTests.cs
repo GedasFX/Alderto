@@ -1,16 +1,13 @@
 ﻿using Xunit;
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Alderto.Data.Models;
-using Alderto.Data.Models.GuildBank;
 using Alderto.Services;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Alderto.Tests.Extensions;
 using Alderto.Tests.MockedEntities;
 using Alderto.Web.Models;
-using Alderto.Web.Models.Bank;
 using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +23,7 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
         {
             var services = MockServices.ScopedServiceProvider;
 
-            _controller = new MessagesController(services.GetService<IMessagesManager>())
+            _controller = new MessagesController(services.GetService<IMessagesManager>(), services.GetService<IDiscordClient>())
             {
                 ControllerContext = new ControllerContext
                 {
@@ -40,14 +37,14 @@ namespace Alderto.Web.Controllers.Guild.Channel.Tests
         {
             _controller.User.SetId(Dummies.Alice.Id);
             var res = await _controller.ListMessages(Dummies.GuildA.Id);
-            var items = (IEnumerable<GuildManagedMessage>)((ObjectResult)res).Value;
+            var items = (IEnumerable<ApiManagedMessage>)((ObjectResult)res).Value;
 
             Assert.Empty(items);
 
             await Assert.ThrowsAsync<MessageNotFoundException>(async () =>
-                await _controller.CreateMessage(Dummies.GuildA.Id, new ApiMessage { ChannelId = 1, Id = 1000 }));
+                await _controller.CreateMessage(Dummies.GuildA.Id, new ApiManagedMessage(new GuildManagedMessage(1, 1, 1000, null!))));
             
-            // Impossible to test due to inability to create mocked entities, even with moq.
+            // Impossible to test due to inability to create mocked entities (IAsyncEnumerable duality), even with moq.
         }
     }
 }

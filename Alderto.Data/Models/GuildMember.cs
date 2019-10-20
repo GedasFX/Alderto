@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -58,9 +58,7 @@ namespace Alderto.Data.Models
         /// Initializes a new empty instance of <see cref="GuildMember"/>.
         /// For use by Entity Framework.
         /// </summary>
-#nullable disable
         private GuildMember() { }
-#nullable restore
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildMember"/>, with primary key (<see cref="MemberId"/> and <see cref="GuildId"/>) set.

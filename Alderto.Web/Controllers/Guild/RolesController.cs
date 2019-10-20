@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions.Forbid;
-using Alderto.Services.Exceptions.NotFound;
-using Alderto.Web.Extensions;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Models;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +18,8 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpGet]
-        public async Task<IActionResult> Roles(ulong guildId)
+        public async Task<IActionResult> ListRoles(ulong guildId)
         {
-            if (!await _client.ValidateGuildAdmin(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
-
             var guild = await _client.GetGuildAsync(guildId);
             if (guild == null)
                 throw new GuildNotFoundException();

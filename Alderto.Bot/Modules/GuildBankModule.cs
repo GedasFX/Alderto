@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Services;
-using Alderto.Services.Exceptions.NotFound;
+using Alderto.Services.Exceptions;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 

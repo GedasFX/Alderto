@@ -29,6 +29,7 @@ namespace Alderto.Data.Migrations
                         .HasMaxLength(20);
 
                     b.Property<string>("LuaCode")
+                        .IsRequired()
                         .HasColumnType("character varying(2000)")
                         .HasMaxLength(2000);
 
@@ -98,6 +99,7 @@ namespace Alderto.Data.Migrations
                         .HasMaxLength(140);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("character varying(70)")
                         .HasMaxLength(70);
 
@@ -152,6 +154,16 @@ namespace Alderto.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("character varying(2000)")
+                        .HasMaxLength(2000);
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("ModeratorRoleId")
                         .HasColumnType("numeric(20,0)");
 
                     b.HasKey("GuildId", "MessageId");

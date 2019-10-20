@@ -42,7 +42,7 @@ namespace Alderto.Web.Controllers.Guild.Bank.Tests
 
             Assert.Empty(items);
 
-            res = (ObjectResult)await _controller.CreateBank(Dummies.GuildA.Id, new GuildBank(Dummies.GuildA.Id, "Bank1") { ModeratorRoleId = 2 });
+            res = (ObjectResult)await _controller.CreateBank(Dummies.GuildA.Id, new ApiGuildBank(new GuildBank(Dummies.GuildA.Id, "Bank1") { ModeratorRoleId = 2 }));
             var bank = (ApiGuildBank)((ObjectResult)res).Value;
 
             Assert.Equal("Bank1", bank.Name);

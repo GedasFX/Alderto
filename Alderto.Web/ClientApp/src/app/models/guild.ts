@@ -4,11 +4,6 @@ export interface IGuild {
   name: string;
   owner: boolean;
   permissions: number;
-
-  isAdmin: boolean;
-
-  channels: IGuildChannel[];
-  roles: IGuildRole[];
 }
 
 export interface IGuildChannel {

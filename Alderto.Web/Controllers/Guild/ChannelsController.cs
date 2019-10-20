@@ -1,13 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions.Forbid;
-using Alderto.Services.Exceptions.NotFound;
-using Alderto.Web.Extensions;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Models;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Alderto.Web.Controllers.Guild.Channel
+namespace Alderto.Web.Controllers.Guild
 {
     [Route("guilds/{guildId}/channels")]
     public class ChannelsController : ApiControllerBase
@@ -22,15 +20,12 @@ namespace Alderto.Web.Controllers.Guild.Channel
         [HttpGet]
         public async Task<IActionResult> ListChannels(ulong guildId)
         {
-            if (!await _client.ValidateGuildAdmin(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
-
             var guild = await _client.GetGuildAsync(guildId);
             if (guild == null)
                 throw new GuildNotFoundException();
 
             var channels = await guild.GetTextChannelsAsync();
-            
+
             return Content(channels.Select(c => new ApiGuildChannel(c.Id, c.Name)));
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Alderto.Services.Exceptions.NotFound
+﻿namespace Alderto.Services.Exceptions
 {
     public class BankNotFoundException : ApiException
     {

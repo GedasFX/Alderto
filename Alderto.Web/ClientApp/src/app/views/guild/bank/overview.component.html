@@ -1,5 +1,5 @@
 <div class="animated fadeIn">
-  <div *ngIf="isAdmin" class="card">
+  <div *ngIf="userIsAdmin" class="card">
     <div class="card-header">
       <i class="fa fa-plus"></i> <a (click)="openBankCreateModal();">Create New Bank</a>
     </div>
@@ -10,9 +10,9 @@
       <div class="card-header">
         <i class="fa fa-bank"></i><span>{{ bank.name }}</span>
         <div class="card-header-actions">
-          <a *ngIf="bank.canModify" class="card-header-action" (click)="openItemCreateModal(bank)"><i class="fa fa-plus"></i> </a>
-          <a *ngIf="isAdmin" class="card-header-action" (click)="openBankEditModal(bank)"><i class="fa fa-pencil"></i> </a>
-          <a *ngIf="isAdmin" class="card-header-action" (click)="openBankRemoveModal(bank)"><i class="fa fa-trash-o"></i></a>
+          <a *ngIf="bank.userCanModify" class="card-header-action" (click)="openItemCreateModal(bank)"><i class="fa fa-plus"></i> </a>
+          <a *ngIf="userIsAdmin" class="card-header-action" (click)="openBankEditModal(bank)"><i class="fa fa-pencil"></i> </a>
+          <a *ngIf="userIsAdmin" class="card-header-action" (click)="openBankRemoveModal(bank)"><i class="fa fa-trash-o"></i></a>
         </div>
       </div>
       <div class="card-body">
@@ -24,11 +24,11 @@
               <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
               <div>{{ item.name }}</div>
               <div class="small">
-                <span [class.text-danger]="item.quantity <= 0">{{ item.quantity }}</span>
+                <span [class.text-danger]="item.quantity <= 0">{{ item.quantity | number }}</span>
               </div>
             </a>
           </div>
-          <div *ngIf="bank.canModify" class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item">
+          <div *ngIf="bank.userCanModify" class="col-6 col-sm-4 col-md-3 col-lg-2 bank-item">
             <a (click)="openItemCreateModal(bank)">
               <i class="fa fa-plus fa-2x"></i>
               <div>Add new item</div>
@@ -36,8 +36,8 @@
           </div>
         </div>
       </div>
-      <div *ngIf="bankValues[bank.id]" class="card-footer text-center">
-        Value: {{ bankValues[bank.id] }}
+      <div *ngIf="bank.value" class="card-footer text-center">
+        Value: {{ bank.value | number }}
       </div>
     </div>
   </div>
