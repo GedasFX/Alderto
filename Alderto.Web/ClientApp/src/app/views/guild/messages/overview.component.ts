@@ -68,7 +68,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     public openMessageRemoveModal(message: IManagedMessage): void {
         const modal = this.modal.show(MessageRemoveComponent,
             {
-                initialState: { messages: this.messages, message },
+                initialState: { message },
                 ignoreBackdropClick: true
             });
         (modal.content.onMessageDeleted as Subject<void>).subscribe(() => {
