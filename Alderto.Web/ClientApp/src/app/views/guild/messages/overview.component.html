@@ -16,14 +16,15 @@
             <th>Content</th>
             <th>Last Modified</th>
             <th></th>
-            <th *ngIf="userIsAdmin"></th>
           </tr>
           <tr *ngFor="let msg of group">
             <td><a href="https://discordapp.com/channels/{{currentGuild.id}}/{{msg.channelId}}/{{msg.id}}">{{ msg.id }}</a></td>
             <td>{{ msg.content | shorten: 100: '...' }}</td>
             <td>{{ msg.lastModified | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
-            <td><i class="fa fa-pencil" (click)="openMessageEditModal(msg)"></i></td>
-            <td *ngIf="userIsAdmin"><i class="fa fa-trash" (click)="openMessageRemoveModal(msg)"></i></td>
+            <td>
+              <i class="fa fa-pencil" (click)="openMessageEditModal(msg)"></i>&nbsp;
+              <i *ngIf="userIsAdmin" class="fa fa-trash" (click)="openMessageRemoveModal(msg)"></i>
+            </td>
           </tr>
         </table>
       </div>
