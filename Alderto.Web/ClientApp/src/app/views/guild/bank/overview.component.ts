@@ -55,11 +55,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
 
     public openBankEditModal(bank: GuildBank): void {
-        this.modal.show(BankEditComponent,
+        const modal = this.modal.show(BankEditComponent,
             {
                 initialState: { bank },
                 ignoreBackdropClick: true
             });
+        (modal.content.onBankEdited as Subject<void>).subscribe(() => {
+            console.log(bank);
+            bank.updateValue();
+        });
     }
 
     public openBankRemoveModal(bank: GuildBank): void {
@@ -93,6 +97,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
                 initialState: { item, canModify: await bank.userCanModify },
                 ignoreBackdropClick: true
             });
+        (modal.content.onItemEdited as Subject<void>).subscribe(() => {
+            bank.updateValue();
+        });
         (modal.content.onItemDeleted as Subject<void>).subscribe(() => {
             bank.contents.splice(bank.contents.indexOf(item), 1);
         });

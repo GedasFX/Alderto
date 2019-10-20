@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
@@ -78,6 +79,8 @@ namespace Alderto.Services.Impl
 
             if (moderatorRoleId != null)
                 dbMsg.ModeratorRoleId = moderatorRoleId;
+
+            dbMsg.LastModified = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
         }

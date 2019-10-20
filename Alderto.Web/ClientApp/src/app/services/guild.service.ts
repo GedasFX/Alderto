@@ -17,43 +17,43 @@ export class Guild {
 
     private loadedChannels: IGuildChannel[];
     public get channels(): Promise<IGuildChannel[]> {
-        return new Promise<IGuildChannel[]>(r => {
-            if (this.loadedChannels != null)
+        return new Promise<IGuildChannel[]>(async r => {
+            if (this.loadedChannels != null) {
                 r(this.loadedChannels);
+                return;
+            }
 
-            this.guildApi.fetchChannels(this.id).subscribe(channels => {
-                this.loadedChannels = channels;
-                r(channels);
-            });
+            this.loadedChannels = await this.guildApi.fetchChannels(this.id).toPromise();
+            r(this.loadedChannels);
         });
     }
 
     private loadedRoles: IGuildRole[];
     public get roles(): Promise<IGuildRole[]> {
-        return new Promise<IGuildRole[]>(r => {
-            if (this.loadedRoles != null)
+        return new Promise<IGuildRole[]>(async r => {
+            if (this.loadedRoles != null) {
                 r(this.loadedRoles);
+                return;
+            }
 
-            this.guildApi.fetchRoles(this.id).subscribe(roles => {
-                this.loadedRoles = roles;
-                r(roles);
-            });
+            this.loadedRoles = await this.guildApi.fetchRoles(this.id).toPromise();
+            r(this.loadedRoles);
         });
     }
 
     private loadedUserRoles: IGuildRole[];
     public get userRoles(): Promise<IGuildRole[]> {
-        return new Promise<IGuildRole[]>(r => {
-            if (this.loadedUserRoles != null)
+        return new Promise<IGuildRole[]>(async r => {
+            if (this.loadedUserRoles != null) {
                 r(this.loadedUserRoles);
+                return;
+            }
 
-            this.guildApi.fetchUserRoles(this.id).subscribe(roleIds => {
-                this.roles.then(roles => {
-                    this.loadedUserRoles = [];
-                    roleIds.forEach(rid => {
-                        this.loadedUserRoles.push(roles.find(i => i.id === rid));
-                    });
-                });
+            const roleIds = await this.guildApi.fetchUserRoles(this.id).toPromise();
+            const roles = await this.roles;
+            this.loadedUserRoles = [];
+            roleIds.forEach(rid => {
+                this.loadedUserRoles.push(roles.find(i => i.id === rid));
             });
         });
     }

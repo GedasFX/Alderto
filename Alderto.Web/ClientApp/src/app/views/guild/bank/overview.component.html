@@ -24,7 +24,7 @@
               <i *ngIf="!item.imageUrl" class="fa fa-question-circle fa-2x"></i>
               <div>{{ item.name }}</div>
               <div class="small">
-                <span [class.text-danger]="item.quantity <= 0">{{ item.quantity }}</span>
+                <span [class.text-danger]="item.quantity <= 0">{{ item.quantity | number }}</span>
               </div>
             </a>
           </div>
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div *ngIf="bank.value" class="card-footer text-center">
-        Value: {{ bank.value }}
+        Value: {{ bank.value | number }}
       </div>
     </div>
   </div>

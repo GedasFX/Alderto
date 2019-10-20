@@ -36,9 +36,6 @@ namespace Alderto.Web.Extensions
         /// <returns>True if user was confirmed to be admin of a given guild.</returns>
         public static async Task<bool> ValidateResourceModeratorAsync(this IDiscordClient client, ulong userId, ulong guildId, ulong? modRoleId)
         {
-            if (modRoleId == null)
-                return false;
-
             var guild = await client.GetGuildAsync(guildId);
             if (guild == null)
                 return false;
@@ -47,7 +44,9 @@ namespace Alderto.Web.Extensions
             if (user == null)
                 return false;
 
-            return user.RoleIds.Any(r => r == modRoleId) || user.GuildPermissions.Administrator;
+            // Check if user has moderator role, or is administrator. 
+            // Do not iterate thru roles if modrole is undefined.
+            return modRoleId != null && user.RoleIds.Any(r => r == modRoleId) || user.GuildPermissions.Administrator;
         }
 
         /// <summary>

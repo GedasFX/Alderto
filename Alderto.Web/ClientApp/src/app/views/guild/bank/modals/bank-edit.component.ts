@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AldertoWebBankApi, GuildService } from 'src/app/services';
 import { IGuildBank, IGuildChannel, IGuildRole } from 'src/app/models';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 @Component({
     templateUrl: 'bank-edit.component.html'
@@ -37,9 +37,9 @@ export class BankEditComponent implements OnInit, OnDestroy {
             moderatorRoleId: [this.bank.moderatorRoleId]
         });
 
-        this.subscriptions.push(this.guild.currentGuild$.subscribe(g => {
-            g.channels.then(c => this.channelSelect = c);
-            g.roles.then(r => this.roleSelect = r);
+        this.subscriptions.push(this.guild.currentGuild$.subscribe(async g => {
+            this.channelSelect = await g.channels;
+            this.roleSelect = await g.roles;
         }));
     }
 
@@ -61,7 +61,7 @@ export class BankEditComponent implements OnInit, OnDestroy {
                 this.bank.name = this.formGroup.value.name;
                 this.bank.logChannelId = this.formGroup.value.logChannelId;
                 this.bank.moderatorRoleId = this.formGroup.value.moderatorRoleId;
-                console.log(this.formGroup.value);
+
                 this.toastr.success(`Successfully edited bank <b>${this.bank.name}</b>`, null, { enableHtml: true });
             },
             (err: HttpErrorResponse) => {

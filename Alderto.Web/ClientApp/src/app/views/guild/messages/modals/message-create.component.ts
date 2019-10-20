@@ -24,11 +24,13 @@ export class MessageCreateComponent implements OnInit, OnDestroy {
 
     public importGroup = this.fb.group({
         channelId: [null, Validators.required],
+        moderatorRoleId: [null],
         messageId: [null, [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
 
     public createGroup = this.fb.group({
         channelId: [null, Validators.required],
+        moderatorRoleId: [null],
         content: [null, Validators.required]
     });
 
@@ -45,14 +47,24 @@ export class MessageCreateComponent implements OnInit, OnDestroy {
     public async ngOnInit() {
         this.onMessageCreated = new Subject();
         this.channelSelect = await this.guild.currentGuild.channels;
+        this.roleSelect = await this.guild.currentGuild.roles;
     }
+
     public ngOnDestroy() {
         this.onMessageCreated.complete();
         this.subscriptions.forEach(s => s.unsubscribe());
     }
 
     public onCreate() {
-        this.messageApi.createNewMessage(this.guild.currentGuildId, this.createGroup.value.channelId, this.createGroup.value.content).subscribe(
+        if (!this.createGroup.valid)
+            return;
+
+        this.messageApi.createNewMessage(
+            this.guild.currentGuildId,
+            this.createGroup.value.channelId,
+            this.createGroup.value.content,
+            this.createGroup.value.moderatorRoleId,
+        ).subscribe(
             message => {
                 // Emit the created message.
                 this.onMessageCreated.next(message);
@@ -69,7 +81,15 @@ export class MessageCreateComponent implements OnInit, OnDestroy {
     }
 
     public onImport() {
-        this.messageApi.importMessage(this.guild.currentGuildId, this.importGroup.value.channelId, this.importGroup.value.messageId).subscribe(
+        if (!this.importGroup.valid)
+            return;
+
+        this.messageApi.importMessage(
+            this.guild.currentGuildId,
+            this.importGroup.value.channelId,
+            this.importGroup.value.messageId,
+            this.importGroup.value.moderatorRoleId
+        ).subscribe(
             message => {
                 // Emit the created message.
                 this.onMessageCreated.next(message);

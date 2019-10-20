@@ -49,14 +49,14 @@ namespace Alderto.Web.Controllers.Guild
             // If create new message
             if (message.Content != null)
             {
-                var msg = await _msgManager.PostMessageAsync(guildId, message.ChannelId, message.Content);
+                var msg = await _msgManager.PostMessageAsync(guildId, message.ChannelId, message.Content, message.ModeratorRoleId);
                 return Content(new ApiManagedMessage(msg));
             }
 
             // If import a message
             if (message.Id != 0)
             {
-                var msg = await _msgManager.ImportMessageAsync(guildId, message.ChannelId, message.Id);
+                var msg = await _msgManager.ImportMessageAsync(guildId, message.ChannelId, message.Id, message.ModeratorRoleId);
                 return Content(new ApiManagedMessage(msg));
             }
 
