@@ -15,8 +15,8 @@ using System.Text.Json;
 
 namespace Alderto.Web.Controllers
 {
-    [ApiController, Route("api/account")]
-    public class AccountController : ControllerBase
+    [Route("account")]
+    public class AccountController : ApiControllerBase
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _configuration;
@@ -42,7 +42,7 @@ namespace Alderto.Web.Controllers
             var userClaims = authResult.Principal.Claims.ToList();
 
             // Store data for the token
-            var userId = userClaims.Find(c => c.Type == ClaimTypes.NameIdentifier);
+            var userId = userClaims.Find(c => c.Type == ClaimTypes.NameIdentifier)!;
             var userDiscordToken = authResult.Properties.Items[".Token.access_token"];
 
             // Create the token.
@@ -60,7 +60,7 @@ namespace Alderto.Web.Controllers
             var user = new
             {
                 id = userId.Value,
-                username = userClaims.Find(c => c.Type == ClaimTypes.Name).Value,
+                username = userClaims.Find(c => c.Type == ClaimTypes.Name)!.Value,
                 discord = userDiscordToken,
                 token = tokenHandler.WriteToken(token)
             };

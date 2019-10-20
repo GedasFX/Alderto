@@ -8,15 +8,22 @@
     <Configurations>Debug;Release;Testing</Configurations>
 
     <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
+    <CodeAnalysisRuleSet>..\Custom Ruleset.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|AnyCPU'">
     <DefineConstants>TRACE;TEST</DefineConstants>
     <Optimize>false</Optimize>
+    <CodeAnalysisRuleSet>..\Custom Ruleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CodeAnalysisRuleSet>..\Custom Ruleset.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +40,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Bot.Lua\Alderto.Bot.Lua.csproj" />
     <ProjectReference Include="..\Alderto.Bot\Alderto.Bot.csproj" />
+    <ProjectReference Include="..\Alderto.Web\Alderto.Web.csproj" />
   </ItemGroup>
 
 </Project>

@@ -83,7 +83,7 @@ namespace Alderto.Bot.Modules
             var no = 1;
             foreach (var user in guildUsers)
             {
-                var member = await _guildMemberManager.GetGuildMemberAsync(user);
+                var member = (await _guildMemberManager.GetGuildMemberAsync(user))!;
                 await _currencyManager.ModifyPointsAsync(member, qty);
 
                 // Format a nice output.
@@ -96,13 +96,13 @@ namespace Alderto.Bot.Modules
         [Command("$")]
         [Summary("Checks the amount of points a given user has.")]
         public async Task CheckAsync(
-            [Summary("Person to check. If no user was provided, checks personal points.")] IGuildUser user = null)
+            [Summary("Person to check. If no user was provided, checks personal points.")] IGuildUser? user = null)
         {
             if (user == null)
                 user = (IGuildUser)Context.Message.Author;
 
             var currencySymbol = (await _guildPreferences.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
-            var dbUser = await _guildMemberManager.GetGuildMemberAsync(user);
+            var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user))!;
 
             await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
         }
@@ -112,7 +112,7 @@ namespace Alderto.Bot.Modules
         public async Task Timely()
         {
             var user = (IGuildUser)Context.User;
-            var dbUser = await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id);
+            var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id))!;
 
             var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
             var timelyCooldown = preferences.TimelyCooldown;

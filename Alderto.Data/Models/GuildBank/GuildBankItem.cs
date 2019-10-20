@@ -19,20 +19,8 @@ namespace Alderto.Data.Models.GuildBank
         /// <summary>
         /// Name of the item.
         /// </summary>
-        [MaxLength(70)]
+        [MaxLength(70), Required]
         public string Name { get; set; }
-
-        /// <summary>
-        /// Description of the item.
-        /// </summary>
-        [MaxLength(280)]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Path to the image to be displayed in the bank.
-        /// </summary>
-        [MaxLength(140)]
-        public string ImageUrl { get; set; }
 
         /// <summary>
         /// Monetary value per unit.
@@ -45,14 +33,46 @@ namespace Alderto.Data.Models.GuildBank
         public double Quantity { get; set; }
 
         /// <summary>
+        /// Description of the item.
+        /// </summary>
+        [MaxLength(280)]
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Path to the image to be displayed in the bank.
+        /// </summary>
+        [MaxLength(140)]
+        public string? ImageUrl { get; set; }
+
+        /// <summary>
         /// Guild bank object.
         /// </summary>
         [ForeignKey(nameof(GuildBankId))]
-        public virtual GuildBank GuildBank { get; set; }
+        public virtual GuildBank? GuildBank { get; set; }
+
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="GuildBankItem"/>.
+        /// For use by Entity Framework.
+        /// </summary>
+#nullable disable
+        private GuildBankItem() { }
+#nullable restore
+
+        public GuildBankItem(string name)
+        {
+            Name = name;
+        }
+
+        public GuildBankItem(int id, int bankId, string name)
+            : this(name)
+        {
+            Id = id;
+            GuildBankId = bankId;
+        }
 
         public new GuildBankItem MemberwiseClone()
         {
-            return (GuildBankItem) base.MemberwiseClone();
+            return (GuildBankItem)base.MemberwiseClone();
         }
     }
 }

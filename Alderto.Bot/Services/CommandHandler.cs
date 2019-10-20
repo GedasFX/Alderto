@@ -18,12 +18,15 @@ namespace Alderto.Bot.Services
         private readonly IGuildPreferencesProvider _guildPreferences;
 
         public CommandHandler(
-            DiscordSocketClient client,
+            IDiscordClient client,
             CommandService commands,
             IServiceProvider services,
             IGuildPreferencesProvider guildPreferences)
         {
-            _client = client;
+            if (!(client is DiscordSocketClient socketClient))
+                throw new ArgumentException("Discord client must be of Socket type to use Command Handler.");
+
+            _client = socketClient;
             _commands = commands;
             _services = services;
             _guildPreferences = guildPreferences;
@@ -52,7 +55,6 @@ namespace Alderto.Bot.Services
             // See Dependency Injection guide for more information.
             using var scope = _services.CreateScope();
             await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
-
         }
         
         public async Task HandleCommandAsync(SocketMessage messageParam)

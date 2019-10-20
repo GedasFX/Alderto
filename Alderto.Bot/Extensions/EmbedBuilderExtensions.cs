@@ -16,10 +16,10 @@ namespace Alderto.Bot.Extensions
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns><see cref="builder"/></returns>
         public static EmbedBuilder WithDefault(this EmbedBuilder builder,
-            string description = null,
+            string? description = null,
             Color embedColor = default,
-            IUser author = null,
-            Action<EmbedBuilder> extra = null)
+            IUser? author = null,
+            Action<EmbedBuilder>? extra = null)
         {
             builder.WithColor(embedColor == default ? EmbedColor.Info : embedColor);
 

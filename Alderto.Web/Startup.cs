@@ -1,23 +1,29 @@
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Services;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Alderto.Web
 {
@@ -31,7 +37,7 @@ namespace Alderto.Web
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices([NotNull] IServiceCollection services)
         {
             // === <General> ===
             // Add database.
@@ -50,7 +56,7 @@ namespace Alderto.Web
             // Add database accessors.
             services.AddBotManagers();
 
-            ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
+            _ = ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
             services.AddMessagesManager();
 
@@ -90,14 +96,37 @@ namespace Alderto.Web
             services.AddAuthorization();
 
             // Add Mvc
-            services.AddMvcCore().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
-                options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
-            });
+            services
+                .AddMvcCore()
+                .AddDataAnnotations()
+                .AddApiExplorer()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
+                        var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
+                                       value.Errors[0].ErrorMessage;
+                        return new BadRequestObjectResult(new ErrorMessage(400, 0, errorMsg));
+                    };
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
+                });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Alderto Documentation",
+                    Version = "v1"
+                });
+            });
 
             // === <Bot> ===
             // Add discord socket client
@@ -131,30 +160,78 @@ namespace Alderto.Web
                 app.UseHttpsRedirection();
             }
 
-            app.UseCookiePolicy();
-
-            app.UseSpaStaticFiles();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-            
-            app.UseEndpoints(p =>
+            // Configure api routing.
+            app.Map("/api", api =>
             {
-                // Map the API controller attribute routing.
-                p.MapControllers();
-
-                // All unmapped api requests should return NotFound
-                p.Map("/api/{*url}", context =>
+                if (env.IsDevelopment())
                 {
-                    context.Response.OnStarting(() =>
-                        Task.FromResult(context.Response.StatusCode = StatusCodes.Status404NotFound));
+                    api.UseStaticFiles();
+                    api.UseSwagger();
+                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
+                }
 
-                    return Task.CompletedTask;
+                api.UseRouting();
+
+                api.UseAuthentication();
+                api.UseAuthorization();
+
+                // Handle Service errors
+                api.Use(async (context, next) =>
+                {
+                    try
+                    {
+                        await next.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        // Handle known API Exceptions.
+                        if (e is ApiException apiException)
+                        {
+                            context.Response.OnStarting(() =>
+                    {
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = (apiException.Error.Code / 1000) switch
+                        {
+                            1 => StatusCodes.Status403Forbidden,
+                            2 => StatusCodes.Status404NotFound,
+                            3 => StatusCodes.Status400BadRequest,
+                            _ => throw e
+                        };
+
+                        return Task.CompletedTask;
+                    });
+
+                            await context.Response.WriteAsync(
+                                JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                        }
+                        else if (e is HttpException discordException)
+                        {
+                            context.Response.OnStarting(() =>
+                            {
+                                context.Response.ContentType = "application/json";
+                                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                                return Task.CompletedTask;
+                            });
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(
+                                discordException.DiscordCode switch
+                                {
+                                    50001 => ErrorMessages.MissingChannelAccess,
+                                    50013 => ErrorMessages.MissingWritePermissions,
+                                    _ => throw e
+                                }, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                        }
+                        else
+                            throw;
+                    }
                 });
+
+                api.UseEndpoints(p => { p.MapControllers(); });
             });
-            
+
+            // Use SPA Application
+            app.UseSpaStaticFiles();
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())
@@ -164,7 +241,7 @@ namespace Alderto.Web
             });
         }
 
-        public async Task UpdateDatabase(IApplicationBuilder app)
+        private static async Task UpdateDatabase(IApplicationBuilder app)
         {
             using var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
@@ -173,9 +250,9 @@ namespace Alderto.Web
             await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
             var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
 
-            logger.Log(LogLevel.Information, "Initializing database...");
+            logger.LogInformation("Initializing Database...");
             await context.Database.MigrateAsync();
-            logger.LogInformation("Database ready!");
+            logger.LogInformation("Database Ready!");
         }
     }
 }

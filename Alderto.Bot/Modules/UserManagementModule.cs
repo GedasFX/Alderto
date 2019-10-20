@@ -26,7 +26,7 @@ namespace Alderto.Bot.Modules
         [RequireBotPermission(GuildPermission.ManageNicknames | GuildPermission.ManageRoles)]
         public async Task Accept(
             [Summary("User")] IGuildUser user,
-            [Remainder] [Summary("Nickname. Does not change nickname if none was specified.")] string nickname = null)
+            [Remainder] [Summary("Nickname. Does not change nickname if none was specified.")] string? nickname = null)
         {
             var pref = await _guildPreferencesProvider.GetPreferencesAsync(user.GuildId);
 

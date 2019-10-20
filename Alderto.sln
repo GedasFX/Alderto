@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Bot.Lua", "Alderto.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Services", "Alderto.Services\Alderto.Services.csproj", "{D7311A64-27AC-4949-BCCB-573BED3028DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNet.Security.OAuth.Discord", "AspNet.Security.OAuth.Discord\AspNet.Security.OAuth.Discord.csproj", "{2CCE8A32-8527-4609-823B-A83741BD0ECC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OAuth.Discord", "AspNet.Security.OAuth.Discord\AspNet.Security.OAuth.Discord.csproj", "{2CCE8A32-8527-4609-823B-A83741BD0ECC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02292DA8-3661-4E82-97D3-B6362CD09355}"
+	ProjectSection(SolutionItems) = preProject
+		Custom Ruleset.ruleset = Custom Ruleset.ruleset
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

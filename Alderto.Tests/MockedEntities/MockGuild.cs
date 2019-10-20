@@ -1,13 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
+using Discord.WebSocket;
+using Moq;
 
 namespace Alderto.Tests.MockedEntities
 {
     public class MockGuild : IGuild
     {
+        private readonly IGuildUser[] _users;
+        private readonly ITextChannel[] _channels;
+
+        public MockGuild(ulong guildId, IGuildUser[] users, ITextChannel[] channels)
+        {
+            Id = guildId;
+            _users = users;
+            _channels = channels;
+        }
+
+#nullable disable
         public Task DeleteAsync(RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -82,12 +96,12 @@ namespace Alderto.Tests.MockedEntities
 
         public Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IGuildChannel>(_channels.SingleOrDefault(o => o.Id == id));
         }
 
         public Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IReadOnlyCollection<ITextChannel>>(_channels);
         }
 
         public Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
@@ -188,12 +202,12 @@ namespace Alderto.Tests.MockedEntities
 
         public Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IReadOnlyCollection<IGuildUser>>(_users);
         }
 
         public Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_users.SingleOrDefault(o => o.Id == id));
         }
 
         public Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
@@ -275,5 +289,6 @@ namespace Alderto.Tests.MockedEntities
         public IReadOnlyCollection<GuildEmote> Emotes { get; set; }
         public IReadOnlyCollection<string> Features { get; set; }
         public IReadOnlyCollection<IRole> Roles { get; set; }
+#nullable restore
     }
 }

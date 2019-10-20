@@ -27,7 +27,7 @@ namespace Alderto.Tests
         public async Task Give()
         {
             var user = Dummies.Alice;
-            await _manager.ModifyPointsAsync(await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id), 20);
+            await _manager.ModifyPointsAsync((await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id))!, 20);
             var dbUser = await _context.GuildMembers.SingleOrDefaultAsync(m => m.GuildId == user.GuildId && m.MemberId == user.Id);
 
             Assert.Equal(expected: 20, dbUser.CurrencyCount);
@@ -36,8 +36,7 @@ namespace Alderto.Tests
         [Fact]
         public async Task Timely()
         {
-            var user = Dummies.Alice;
-            var member = await _guildMemberManager.GetGuildMemberAsync(user);
+            var member = (await _guildMemberManager.GetGuildMemberAsync(Dummies.Alice))!;
 
             // At the start, the currency count should be 0.
             Assert.Equal(expected: 0, member.CurrencyCount);

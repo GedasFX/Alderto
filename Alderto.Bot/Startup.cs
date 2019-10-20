@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Services;
 using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +60,7 @@ namespace Alderto.Bot
             using (var scope = services.CreateScope())
             {
                 Console.Out.WriteLine("Initializing database...");
-                using (var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>())
+                await using (var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>())
                 {
                     await context.Database.MigrateAsync();
                 }

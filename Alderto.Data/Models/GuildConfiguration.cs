@@ -11,27 +11,27 @@ namespace Alderto.Data.Models
         public static GuildConfiguration DefaultConfiguration => (GuildConfiguration)CfgDefaults.MemberwiseClone();
 
         /// <summary>
-        /// Default value for <see cref="GuildConfiguration.Prefix"/>
+        /// Default value for <see cref="Prefix"/>
         /// </summary>
         public static string DefaultPrefix { get; } = ".";
 
         /// <summary>
-        /// Default value for <see cref="GuildConfiguration.CurrencySymbol"/>
+        /// Default value for <see cref="CurrencySymbol"/>
         /// </summary>
         public static string DefaultCurrencySymbol { get; } = "⚽";
 
         /// <summary>
-        /// Default value for <see cref="GuildConfiguration.TimelyRewardQuantity"/>
+        /// Default value for <see cref="TimelyRewardQuantity"/>
         /// </summary>
         public static int DefaultTimelyRewardQuantity { get; } = 1;
 
         /// <summary>
-        /// Default value for <see cref="GuildConfiguration.TimelyCooldown"/>
+        /// Default value for <see cref="TimelyCooldown"/>
         /// </summary>
         public static int DefaultTimelyCooldown { get; } = 86400; // 24h
 
         /// <summary>
-        /// Default value for <see cref="GuildConfiguration.AcceptedMemberRoleId"/>
+        /// Default value for <see cref="AcceptedMemberRoleId"/>
         /// </summary>
         public static ulong DefaultAcceptedMemberRoleId { get; } = 0;
 
@@ -45,7 +45,7 @@ namespace Alderto.Data.Models
             AcceptedMemberRoleId = DefaultAcceptedMemberRoleId
         };
 
-        
+
         /// <summary>
         /// Discord guild identifier. Primary and foreign key for <see cref="Models.Guild"/>.
         /// If GuildId > 0, the configuration is determined to be in the database. Make sure you know what you are doing modifying this value.
@@ -76,20 +76,20 @@ namespace Alderto.Data.Models
         public int TimelyCooldown { get; set; }
 
         /// <summary>
-        /// Id of role, whenever user was accepted to the guild.
+        /// Id of role to add the user to, whenever user was accepted to the guild.
         /// </summary>
         public ulong AcceptedMemberRoleId { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/> of which owns this configuration.
         /// </summary>
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildConfiguration"/>, with configuration defaults
         /// </summary>
-        public GuildConfiguration()
-        {
-        }
+#nullable disable
+        private GuildConfiguration() { }
+#nullable restore
     }
 }

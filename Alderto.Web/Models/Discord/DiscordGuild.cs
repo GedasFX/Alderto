@@ -1,5 +1,6 @@
 ﻿namespace Alderto.Web.Models.Discord
 {
+#nullable disable
     public class DiscordGuild
     {
         public string Id { get; set; }
@@ -8,4 +9,5 @@
         public bool Owner { get; set; }
         public string Icon { get; set; }
     }
+#nullable restore
 }

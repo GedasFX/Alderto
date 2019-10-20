@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 
+#nullable disable
+
 namespace Alderto.Tests.MockedEntities
 {
     public class MockGuildUser : IGuildUser

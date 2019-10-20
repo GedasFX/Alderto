@@ -17,28 +17,31 @@ namespace Alderto.Data
         public DbSet<GuildBank> GuildBanks { get; set; }
         public DbSet<GuildBankItem> GuildBankItems { get; set; }
 
-        public AldertoDbContext(DbContextOptions options) : base(options)
-        {
-        }
+        public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
 
-        public AldertoDbContext()
-        {
-        }
+#nullable disable
+        public AldertoDbContext(DbContextOptions options) : base(options) { }
+#nullable restore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Guild>()
                 .HasOne(g => g.Configuration)
-                .WithOne(c => c.Guild)
+                .WithOne(c => c!.Guild!)
                 .HasForeignKey<GuildConfiguration>(c => c.GuildId);
 
             modelBuilder.Entity<GuildMember>()
                 .HasKey(g => new { g.GuildId, g.MemberId });
 
             modelBuilder.Entity<GuildBank>()
+                // Frequent searches for guild banks are done by GuildId
+                // Additionally a constraint for no duplicate names require unique index.
                 .HasIndex(b => new { b.GuildId, b.Name })
                 .IsUnique();
-            
+
+            modelBuilder.Entity<GuildManagedMessage>()
+                .HasKey(m => new { m.GuildId, m.MessageId });
+
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
 

@@ -11,22 +11,22 @@ namespace Alderto.Data.Models.GuildBank
         /// </summary>
         [Key]
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Discord Guild Id.
         /// </summary>
         public ulong GuildId { get; set; }
 
         /// <summary>
-        /// Id of channel to log changes to the bank to.
-        /// </summary>
-        public ulong? LogChannelId { get; set; }
-
-        /// <summary>
         /// Name of the bank.
         /// </summary>
         [MaxLength(32), Required]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Id of channel to log changes to the bank to.
+        /// </summary>
+        public ulong? LogChannelId { get; set; }
 
         /// <summary>
         /// Id of role, which allows to modify contents of the bank.
@@ -37,17 +37,20 @@ namespace Alderto.Data.Models.GuildBank
         /// Guild, referenced by <see cref="GuildId"/>.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         /// <summary>
         /// A collection of items in the bank.
         /// </summary>
-        public virtual ICollection<GuildBankItem> Contents { get; set; }
+        public virtual ICollection<GuildBankItem>? Contents { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
+        /// For use by Entity Framework.
         /// </summary>
-        public GuildBank() { }
+#nullable disable
+        private GuildBank() { }
+#nullable restore
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildBank"/>, with <see cref="GuildId"/>) property set.
@@ -62,7 +65,7 @@ namespace Alderto.Data.Models.GuildBank
 
         public new GuildBank MemberwiseClone()
         {
-            return (GuildBank) base.MemberwiseClone();
+            return (GuildBank)base.MemberwiseClone();
         }
     }
 }

@@ -1,19 +1,22 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Alderto.Services.Exceptions;
 using Alderto.Web.Models.Discord;
-using Discord.WebSocket;
+using Discord;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers
 {
-    [Route("api/users")]
+    [Route("users")]
     public class UserController : ApiControllerBase
     {
-        private readonly DiscordSocketClient _bot;
+        private readonly IDiscordClient _client;
 
-        public UserController(DiscordSocketClient bot)
+        public UserController(IDiscordClient client)
         {
-            _bot = bot;
+            _client = client;
         }
 
         [HttpPost("@me/mutual-guilds")]
@@ -25,7 +28,8 @@ namespace Alderto.Web.Controllers
                 return BadRequest(ErrorMessages.PayloadOver100);
 
             // _bot.GetGuild(ulong id) returns null if bot is currently not connected to that guild.
-            var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuild(ulong.Parse(userGuild.Id)) != null);
+            var mutualGuilds = userGuilds.Where(userGuild => _client.GetGuildAsync(ulong.Parse(userGuild.Id, CultureInfo.InvariantCulture)).Result != null);
+
             return Content(mutualGuilds);
         }
     }

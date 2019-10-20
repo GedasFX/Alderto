@@ -15,19 +15,22 @@ namespace Alderto.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("TriggerKeyword")
+                        .HasColumnType("character varying(20)")
                         .HasMaxLength(20);
 
                     b.Property<string>("LuaCode")
+                        .IsRequired()
+                        .HasColumnType("character varying(2000)")
                         .HasMaxLength(2000);
 
                     b.HasKey("GuildId", "TriggerKeyword");
@@ -38,9 +41,10 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
                 {
                     b.Property<decimal>("Id")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<DateTimeOffset?>("PremiumUntil");
+                    b.Property<DateTimeOffset?>("PremiumUntil")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -50,19 +54,22 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal?>("LogChannelId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal?>("ModeratorRoleId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("character varying(32)")
                         .HasMaxLength(32);
 
                     b.HasKey("Id");
@@ -76,22 +83,31 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Description")
+                        .HasColumnType("character varying(280)")
                         .HasMaxLength(280);
 
-                    b.Property<int>("GuildBankId");
+                    b.Property<int>("GuildBankId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
+                        .HasColumnType("character varying(140)")
                         .HasMaxLength(140);
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(70)")
                         .HasMaxLength(70);
 
-                    b.Property<double>("Quantity");
+                    b.Property<double>("Quantity")
+                        .HasColumnType("double precision");
 
-                    b.Property<double>("Value");
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -103,47 +119,81 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.GuildConfiguration", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("AcceptedMemberRoleId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("CurrencySymbol")
                         .IsRequired()
+                        .HasColumnType("character varying(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("Prefix")
                         .IsRequired()
+                        .HasColumnType("character varying(20)")
                         .HasMaxLength(20);
 
-                    b.Property<int>("TimelyCooldown");
+                    b.Property<int>("TimelyCooldown")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("TimelyRewardQuantity");
+                    b.Property<int>("TimelyRewardQuantity")
+                        .HasColumnType("integer");
 
                     b.HasKey("GuildId");
 
                     b.ToTable("GuildPreferences");
                 });
 
+            modelBuilder.Entity("Alderto.Data.Models.GuildManagedMessage", b =>
+                {
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("MessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("character varying(2000)")
+                        .HasMaxLength(2000);
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("ModeratorRoleId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("GuildId", "MessageId");
+
+                    b.ToTable("GuildManagedMessages");
+                });
+
             modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("MemberId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<int>("CurrencyCount");
+                    b.Property<int>("CurrencyCount")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("CurrencyLastClaimed");
+                    b.Property<DateTimeOffset>("CurrencyLastClaimed")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset?>("JoinedAt");
+                    b.Property<DateTimeOffset?>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Nickname")
+                        .HasColumnType("character varying(32)")
                         .HasMaxLength(32);
 
                     b.Property<decimal?>("RecruiterMemberId")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.HasKey("GuildId", "MemberId");
 
@@ -155,12 +205,14 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.Member", b =>
                 {
                     b.Property<decimal>("Id")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Discriminator")
+                        .HasColumnType("character varying(4)")
                         .HasMaxLength(4);
 
                     b.Property<string>("Username")
+                        .HasColumnType("character varying(32)")
                         .HasMaxLength(32);
 
                     b.HasKey("Id");
@@ -173,7 +225,8 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
                         .WithMany("CustomCommands")
                         .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
@@ -181,7 +234,8 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
                         .WithMany("GuildBanks")
                         .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
@@ -189,7 +243,8 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.GuildBank.GuildBank", "GuildBank")
                         .WithMany("Contents")
                         .HasForeignKey("GuildBankId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildConfiguration", b =>
@@ -197,7 +252,17 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
                         .WithOne("Configuration")
                         .HasForeignKey("Alderto.Data.Models.GuildConfiguration", "GuildId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildManagedMessage", b =>
+                {
+                    b.HasOne("Alderto.Data.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
@@ -205,12 +270,14 @@ namespace Alderto.Data.Migrations
                     b.HasOne("Alderto.Data.Models.Guild", "Guild")
                         .WithMany("GuildMembers")
                         .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Alderto.Data.Models.Member", "Member")
                         .WithMany("GuildMembers")
                         .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

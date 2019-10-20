@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Alderto.Data.Models.GuildBank;
 
 namespace Alderto.Data.Models
 {
@@ -22,7 +20,7 @@ namespace Alderto.Data.Models
         /// Last known nickname of the user. Max Length: 32 (Discord limitation)
         /// </summary>
         [MaxLength(32)]
-        public string Nickname { get; set; }
+        public string? Nickname { get; set; }
 
         /// <summary>
         /// Time of last currency claim.
@@ -48,18 +46,19 @@ namespace Alderto.Data.Models
         /// Guild, referenced by <see cref="GuildId"/>.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
-        public virtual Guild Guild { get; set; }
+        public virtual Guild? Guild { get; set; }
 
         /// <summary>
         /// Member, referenced by <see cref="MemberId"/>.
         /// </summary>
         [ForeignKey(nameof(MemberId))]
-        public virtual Member Member { get; set; }
-        
+        public virtual Member? Member { get; set; }
+
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.
+        /// For use by Entity Framework.
         /// </summary>
-        public GuildMember() { }
+        private GuildMember() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildMember"/>, with primary key (<see cref="MemberId"/> and <see cref="GuildId"/>) set.

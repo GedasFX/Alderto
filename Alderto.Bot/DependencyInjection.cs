@@ -20,8 +20,8 @@ namespace Alderto.Bot
         /// <param name="botToken">Token of the bot.</param>
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddDiscordSocketClient(this IServiceCollection services,
-            string botToken, Action<DiscordSocketConfig> config = null) =>
-            services.AddSingleton<DiscordSocketClient, DiscordSocketClientWrapper>()
+            string botToken, Action<DiscordSocketConfig>? config = null) =>
+            services.AddSingleton<IDiscordClient, DiscordSocketClientWrapper>()
                 .Configure<DiscordSocketConfigWrapper>(localConfig =>
                 {
                     localConfig.BotToken = botToken;
@@ -30,7 +30,7 @@ namespace Alderto.Bot
 
         private class DiscordSocketConfigWrapper : DiscordSocketConfig
         {
-            public string BotToken { get; set; }
+            public string? BotToken { get; set; }
         }
         private class DiscordSocketClientWrapper : DiscordSocketClient
         {
@@ -48,7 +48,7 @@ namespace Alderto.Bot
                     return Task.CompletedTask;
                 };
 
-                Run(config.Value.BotToken).ConfigureAwait(false);
+                Run(config.Value.BotToken!).ConfigureAwait(false);
             }
 
             private async Task Run(string token)
@@ -64,23 +64,23 @@ namespace Alderto.Bot
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         /// <param name="config">Additional options to configure bot with.</param>
         public static IServiceCollection AddCommandService(this IServiceCollection services,
-            Action<CommandServiceConfig> config = null) =>
+            Action<CommandServiceConfig>? config = null) =>
             services.AddSingleton<CommandService, CommandServiceWrapper>().Configure(config);
 
         private class CommandServiceWrapper : CommandService
         {
-            public CommandServiceWrapper(DiscordSocketClient client, ILogger<CommandService> logger,
+            public CommandServiceWrapper(IDiscordClient client, ILogger<CommandService> logger,
                 IOptions<CommandServiceConfig> cmdServiceConfig, IConfiguration config) : base(cmdServiceConfig.Value)
             {
                 if (ulong.TryParse(config["LoggingChannelId"], out var loggingChannelId))
                 {
+                    var channel = (IMessageChannel)client.GetChannelAsync(loggingChannelId).Result;
                     Log += async message =>
                     {
                         if (message.Exception is CommandException commandException)
                         {
-                            await ((IMessageChannel)client.GetChannel(loggingChannelId))
-                                .SendMessageAsync(
-                                    $"```{commandException.Message}\n{commandException.InnerException}```");
+                            await channel.SendMessageAsync(
+                                $"```{commandException.Message}\n{commandException.InnerException}```");
                         }
                     };
                 }
