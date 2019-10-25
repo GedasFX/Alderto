@@ -92,12 +92,14 @@ namespace Alderto.Services.Impl
             if (dbMsg == null)
                 throw new MessageNotFoundException();
 
-            var message = await GetDiscordBotMessageAsync(dbMsg);
-
-            // User can always delete its own posts.
-
-            // First attempt to delete from the server.
-            await message.DeleteAsync();
+            // Try to delete message from discord.
+            try
+            {
+                // User can always delete its own posts.
+                var message = await GetDiscordBotMessageAsync(dbMsg);
+                await message.DeleteAsync();
+            } catch (MessageNotFoundException) { /* Message is already gone from discord. Ignore error. */ }
+            
 
             _context.GuildManagedMessages.Remove(dbMsg);
             await _context.SaveChangesAsync();
