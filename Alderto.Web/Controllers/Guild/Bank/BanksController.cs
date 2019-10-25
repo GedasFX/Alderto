@@ -23,8 +23,6 @@ namespace Alderto.Web.Controllers.Guild.Bank
             _client = client;
         }
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-
         [HttpGet]
         public async Task<IActionResult> ListBanks(ulong guildId)
         {
