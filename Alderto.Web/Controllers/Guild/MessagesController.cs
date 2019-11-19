@@ -85,6 +85,9 @@ namespace Alderto.Web.Controllers.Guild
         [HttpDelete("{messageId}")]
         public async Task<IActionResult> RemoveMessage(ulong guildId, ulong messageId)
         {
+            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
+                throw new UserNotGuildAdminException();
+
             await _msgManager.RemoveMessageAsync(guildId, messageId);
             return NoContent();
         }
