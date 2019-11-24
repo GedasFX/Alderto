@@ -3,77 +3,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using Alderto.Web.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Text.Json;
 
 namespace Alderto.Web.Controllers
 {
     [Route("account")]
     public class AccountController : ApiControllerBase
     {
-        private readonly ILogger<AccountController> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly AuthService _authService;
 
-        public AccountController(ILogger<AccountController> logger, IConfiguration configuration)
+        public AccountController(ILogger<AccountController> logger, IConfiguration configuration, AuthService authService)
         {
-            _logger = logger;
-            _configuration = configuration;
+            _authService = authService;
         }
 
         [HttpGet("login")]
         [Authorize(AuthenticationSchemes = DiscordAuthenticationDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Login()
+        public ActionResult Login()
         {
-            // Authorized using discord. Create JWT token.
+            return Redirect("/");
+        }
 
-            // Fetch the authentication result. It contains the access token to discord.
-            var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        [HttpPost("login"), Authorize("TokenRefresh")]
+        public async Task<ActionResult<string>> RefreshJwtAsync()
+        {
+            var authResult = await HttpContext.AuthenticateAsync("TokenRefresh");
+            var jwt = await _authService.GenerateJwtAsync(authResult.Ticket);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            return jwt;
+        }
 
-            // Add claims to the JWT.
-            var userClaims = authResult.Principal.Claims.ToList();
-
-            // Store data for the token
-            var userId = userClaims.Find(c => c.Type == ClaimTypes.NameIdentifier)!;
-            var userDiscordToken = authResult.Properties.Items[".Token.access_token"];
-
-            // Create the token.
-            var token = tokenHandler.CreateJwtSecurityToken(
-                subject: new ClaimsIdentity(new[]
-                {
-                    userId,
-                    new Claim("discord", userDiscordToken)
-                }),
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Convert.FromBase64String(_configuration["JWTPrivateKey"])),
-                    SecurityAlgorithms.HmacSha256Signature),
-                expires: authResult.Properties.ExpiresUtc?.DateTime
-            );
-            var user = new
-            {
-                id = userId.Value,
-                username = userClaims.Find(c => c.Type == ClaimTypes.Name)!.Value,
-                discord = userDiscordToken,
-                token = tokenHandler.WriteToken(token)
-            };
-
-            _logger.LogInformation($"User {User.Identity.Name} has logged in.");
-            await HttpContext.SignOutAsync(); // Cookie is no longer needed. Sign out.
-
-            // Faking a view. Sends the token to localStorage and redirecting to main webpage.
-            return Content(
-                "<script>" +
-                    $"localStorage.setItem('user', '{ JsonSerializer.Serialize(user) }');" +
-                     "window.location.href = '/'" +
-                "</script>", "text/html");
+        [HttpPost("logout"), Authorize("TokenRefresh")]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await HttpContext.SignOutAsync("TokenRefresh");
+            return Ok();
         }
     }
 }

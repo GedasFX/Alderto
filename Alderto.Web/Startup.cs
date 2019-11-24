@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
@@ -8,10 +9,10 @@ using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
+using Alderto.Web.Services;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -66,8 +67,6 @@ namespace Alderto.Web
                 .AddAuthentication(options =>
                 {
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddDiscord(options =>
                 {
@@ -76,6 +75,8 @@ namespace Alderto.Web
                     options.SaveTokens = true;
 
                     options.Scope.Add("guilds");
+
+                    options.SignInScheme = "RefreshToken";
                 })
                 .AddJwtBearer(options =>
                 {
@@ -89,11 +90,23 @@ namespace Alderto.Web
                             new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
-                .AddCookie(options =>
+                .AddCookie("RefreshToken", options =>
                 {
-                    options.Cookie.Name = ".Session";
+                    options.Cookie.Name = ".RefreshToken";
+                    options.Cookie.Path = "/api/account/login";
+                    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                    //options.Cookie.SameSite = SameSiteMode.Strict;
+                    //options.Cookie.HttpOnly = true;
                 });
+
             services.AddAuthorization();
+
+            services.AddHttpClient<DiscordHttpClient>(o =>
+            {
+                o.BaseAddress = new Uri("https://discordapp.com/api/v6");
+                o.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            });
+            services.AddScoped<AuthService>();
 
             // Add Mvc
             services
@@ -112,6 +125,7 @@ namespace Alderto.Web
                 })
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
                     options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
                 });
