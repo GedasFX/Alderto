@@ -15,6 +15,7 @@ using Discord;
 using Discord.Commands;
 using Discord.Net;
 using IdentityModel;
+using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -46,17 +47,18 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices([NotNull] IServiceCollection services)
         {
+            var dbConnectionString = $"Server={Configuration["Database:Host"]};" +
+                                     $"Port={Configuration["Database:Port"]};" +
+                                     $"Database={Configuration["Database:Database"]};" +
+                                     $"UserId={Configuration["Database:Username"]};" +
+                                     $"Password={Configuration["Database:Password"]};" +
+                                     Configuration["Database:Extras"];
+
             // === <General> ===
             // Add database.
             services.AddDbContext<AldertoDbContext>(options =>
             {
-                options.UseNpgsql(
-                    $"Server={Configuration["Database:Host"]};" +
-                    $"Port={Configuration["Database:Port"]};" +
-                    $"Database={Configuration["Database:Database"]};" +
-                    $"UserId={Configuration["Database:Username"]};" +
-                    $"Password={Configuration["Database:Password"]};" +
-                    Configuration["Database:Extras"],
+                options.UseNpgsql(dbConnectionString,
                     builder => builder.MigrationsAssembly("Alderto.Data"));
             });
 
@@ -106,8 +108,9 @@ namespace Alderto.Web
 
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential(filename: "token.rsa")
-                .AddInMemoryPersistedGrants()
-                //.AddInMemoryIdentityResources(Array.Empty<IdentityResource>())
+                .AddOperationalStore(o => o.ConfigureDbContext = c =>
+                    c.UseNpgsql(dbConnectionString,
+                        b => b.MigrationsAssembly("Alderto.Web")))
                 .AddProfileService<AuthProfileService>()
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
                 .AddInMemoryClients(new[]
@@ -291,12 +294,20 @@ namespace Alderto.Web
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 
-            await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
-            var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
+            await using var applicationDbContext = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
+            var applicationDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<AldertoDbContext>>();
 
-            logger.LogInformation("Initializing Database...");
-            await context.Database.MigrateAsync();
-            logger.LogInformation("Database Ready!");
+            applicationDbContextLogger.LogInformation("Initializing Application Database...");
+            await applicationDbContext.Database.MigrateAsync();
+            applicationDbContextLogger.LogInformation("Database Application Ready!");
+
+
+            await using var persistedGrantDbContext = serviceScope.ServiceProvider.GetService<PersistedGrantDbContext>();
+            var persistedGrantDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<PersistedGrantDbContext>>();
+
+            persistedGrantDbContextLogger.LogInformation("Initializing Auth Database...");
+            await persistedGrantDbContext.Database.MigrateAsync();
+            persistedGrantDbContextLogger.LogInformation("Database Auth Ready!");
         }
     }
 }
