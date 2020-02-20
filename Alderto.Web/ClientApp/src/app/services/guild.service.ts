@@ -105,7 +105,7 @@ export class GuildService {
     });
   }
 
-  private get mutualGuilds() {
+  public get mutualGuilds() {
     return this.mutualGuilds$.getValue();
   }
 
