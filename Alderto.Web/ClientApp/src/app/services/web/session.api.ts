@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { authHost } from 'src/appsettings';
 
 export interface ITokenResponse {
   access_token: string;
@@ -19,7 +18,7 @@ export class SessionWebApi {
 
   public authorize() {
     const redirectUri = encodeURI(`${window.location.origin}/login`);
-    window.location.href = `${authHost}/connect/authorize?client_id=js&redirect_uri=${redirectUri}&response_type=code&scope=api%20offline_access`;
+    window.location.href = `${(window as any).config.AUTH_HOST}/connect/authorize?client_id=js&redirect_uri=${redirectUri}&response_type=code&scope=api%20offline_access`;
   }
 
   public login(code: string) {
@@ -29,14 +28,14 @@ export class SessionWebApi {
       .append('grant_type', 'authorization_code')
       .append('redirect_uri', `${window.location.origin}/login`);
 
-    return this.http.post<ITokenResponse>(`${authHost}/connect/token`,
+    return this.http.post<ITokenResponse>(`${(window as any).config.AUTH_HOST}/connect/token`,
       params.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
   }
 
   public logout() {
-    //return this.http.post('/api/account/logout', null);
+    return this.http.post('/api/account/logout', null);
   }
 
   public refresh(refreshToken: string) {
@@ -44,9 +43,8 @@ export class SessionWebApi {
       .append('refresh_token', refreshToken)
       .append('client_id', 'js')
       .append('grant_type', 'refresh_token');
-      //.append('redirect_uri', `${window.location.origin}/login`);
 
-    return this.http.post<ITokenResponse>(`${authHost}/connect/token`,
+    return this.http.post<ITokenResponse>(`${(window as any).config.AUTH_HOST}/connect/token`,
       params.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });

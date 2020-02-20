@@ -5,7 +5,6 @@ import { catchError, switchMap, filter, take } from 'rxjs/operators';
 
 import { AccountService } from '../services/account.service';
 import { ITokenResponse } from '../services';
-import { apiHost } from 'src/appsettings';
 
 @Injectable({
   providedIn: 'root'
