@@ -93,11 +93,7 @@ namespace Alderto.Web
                     options.Authority = "https://localhost/api";
                     options.Audience = "api";
                 })
-                .AddCookie(o =>
-                {
-                    o.Cookie.Path = "/api/account/login";
-                    o.ExpireTimeSpan = TimeSpan.FromDays(14);
-                });
+                .AddCookie();
 
             services.AddAuthorization(o =>
             {

@@ -8,9 +8,9 @@ namespace Alderto.Web.Controllers
     {
         [HttpGet("login")]
         [Authorize(AuthenticationSchemes = "Discord")]
-        public ActionResult Login(string? redirectUrl = null)
+        public ActionResult Login(string? returnUrl = null)
         {
-            return Redirect(redirectUrl ?? "/");
+            return Redirect(returnUrl ?? "/");
         }
     }
 }
