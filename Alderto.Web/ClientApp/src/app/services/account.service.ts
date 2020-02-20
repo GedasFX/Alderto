@@ -1,35 +1,35 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-
-export class User {
-  public id: number;
-  public token: string;
-  public discord: string;
-
-  public username: string;
-}
+import { SessionWebApi } from './web';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AccountService {
-  public user$: BehaviorSubject<User>;
+    public readonly access_token$: BehaviorSubject<string>;
 
-  constructor() {
-    this.user$ = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
-  }
+    constructor(private readonly sessionApi: SessionWebApi) {
+        this.access_token$ = new BehaviorSubject<string>(undefined);
+    }
 
-  public login() {
-    // No need to modify subject or localstorage as they are going to be changed either way.
-    window.location.href = '/api/account/login';
-  }
-  
-  public logout() {
-    localStorage.removeItem('user');
-    this.user$.next(null);
-  }
+    public login() {
+        this.sessionApi.login();
+    }
 
-  public get user() { return this.user$.value; }
+    public logout() {
+        this.sessionApi.logout();
+    }
 
-  public isLoggedIn() { return this.user !== null; }
+    public updateToken() {
+        return new Promise<string>(p =>
+            this.sessionApi.refreshToken().subscribe(token => {
+                console.log(token);
+                this.access_token$.next(token);
+                p(token);
+            }));
+    }
+
+    public get access_token() { return this.access_token$.getValue() }
+
+    public isLoggedIn() { return this.access_token !== null; }
 }

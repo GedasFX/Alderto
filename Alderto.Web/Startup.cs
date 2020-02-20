@@ -181,7 +181,7 @@ namespace Alderto.Web
                 {
                     api.UseStaticFiles();
                     api.UseSwagger();
-                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
+                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Alderto API v1"));
                 }
 
                 api.UseRouting();
@@ -202,18 +202,18 @@ namespace Alderto.Web
                         if (e is ApiException apiException)
                         {
                             context.Response.OnStarting(() =>
-                    {
-                        context.Response.ContentType = "application/json";
-                        context.Response.StatusCode = (apiException.Error.Code / 1000) switch
-                        {
-                            1 => StatusCodes.Status403Forbidden,
-                            2 => StatusCodes.Status404NotFound,
-                            3 => StatusCodes.Status400BadRequest,
-                            _ => throw e
-                        };
+                            {
+                                context.Response.ContentType = "application/json";
+                                context.Response.StatusCode = (apiException.Error.Code / 1000) switch
+                                {
+                                    1 => StatusCodes.Status403Forbidden,
+                                    2 => StatusCodes.Status404NotFound,
+                                    3 => StatusCodes.Status400BadRequest,
+                                    _ => throw e
+                                };
 
-                        return Task.CompletedTask;
-                    });
+                                return Task.CompletedTask;
+                            });
 
                             await context.Response.WriteAsync(
                                 JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));

@@ -1,4 +1,5 @@
 ﻿using Alderto.Web.Models.Discord;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -23,8 +24,8 @@ namespace Alderto.Web.Services
         public Task<DiscordApiUser> GetUserAsync(string discordAccessToken)
             => GetResourceAsync<DiscordApiUser>(discordAccessToken, UserUri);
 
-        public Task<IEnumerable<DiscordApiGuild>> GetUserGuildsAsync(string discordAccessToken)
-            => GetResourceAsync<IEnumerable<DiscordApiGuild>>(discordAccessToken, UserGuildsUri);
+        public Task<List<DiscordApiGuild>> GetUserGuildsAsync(string discordAccessToken)
+            => GetResourceAsync<List<DiscordApiGuild>>(discordAccessToken, UserGuildsUri);
 
         private async Task<T> GetResourceAsync<T>(string discordAccessToken, Uri uri)
         {
@@ -33,8 +34,9 @@ namespace Alderto.Web.Services
 
             var response = await _httpClient.SendAsync(request);
 
-            using var stream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(stream);
+            var stream = await response.Content.ReadAsStringAsync();
+            var o = JsonSerializer.Deserialize<T>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return o;
         }
     }
 }

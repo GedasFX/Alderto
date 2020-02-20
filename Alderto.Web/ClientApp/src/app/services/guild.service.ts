@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { IGuild, IGuildChannel, IGuildRole } from 'src/app/models';
-import { DiscordWebApi, AldertoWebUserApi, AldertoWebGuildApi } from './web';
+import { AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
+import { UserService } from './user.service';
 
 export class Guild {
     public readonly id: string;
@@ -73,29 +74,29 @@ export class Guild {
     providedIn: 'root'
 })
 export class GuildService {
-    public readonly userGuilds: Guild[] = [];
-    public readonly mutualGuilds: Guild[] = [];
-
-    public readonly currentGuild$ = new BehaviorSubject(undefined as Guild);
+    public readonly mutualGuilds$: BehaviorSubject<Guild[]>;
+    public readonly currentGuild$: BehaviorSubject<Guild>;
 
     constructor(
-        discord: DiscordWebApi,
-        userApi: AldertoWebUserApi,
+        userService: UserService,
         guildApi: AldertoWebGuildApi,
         nav: NavigationService
     ) {
-        discord.fetchGuilds().subscribe(g => {
-            g.forEach(e => this.userGuilds.push(new Guild(e, guildApi)));
+        this.mutualGuilds$ = new BehaviorSubject<Guild[]>(undefined);
+        this.currentGuild$ = new BehaviorSubject<Guild>(undefined);
 
-            userApi.fetchMutualGuilds(g).subscribe(mg => {
-                // Shallow copy of user guilds array, filtered by mutual guild id's
-                mg.forEach(o => this.mutualGuilds.push(this.userGuilds.find(l => l.id === o.id)));
-
-                nav.currentGuildId$.subscribe(id => {
-                    this.currentGuild$.next(this.mutualGuilds.find(l => l.id === id));
-                });
-            });
+        userService.user$.subscribe(u => {
+            if (this.mutualGuilds == null)
+              this.mutualGuilds$.next(u.guilds.map(g => new Guild(g, guildApi)));
         });
+
+        nav.currentGuildId$.subscribe(id => {
+            this.currentGuild$.next(this.mutualGuilds.find(l => l.id === id));
+        });
+    }
+
+    private get mutualGuilds() {
+        return this.mutualGuilds$.getValue();
     }
 
     public get currentGuildId(): string {
