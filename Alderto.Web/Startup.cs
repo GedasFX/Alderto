@@ -99,15 +99,14 @@ namespace Alderto.Web
 
             services.AddAuthorization(o =>
             {
-                o.DefaultPolicy = new AuthorizationPolicyBuilder(
-                        JwtBearerDefaults.AuthenticationScheme,
-                        CookieAuthenticationDefaults.AuthenticationScheme)
+                o.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                     .Build();
             });
 
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential(filename: "token.rsa")
+                .AddInMemoryPersistedGrants()
                 //.AddInMemoryIdentityResources(Array.Empty<IdentityResource>())
                 .AddProfileService<AuthProfileService>()
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
@@ -128,7 +127,7 @@ namespace Alderto.Web
                         AllowOfflineAccess = true,
                         RefreshTokenUsage = TokenUsage.OneTimeOnly,
 
-                        AllowedScopes = {"api"}
+                        AllowedScopes = { "api" }
                     }
                 });
 

@@ -26,13 +26,13 @@ export class AccountService {
   }
 
   public logout() {
-    this.sessionApi.logout();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    return this.sessionApi.logout();
   }
 
-  public updateToken() {
-    //return this.sessionApi.refreshToken(this.refreshToken).pipe(tap(t => {
-    //  this.accessToken$.next(t as string);
-    //}));
+  public refreshSession() {
+    return this.sessionApi.refresh(this.refreshToken);
   }
 
   public storeTokens(t: ITokenResponse) {

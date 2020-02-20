@@ -8,7 +8,7 @@ import { AppComponent, AccountComponent, ServerSelectComponent } from './layout'
 
 import { AppHeaderModule, AppBreadcrumbModule, AppSidebarModule, AppFooterModule } from '@coreui/angular';
 import { BsDropdownModule } from 'ngx-bootstrap';
-import { JwtInterceptor, ErrorInterceptor } from './interceptors';
+import { TokenInterceptor } from './interceptors';
 import { P404Component } from './views/error/404.component';
 import { ToastrModule } from 'ngx-toastr';
 import { LoginComponent } from "./views/login/login.component";
@@ -34,8 +34,7 @@ import { LoginComponent } from "./views/login/login.component";
     ToastrModule.forRoot()
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

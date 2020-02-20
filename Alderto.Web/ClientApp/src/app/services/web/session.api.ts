@@ -39,7 +39,16 @@ export class SessionWebApi {
     //return this.http.post('/api/account/logout', null);
   }
 
-  public refreshToken() {
-    return this.http.post('/api/account/login', null, { responseType: 'text' });
+  public refresh(refreshToken: string) {
+    const params = new HttpParams()
+      .append('refresh_token', refreshToken)
+      .append('client_id', 'js')
+      .append('grant_type', 'refresh_token');
+      //.append('redirect_uri', `${window.location.origin}/login`);
+
+    return this.http.post<ITokenResponse>(`${authHost}/connect/token`,
+      params.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
   }
 }

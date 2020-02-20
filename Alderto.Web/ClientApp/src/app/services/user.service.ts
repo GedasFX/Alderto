@@ -21,10 +21,8 @@ export class UserService {
 
   constructor(accountService: AccountService, userApi: AldertoWebUserApi) {
     accountService.accessToken$.subscribe(t => {
-      if (t == null) {
-        accountService.updateToken();
+      if (t == null)
         return;
-      }
 
       userApi.fetchUser().subscribe(u => { this.user$.next(u); });
       userApi.fetchGuilds().subscribe(u => {
