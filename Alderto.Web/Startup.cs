@@ -13,6 +13,9 @@ using Alderto.Web.Services;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using IdentityModel;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +28,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ErrorMessage = Alderto.Services.Exceptions.ErrorMessage;
 
 namespace Alderto.Web
 {
@@ -74,9 +78,9 @@ namespace Alderto.Web
                     options.ClientSecret = Configuration["DiscordAPI:ClientSecret"];
                     options.SaveTokens = true;
 
-                    options.Scope.Add("guilds");
+                    options.ClaimActions.MapJsonKey(JwtClaimTypes.Subject, "id");
 
-                    options.SignInScheme = "RefreshToken";
+                    options.Scope.Add("guilds");
                 })
                 .AddJwtBearer(options =>
                 {
@@ -84,22 +88,41 @@ namespace Alderto.Web
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = false,
-                        ValidateAudience = false,
+
+                        ValidAudience = "api",
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey =
                             new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
                     };
                 })
-                .AddCookie("RefreshToken", options =>
-                {
-                    options.Cookie.Name = ".RefreshToken";
-                    options.Cookie.Path = "/api/account/login";
-                    options.ExpireTimeSpan = TimeSpan.FromDays(14);
-                    //options.Cookie.SameSite = SameSiteMode.Strict;
-                    //options.Cookie.HttpOnly = true;
-                });
+                .AddCookie();
 
             services.AddAuthorization();
+
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                //.AddInMemoryIdentityResources(Array.Empty<IdentityResource>())
+                .AddInMemoryApiResources(new[] { new ApiResource("api") })
+                .AddInMemoryClients(new[]
+                {
+                    new Client
+                    {
+                        ClientId = "js",
+                        ClientName = "Alderto Single Page Application",
+                        AllowedGrantTypes = GrantTypes.Code,
+                        RequireClientSecret = false,
+                        RequireConsent = false,
+
+                        RedirectUris =           Configuration["OAuth:RedirectUris"].Split(';'),
+                        PostLogoutRedirectUris = Configuration["OAuth:PostLogoutRedirectUris"].Split(';'),
+                        AllowedCorsOrigins =     Configuration["OAuth:AllowedCorsOrigins"].Split(';'),
+
+                        AllowOfflineAccess = true,
+                        RefreshTokenUsage = TokenUsage.OneTimeOnly,
+
+                        AllowedScopes = { "api" }
+                    }
+                });
 
             services.AddHttpClient<DiscordHttpClient>(o =>
             {
@@ -186,7 +209,7 @@ namespace Alderto.Web
 
                 api.UseRouting();
 
-                api.UseAuthentication();
+                api.UseIdentityServer();
                 api.UseAuthorization();
 
                 // Handle Service errors

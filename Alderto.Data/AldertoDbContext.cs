@@ -10,8 +10,6 @@ namespace Alderto.Data
         public DbSet<GuildMember> GuildMembers { get; set; }
         public DbSet<Member> Members { get; set; }
 
-        public DbSet<MemberSession> MemberSessions { get; set; }
-
         public DbSet<CustomCommand> CustomCommands { get; set; }
 
         public DbSet<GuildConfiguration> GuildPreferences { get; set; }
@@ -46,9 +44,6 @@ namespace Alderto.Data
 
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });
-
-            modelBuilder.Entity<MemberSession>()
-                .HasKey(m => new { m.MemberId, m.IssuedAt });
 
             base.OnModelCreating(modelBuilder);
         }

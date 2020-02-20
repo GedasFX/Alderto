@@ -85,9 +85,9 @@ export class GuildService {
         this.mutualGuilds$ = new BehaviorSubject<Guild[]>(undefined);
         this.currentGuild$ = new BehaviorSubject<Guild>(undefined);
 
-        userService.user$.subscribe(u => {
+        userService.userGuilds$.subscribe(u => {
             if (this.mutualGuilds == null)
-              this.mutualGuilds$.next(u.guilds.map(g => new Guild(g, guildApi)));
+              this.mutualGuilds$.next(u.map(g => new Guild(g, guildApi)));
         });
 
         nav.currentGuildId$.subscribe(id => {

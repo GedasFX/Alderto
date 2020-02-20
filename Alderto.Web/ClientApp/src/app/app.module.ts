@@ -11,11 +11,13 @@ import { BsDropdownModule } from 'ngx-bootstrap';
 import { JwtInterceptor, ErrorInterceptor } from './interceptors';
 import { P404Component } from './views/error/404.component';
 import { ToastrModule } from 'ngx-toastr';
+import { LoginComponent } from "./views/login/login.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     AccountComponent,
+    LoginComponent,
     P404Component,
     ServerSelectComponent
   ],

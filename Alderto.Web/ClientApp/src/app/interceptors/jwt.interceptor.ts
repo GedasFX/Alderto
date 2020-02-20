@@ -12,7 +12,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
     public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (request.url.startsWith('/api/') && this.accountService != null) {
-            const token = this.accountService.access_token;
+            const token = this.accountService.accessToken;
             if (token) {
                 // Going to the API
 

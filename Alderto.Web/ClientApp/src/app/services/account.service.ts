@@ -1,35 +1,50 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SessionWebApi } from './web';
+import { ITokenResponse } from "src/app/services/web/session.api";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class AccountService {
-    public readonly access_token$: BehaviorSubject<string>;
+  public readonly accessToken$: BehaviorSubject<string>;
+  public readonly refreshToken$: BehaviorSubject<string>;
 
-    constructor(private readonly sessionApi: SessionWebApi) {
-        this.access_token$ = new BehaviorSubject<string>(undefined);
-    }
+  constructor(private readonly sessionApi: SessionWebApi) {
+    this.accessToken$ = new BehaviorSubject<string>(localStorage["access_token"]);
+    this.refreshToken$ = new BehaviorSubject<string>(localStorage["refresh_token"]);
+  }
 
-    public login() {
-        this.sessionApi.login();
-    }
+  public authorize() {
+    this.sessionApi.authorize();
+  }
 
-    public logout() {
-        this.sessionApi.logout();
-    }
+  public login(code: string) {
+    this.sessionApi.login(code).subscribe(t => {
+      this.storeTokens(t);
+    });
+  }
 
-    public updateToken() {
-        return new Promise<string>(p =>
-            this.sessionApi.refreshToken().subscribe(token => {
-                console.log(token);
-                this.access_token$.next(token);
-                p(token);
-            }));
-    }
+  public logout() {
+    this.sessionApi.logout();
+  }
 
-    public get access_token() { return this.access_token$.getValue() }
+  public updateToken() {
+    //return this.sessionApi.refreshToken(this.refreshToken).pipe(tap(t => {
+    //  this.accessToken$.next(t as string);
+    //}));
+  }
 
-    public isLoggedIn() { return this.access_token !== null; }
+  public storeTokens(t: ITokenResponse) {
+    this.accessToken$.next(t.access_token);
+    this.refreshToken$.next(t.refresh_token);
+
+    localStorage.setItem('access_token', t.access_token);
+    localStorage.setItem('refresh_token', t.refresh_token);
+  }
+
+  public get accessToken() { return this.accessToken$.getValue() }
+  public get refreshToken() { return this.refreshToken$.getValue() }
+
+  public isLoggedIn() { return this.accessToken != null; }
 }
