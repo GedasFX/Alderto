@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService, DiscordWebApi } from '../services';
+import { AccountService } from '../services';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-account',
@@ -12,27 +13,27 @@ export class AccountComponent implements OnInit {
 
   constructor(
     private readonly account: AccountService,
-    private readonly discord: DiscordWebApi) { }
+    private readonly userService: UserService) { }
 
   public ngOnInit() {
-    this.loggedIn = this.account.isLoggedIn();
+    this.userService.user$.subscribe(user => {
+      this.loggedIn = user != null;
 
-    if (this.loggedIn) {
-      this.discord.fetchUser().subscribe(user => {
+      if (user != null)
         this.userImg = user.avatar == null
           ? this.getDefaultAvatar(user.discriminator)
           : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`;
-      });
-    }
+    });
   }
 
   public login() {
-    this.account.login();
+    this.account.authorize();
   }
 
   public logout() {
-      this.account.logout();
+    this.account.logout().subscribe(() => {
       window.location.href = '/';
+    });
   }
 
   private getDefaultAvatar(discriminator): string {

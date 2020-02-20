@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
@@ -8,11 +10,17 @@ using Alderto.Bot.Services;
 using Alderto.Data;
 using Alderto.Services.Exceptions;
 using Alderto.Web.Helpers;
+using Alderto.Web.Services;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using IdentityModel;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,8 +30,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ErrorMessage = Alderto.Services.Exceptions.ErrorMessage;
 
 namespace Alderto.Web
 {
@@ -39,17 +47,18 @@ namespace Alderto.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices([NotNull] IServiceCollection services)
         {
+            var dbConnectionString = $"Server={Configuration["Database:Host"]};" +
+                                     $"Port={Configuration["Database:Port"]};" +
+                                     $"Database={Configuration["Database:Database"]};" +
+                                     $"UserId={Configuration["Database:Username"]};" +
+                                     $"Password={Configuration["Database:Password"]};" +
+                                     Configuration["Database:Extras"];
+
             // === <General> ===
             // Add database.
             services.AddDbContext<AldertoDbContext>(options =>
             {
-                options.UseNpgsql(
-                    $"Server={Configuration["Database:Host"]};" +
-                    $"Port={Configuration["Database:Port"]};" +
-                    $"Database={Configuration["Database:Database"]};" +
-                    $"UserId={Configuration["Database:Username"]};" +
-                    $"Password={Configuration["Database:Password"]};" +
-                    Configuration["Database:Extras"],
+                options.UseNpgsql(dbConnectionString,
                     builder => builder.MigrationsAssembly("Alderto.Data"));
             });
 
@@ -63,37 +72,70 @@ namespace Alderto.Web
             // === <Web> ===
             // Use discord as authentication service.
             services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                })
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordAPI:ClientId"];
                     options.ClientSecret = Configuration["DiscordAPI:ClientSecret"];
                     options.SaveTokens = true;
 
+                    options.ClaimActions.MapJsonKey(JwtClaimTypes.Subject, "id");
+
                     options.Scope.Add("guilds");
+                    options.Events.OnCreatingTicket = c =>
+                    {
+                        c.Identity.AddClaim(new Claim("discord", c.AccessToken));
+                        return Task.CompletedTask;
+                    };
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.SaveToken = true;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
-                    };
+                    options.Authority = "https://localhost/api";
+                    options.Audience = "api";
                 })
-                .AddCookie(options =>
+                .AddCookie();
+
+            services.AddAuthorization(o =>
+            {
+                o.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
+
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential(filename: "token.rsa")
+                .AddOperationalStore(o => o.ConfigureDbContext = c =>
+                    c.UseNpgsql(dbConnectionString,
+                        b => b.MigrationsAssembly("Alderto.Web")))
+                .AddProfileService<AuthProfileService>()
+                .AddInMemoryApiResources(new[] { new ApiResource("api") })
+                .AddInMemoryClients(new[]
                 {
-                    options.Cookie.Name = ".Session";
+                    new Client
+                    {
+                        ClientId = "js",
+                        ClientName = "Alderto Single Page Application",
+                        AllowedGrantTypes = GrantTypes.Code,
+                        RequireClientSecret = false,
+                        RequireConsent = false,
+
+                        RedirectUris = Configuration["OAuth:RedirectUris"].Split(';'),
+                        PostLogoutRedirectUris = Configuration["OAuth:PostLogoutRedirectUris"].Split(';'),
+                        AllowedCorsOrigins = Configuration["OAuth:AllowedCorsOrigins"].Split(';'),
+
+                        AllowOfflineAccess = true,
+                        RefreshTokenUsage = TokenUsage.OneTimeOnly,
+
+                        AllowedScopes = { "api" }
+                    }
                 });
-            services.AddAuthorization();
+
+            services.AddHttpClient<DiscordHttpClient>(o =>
+            {
+                o.BaseAddress = new Uri("https://discordapp.com/api/v6");
+                o.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            });
+            services.AddScoped<AuthService>();
 
             // Add Mvc
             services
@@ -112,6 +154,7 @@ namespace Alderto.Web
                 })
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new SnowflakeConverter());
                     options.JsonSerializerOptions.Converters.Add(new NullableSnowflakeConverter());
                 });
@@ -167,12 +210,12 @@ namespace Alderto.Web
                 {
                     api.UseStaticFiles();
                     api.UseSwagger();
-                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Alderto API v1"));
+                    api.UseSwaggerUI(c => c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Alderto API v1"));
                 }
 
                 api.UseRouting();
 
-                api.UseAuthentication();
+                api.UseIdentityServer();
                 api.UseAuthorization();
 
                 // Handle Service errors
@@ -188,18 +231,18 @@ namespace Alderto.Web
                         if (e is ApiException apiException)
                         {
                             context.Response.OnStarting(() =>
-                    {
-                        context.Response.ContentType = "application/json";
-                        context.Response.StatusCode = (apiException.Error.Code / 1000) switch
-                        {
-                            1 => StatusCodes.Status403Forbidden,
-                            2 => StatusCodes.Status404NotFound,
-                            3 => StatusCodes.Status400BadRequest,
-                            _ => throw e
-                        };
+                            {
+                                context.Response.ContentType = "application/json";
+                                context.Response.StatusCode = (apiException.Error.Code / 1000) switch
+                                {
+                                    1 => StatusCodes.Status403Forbidden,
+                                    2 => StatusCodes.Status404NotFound,
+                                    3 => StatusCodes.Status400BadRequest,
+                                    _ => throw e
+                                };
 
-                        return Task.CompletedTask;
-                    });
+                                return Task.CompletedTask;
+                            });
 
                             await context.Response.WriteAsync(
                                 JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
@@ -247,12 +290,20 @@ namespace Alderto.Web
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 
-            await using var context = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
-            var logger = serviceScope.ServiceProvider.GetService<ILogger<DbContext>>();
+            await using var applicationDbContext = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
+            var applicationDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<AldertoDbContext>>();
 
-            logger.LogInformation("Initializing Database...");
-            await context.Database.MigrateAsync();
-            logger.LogInformation("Database Ready!");
+            applicationDbContextLogger.LogInformation("Initializing Application Database...");
+            await applicationDbContext.Database.MigrateAsync();
+            applicationDbContextLogger.LogInformation("Database Application Ready!");
+
+
+            await using var persistedGrantDbContext = serviceScope.ServiceProvider.GetService<PersistedGrantDbContext>();
+            var persistedGrantDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<PersistedGrantDbContext>>();
+
+            persistedGrantDbContextLogger.LogInformation("Initializing Auth Database...");
+            await persistedGrantDbContext.Database.MigrateAsync();
+            persistedGrantDbContextLogger.LogInformation("Database Auth Ready!");
         }
     }
 }

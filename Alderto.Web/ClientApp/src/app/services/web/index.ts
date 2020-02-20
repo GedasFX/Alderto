@@ -1,2 +1,2 @@
-export * from './discord.api';
+export * from './session.api';
 export * from './alderto';

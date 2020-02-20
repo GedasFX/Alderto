@@ -20,7 +20,7 @@ namespace Alderto.Data
         public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
 
 #nullable disable
-        public AldertoDbContext(DbContextOptions options) : base(options) { }
+        public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options) { }
 #nullable restore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

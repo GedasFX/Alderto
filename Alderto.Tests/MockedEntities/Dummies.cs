@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Discord;
 using Moq;
 
@@ -63,7 +62,7 @@ namespace Alderto.Tests.MockedEntities
             var channelA = new Mock<ITextChannel>();
             channelA.SetupGet(o => o.Id).Returns(1);
             channelA.SetupGet(o => o.Name).Returns("AChannel1");
-            
+
             var channelB = new Mock<ITextChannel>();
             channelB.SetupGet(o => o.Id).Returns(2);
             channelB.SetupGet(o => o.Name).Returns("AChannel2");

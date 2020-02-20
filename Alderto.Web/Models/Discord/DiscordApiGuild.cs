@@ -1,7 +1,7 @@
 ﻿namespace Alderto.Web.Models.Discord
 {
 #nullable disable
-    public class DiscordGuild
+    public class DiscordApiGuild
     {
         public string Id { get; set; }
         public string Name { get; set; }

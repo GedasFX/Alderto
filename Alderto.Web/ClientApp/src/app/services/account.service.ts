@@ -1,35 +1,50 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-
-export class User {
-  public id: number;
-  public token: string;
-  public discord: string;
-
-  public username: string;
-}
+import { SessionWebApi } from './web';
+import { ITokenResponse } from "src/app/services/web/session.api";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  public user$: BehaviorSubject<User>;
+  public readonly accessToken$: BehaviorSubject<string>;
+  public readonly refreshToken$: BehaviorSubject<string>;
 
-  constructor() {
-    this.user$ = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
+  constructor(private readonly sessionApi: SessionWebApi) {
+    this.accessToken$ = new BehaviorSubject<string>(localStorage["access_token"]);
+    this.refreshToken$ = new BehaviorSubject<string>(localStorage["refresh_token"]);
   }
 
-  public login() {
-    // No need to modify subject or localstorage as they are going to be changed either way.
-    window.location.href = '/api/account/login';
+  public authorize() {
+    this.sessionApi.authorize();
   }
-  
+
+  public login(code: string) {
+    this.sessionApi.login(code).subscribe(t => {
+      this.storeTokens(t);
+    });
+  }
+
   public logout() {
-    localStorage.removeItem('user');
-    this.user$.next(null);
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    return this.sessionApi.logout();
   }
 
-  public get user() { return this.user$.value; }
+  public refreshSession() {
+    return this.sessionApi.refresh(this.refreshToken);
+  }
 
-  public isLoggedIn() { return this.user !== null; }
+  public storeTokens(t: ITokenResponse) {
+    this.accessToken$.next(t.access_token);
+    this.refreshToken$.next(t.refresh_token);
+
+    localStorage.setItem('access_token', t.access_token);
+    localStorage.setItem('refresh_token', t.refresh_token);
+  }
+
+  public get accessToken() { return this.accessToken$.getValue() }
+  public get refreshToken() { return this.refreshToken$.getValue() }
+
+  public isLoggedIn() { return this.accessToken != null; }
 }
