@@ -107,7 +107,7 @@ namespace Alderto.Web
             });
 
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
+                .AddDeveloperSigningCredential(filename: "token.rsa")
                 //.AddInMemoryIdentityResources(Array.Empty<IdentityResource>())
                 .AddProfileService<AuthProfileService>()
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
