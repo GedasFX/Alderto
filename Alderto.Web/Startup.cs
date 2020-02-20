@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Bot;
@@ -16,7 +17,9 @@ using Discord.Net;
 using IdentityModel;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +29,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ErrorMessage = Alderto.Services.Exceptions.ErrorMessage;
 
@@ -68,10 +70,7 @@ namespace Alderto.Web
             // === <Web> ===
             // Use discord as authentication service.
             services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddDiscord(options =>
                 {
                     options.ClientId = Configuration["DiscordAPI:ClientId"];
@@ -81,27 +80,36 @@ namespace Alderto.Web
                     options.ClaimActions.MapJsonKey(JwtClaimTypes.Subject, "id");
 
                     options.Scope.Add("guilds");
+                    options.Events.OnCreatingTicket = c =>
+                    {
+                        c.Identity.AddClaim(new Claim("discord", c.AccessToken));
+                        return Task.CompletedTask;
+                    };
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.SaveToken = true;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-
-                        ValidAudience = "api",
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWTPrivateKey"]))
-                    };
+                    options.Authority = "https://localhost/api";
+                    options.Audience = "api";
                 })
-                .AddCookie();
+                .AddCookie(o =>
+                {
+                    o.Cookie.Path = "/api/account/login";
+                    o.ExpireTimeSpan = TimeSpan.FromDays(14);
+                });
 
-            services.AddAuthorization();
+            services.AddAuthorization(o =>
+            {
+                o.DefaultPolicy = new AuthorizationPolicyBuilder(
+                        JwtBearerDefaults.AuthenticationScheme,
+                        CookieAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
 
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential()
                 //.AddInMemoryIdentityResources(Array.Empty<IdentityResource>())
+                .AddProfileService<AuthProfileService>()
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
                 .AddInMemoryClients(new[]
                 {
@@ -113,14 +121,14 @@ namespace Alderto.Web
                         RequireClientSecret = false,
                         RequireConsent = false,
 
-                        RedirectUris =           Configuration["OAuth:RedirectUris"].Split(';'),
+                        RedirectUris = Configuration["OAuth:RedirectUris"].Split(';'),
                         PostLogoutRedirectUris = Configuration["OAuth:PostLogoutRedirectUris"].Split(';'),
-                        AllowedCorsOrigins =     Configuration["OAuth:AllowedCorsOrigins"].Split(';'),
+                        AllowedCorsOrigins = Configuration["OAuth:AllowedCorsOrigins"].Split(';'),
 
                         AllowOfflineAccess = true,
                         RefreshTokenUsage = TokenUsage.OneTimeOnly,
 
-                        AllowedScopes = { "api" }
+                        AllowedScopes = {"api"}
                     }
                 });
 

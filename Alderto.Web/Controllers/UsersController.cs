@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Alderto.Web.Helpers;
+using Discord;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Linq;
+using System.Globalization;
 
 namespace Alderto.Web.Controllers
 {
@@ -13,24 +18,27 @@ namespace Alderto.Web.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DiscordHttpClient _discord;
+        private readonly IDiscordClient _bot;
         private readonly IDataProtector _protector;
 
-        public UsersController(DiscordHttpClient discord, IDataProtectionProvider protector)
+        public UsersController(DiscordHttpClient discord, IDiscordClient bot, IDataProtectionProvider protector)
         {
             _discord = discord;
-            _protector = protector.CreateProtector("DiscordToken");
+            _bot = bot;
+            _protector = protector.CreateProtector(DataProtectionPurposes.DiscordToken);
         }
 
-        [HttpGet("users/@me")]
+        [HttpGet("users/@me"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<DiscordApiUser>> GetMeAsync()
         {
             return await _discord.GetUserAsync(_protector.Unprotect(User.FindFirstValue("discord")));
         }
 
-        [HttpGet("users/@me/guilds")]
-        public async Task<ActionResult<List<DiscordApiGuild>>> GetMyGuildsAsync()
+        [HttpGet("users/@me/guilds"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<IEnumerable<DiscordApiGuild>>> GetMyGuildsAsync()
         {
-            return await _discord.GetUserGuildsAsync(_protector.Unprotect(User.FindFirstValue("discord")));
+            var userGuilds = await _discord.GetUserGuildsAsync(_protector.Unprotect(User.FindFirstValue("discord")));
+            return userGuilds.Where(userGuild => _bot.GetGuildAsync(ulong.Parse(userGuild.Id, CultureInfo.InvariantCulture)).Result != null).ToList();
         }
     }
 }

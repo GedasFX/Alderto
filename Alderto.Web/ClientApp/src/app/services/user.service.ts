@@ -26,10 +26,9 @@ export class UserService {
         return;
       }
 
-      userApi.fetchUser().subscribe(u => { this.user$.next(u); console.log(u); });
+      userApi.fetchUser().subscribe(u => { this.user$.next(u); });
       userApi.fetchGuilds().subscribe(u => {
         this.userGuilds$.next(u);
-        console.log(u);
       });
     });
   }

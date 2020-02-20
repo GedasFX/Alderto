@@ -37,7 +37,7 @@ export class MessageRemoveComponent implements OnInit, OnDestroy {
             this.toastr.success('Successfully removed the message');
         },
             (err: HttpErrorResponse) => {
-                this.toastr.error(err.error.message, 'Could not remove the bank');
+                this.toastr.error(err.error.message, 'Could not remove the message');
             },
             () => {
                 this.modal.hide();
