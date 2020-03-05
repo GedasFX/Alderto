@@ -90,7 +90,7 @@ namespace Alderto.Web
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "https://localhost/api";
+                    options.Authority = Configuration["OAuth:ApiAuthority"];
                     options.Audience = "api";
                 })
                 .AddCookie();
