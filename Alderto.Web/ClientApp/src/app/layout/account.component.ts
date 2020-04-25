@@ -27,9 +27,7 @@ export class AccountComponent implements OnInit {
   }
 
   public login() {
-    this.account.signIn().subscribe(() => {
-      window.location.href = '/';
-    });
+    this.account.signIn().subscribe();
   }
 
   public logout() {
