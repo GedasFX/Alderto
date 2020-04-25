@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { IUser, IGuild } from 'src/app/models';
 
 export interface ITokenResponse {
   access_token: string;
@@ -7,6 +8,11 @@ export interface ITokenResponse {
   token_type: string;
   refresh_token: string;
   scope: string;
+}
+
+export interface IUserInfoResponse {
+  user: IUser;
+  user_guilds: IGuild[];
 }
 
 @Injectable({
@@ -18,7 +24,7 @@ export class SessionWebApi {
 
   public authorize() {
     const redirectUri = encodeURI(`${window.location.origin}/login`);
-    window.location.href = `${(window as any).config.AUTH_HOST}/connect/authorize?client_id=js&redirect_uri=${redirectUri}&response_type=code&scope=api%20offline_access`;
+    window.location.href = `${(window as any).config.AUTH_HOST}/connect/authorize?client_id=js&redirect_uri=${redirectUri}&response_type=code&scope=openid%20api%20offline_access`;
   }
 
   public login(code: string) {
@@ -48,5 +54,9 @@ export class SessionWebApi {
       params.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
+  }
+
+  public userInfo() {
+    return this.http.get<IUserInfoResponse>('/api/connect/userinfo');
   }
 }

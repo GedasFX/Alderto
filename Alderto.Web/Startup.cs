@@ -18,7 +18,6 @@ using IdentityModel;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -31,7 +30,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using ErrorMessage = Alderto.Services.Exceptions.ErrorMessage;
 
 namespace Alderto.Web
 {
@@ -87,13 +85,16 @@ namespace Alderto.Web
                         c.Identity.AddClaim(new Claim("discord", c.AccessToken));
                         return Task.CompletedTask;
                     };
+
+                    options.SignInScheme = "DiscordExt";
                 })
                 .AddJwtBearer(options =>
                 {
                     options.Authority = "https://localhost/api";
                     options.Audience = "api";
                 })
-                .AddCookie();
+                .AddCookie("DiscordExt") // For storing discord persistent tokens
+                .AddCookie(); // IdentityServer4
 
             services.AddAuthorization(o =>
             {
@@ -108,6 +109,11 @@ namespace Alderto.Web
                     c.UseNpgsql(dbConnectionString,
                         b => b.MigrationsAssembly("Alderto.Web")))
                 .AddProfileService<AuthProfileService>()
+                .AddInMemoryIdentityResources(new IdentityResource[]
+                {
+                    new IdentityResources.OpenId(),
+                    new IdentityResources.Profile()
+                })
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
                 .AddInMemoryClients(new[]
                 {
@@ -126,7 +132,7 @@ namespace Alderto.Web
                         AllowOfflineAccess = true,
                         RefreshTokenUsage = TokenUsage.OneTimeOnly,
 
-                        AllowedScopes = { "api" }
+                        AllowedScopes = { "api", "openid" }
                     }
                 });
 
@@ -149,7 +155,7 @@ namespace Alderto.Web
                         var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
                         var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
                                        value.Errors[0].ErrorMessage;
-                        return new BadRequestObjectResult(new ErrorMessage(400, 0, errorMsg));
+                        return new BadRequestObjectResult(new Alderto.Services.Exceptions.ErrorMessage(400, 0, errorMsg));
                     };
                 })
                 .AddJsonOptions(options =>
