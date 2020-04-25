@@ -121,7 +121,7 @@ namespace Alderto.Web
                     {
                         ClientId = "js",
                         ClientName = "Alderto Single Page Application",
-                        AllowedGrantTypes = GrantTypes.Code,
+                        AllowedGrantTypes = GrantTypes.Implicit,
                         RequireClientSecret = false,
                         RequireConsent = false,
 
@@ -131,6 +131,8 @@ namespace Alderto.Web
 
                         AllowOfflineAccess = true,
                         RefreshTokenUsage = TokenUsage.OneTimeOnly,
+
+                        AllowAccessTokensViaBrowser = true,
 
                         AllowedScopes = { "api", "openid" }
                     }

@@ -1,50 +1,54 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { SessionWebApi } from './web';
-import { ITokenResponse } from "src/app/services/web/session.api";
+import { BehaviorSubject, from } from 'rxjs';
+import { UserManagerSettings, UserManager, User } from 'oidc-client';
+import { tap, map } from 'rxjs/operators';
+
+const settings = {
+  authority: `${window.location.origin}/api`,
+  client_id: 'js',
+  redirect_uri: `${window.location.origin}/oauth/signin-callback.html`,
+  post_logout_redirect_uri: `${window.location.origin}/oauth/signout-callback.html`,
+  response_type: 'id_token token',
+  scope: 'openid api',
+
+  silent_redirect_uri: `${window.location.origin}/oauth/refresh-callback.html`,
+  automaticSilentRenew: true,
+} as UserManagerSettings;
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  public readonly accessToken$: BehaviorSubject<string>;
-  public readonly refreshToken$: BehaviorSubject<string>;
+  public user$ = new BehaviorSubject<User>(undefined);
+  private userManager = new UserManager(settings);
 
-  constructor(private readonly sessionApi: SessionWebApi) {
-    this.accessToken$ = new BehaviorSubject<string>(localStorage["access_token"]);
-    this.refreshToken$ = new BehaviorSubject<string>(localStorage["refresh_token"]);
+  constructor() {
+    this.renewToken().subscribe();
   }
 
-  public authorize() {
-    this.sessionApi.authorize();
+  public signIn() {
+    return from(this.userManager.signinPopup()).pipe(tap((u: User) => {
+      this.user$.next(u);
+    }));
   }
 
-  public login(code: string) {
-    this.sessionApi.login(code).subscribe(t => {
-      this.storeTokens(t);
-    });
+  public signOut() {
+    return from(this.userManager.signoutPopup({
+      'id_token_hint': this.user.id_token
+    })).pipe(tap(() => {
+      this.user$.next(null);
+    }));
   }
 
-  public logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    return this.sessionApi.logout();
+  public renewToken() {
+    return from(this.userManager.signinSilent()).pipe(tap((u: User) => this.user$.next(u)));
   }
 
-  public refreshSession() {
-    return this.sessionApi.refresh(this.refreshToken);
-  }
+  public get user() { return this.user$.getValue(); }
 
-  public storeTokens(t: ITokenResponse) {
-    this.accessToken$.next(t.access_token);
-    this.refreshToken$.next(t.refresh_token);
+  public get userLoggedIn() { return !!this.user; }
 
-    localStorage.setItem('access_token', t.access_token);
-    localStorage.setItem('refresh_token', t.refresh_token);
-  }
+  public get userLoggedIn$() { return this.user$.pipe(map(u => !!u)); }
 
-  public get accessToken() { return this.accessToken$.getValue() }
-  public get refreshToken() { return this.refreshToken$.getValue() }
-
-  public isLoggedIn() { return this.accessToken != null; }
+  public get accessToken() { return this.user ? this.user.access_token : null; }
 }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
@@ -35,6 +36,11 @@ namespace Alderto.Web.Helpers
                 var userGuilds = await _discord.GetUserGuildsAsync(accessToken);
 
                 var mutualGuilds = userGuilds.Where(userGuild => _bot.GetGuildAsync(ulong.Parse(userGuild.Id, CultureInfo.InvariantCulture)).Result != null);
+                var mutualGuildsMap = new Dictionary<string, string>();
+                foreach (var guild in mutualGuilds)
+                {
+                    mutualGuildsMap.Add(guild.Name, $"{guild.Id}:{guild.Permissions}:{guild.Owner}:{guild.Icon}");
+                }
 
                 var serializerOptions = new JsonSerializerOptions()
                 {
@@ -43,7 +49,7 @@ namespace Alderto.Web.Helpers
                 };
 
                 context.IssuedClaims.Add(new Claim("user", JsonSerializer.Serialize(user, serializerOptions), "json"));
-                context.IssuedClaims.Add(new Claim("user_guilds", JsonSerializer.Serialize(mutualGuilds, serializerOptions), "json"));
+                context.IssuedClaims.Add(new Claim("user_guilds", JsonSerializer.Serialize(mutualGuildsMap, serializerOptions), "json"));
             }
 
             else if (context.Caller == IdentityServerConstants.ProfileDataCallers.ClaimsProviderAccessToken)

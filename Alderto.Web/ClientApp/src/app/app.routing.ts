@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { P404Component } from './views/error/404.component';
 
 import { AuthGuard } from './auth.guard';
-import { LoginComponent } from "./views/login/login.component";
 
 const routes: Routes = [
   {
@@ -16,11 +15,7 @@ const routes: Routes = [
     path: 'guild/:id',
     loadChildren: () => import('./views/guild/guild.module').then(m => m.GuildModule),
     data: { title: 'Guild' },
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'login',
-    component: LoginComponent
+    // canActivate: [AuthGuard]
   },
   {
     path: '**',
