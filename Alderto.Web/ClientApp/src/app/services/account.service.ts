@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, from } from 'rxjs';
 import { UserManagerSettings, UserManager, User } from 'oidc-client';
 import { tap, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 const settings = {
   authority: `${window.location.origin}/api`,
@@ -13,6 +14,8 @@ const settings = {
 
   silent_redirect_uri: `${window.location.origin}/oauth/refresh-callback.html`,
   automaticSilentRenew: true,
+
+  popupWindowFeatures: 'location=no,toolbar=no,width=500,height=800,left=100,top=100'
 } as UserManagerSettings;
 
 @Injectable({
@@ -22,8 +25,8 @@ export class AccountService {
   public user$ = new BehaviorSubject<User>(undefined);
   private userManager = new UserManager(settings);
 
-  constructor() {
-    this.renewToken().subscribe();
+  constructor(private readonly http: HttpClient) {
+    this.renewToken().subscribe(() => { }, () => { });
   }
 
   public signIn() {
@@ -33,11 +36,7 @@ export class AccountService {
   }
 
   public signOut() {
-    return from(this.userManager.signoutPopup({
-      'id_token_hint': this.user.id_token
-    })).pipe(tap(() => {
-      this.user$.next(null);
-    }));
+    return this.http.post('/api/account/logout', null);
   }
 
   public renewToken() {

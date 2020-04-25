@@ -23,7 +23,7 @@ namespace Alderto.Web.Controllers
         public async Task<ActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            await HttpContext.SignOutAsync(DiscordAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("DiscordExt");
 
             return Ok();
         }
