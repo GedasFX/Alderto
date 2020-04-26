@@ -93,7 +93,11 @@ namespace Alderto.Web
                     options.Authority = "https://localhost/api";
                     options.Audience = "api";
                 })
-                .AddCookie("DiscordExt") // For storing discord persistent tokens
+                .AddCookie("DiscordExt", o => // For storing discord persistent tokens
+                {
+                    o.Cookie.Name = ".Discord";
+                    o.ExpireTimeSpan = TimeSpan.FromDays(30);
+                })
                 .AddCookie(); // IdentityServer4
 
             services.AddAuthorization(o =>

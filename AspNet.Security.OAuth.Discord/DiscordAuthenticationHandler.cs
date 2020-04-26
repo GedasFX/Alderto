@@ -56,7 +56,7 @@ namespace AspNet.Security.OAuth.Discord
                     && string.Equals(Scheme.Name, authenticatedScheme, StringComparison.Ordinal))
                 {
                     // Expiration is set to 2 days before discord access token expires.
-                    if (ticket.Properties.IssuedUtc?.AddDays(5) < Clock.UtcNow)
+                    if (ticket.Properties.IssuedUtc?.AddDays(4) < Clock.UtcNow)
                     {
                         if (await TryRefreshTokenAsync(ticket))
                         {
@@ -115,6 +115,22 @@ namespace AspNet.Security.OAuth.Discord
                     ticket.Properties.UpdateTokenValue("expires_at", expiresAt.ToString("o", CultureInfo.InvariantCulture));
                 }
 
+                if (ticket.Principal.Identity is ClaimsIdentity identity)
+                {
+                    var existingClaim = identity.FindFirst("discord");
+                    if (existingClaim != null && identity.TryRemoveClaim(existingClaim))
+                    {
+                        identity.AddClaim(new Claim("discord", tokens.AccessToken));
+                    }
+                }
+
+                if (ticket.Properties.ExpiresUtc.HasValue && ticket.Properties.IssuedUtc.HasValue)
+                {
+                    var delta = ticket.Properties.ExpiresUtc - ticket.Properties.IssuedUtc;
+                    ticket.Properties.IssuedUtc = Clock.UtcNow;
+                    ticket.Properties.ExpiresUtc = Clock.UtcNow + delta;
+                }
+
                 return true;
             }
 
@@ -141,6 +157,9 @@ namespace AspNet.Security.OAuth.Discord
 
                 throw new HttpRequestException("An error occurred while retrieving the user profile.");
             }
+
+            properties.IsPersistent = true;
+            properties.AllowRefresh = false;
 
             using var payload = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
