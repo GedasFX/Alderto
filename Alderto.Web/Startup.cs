@@ -90,7 +90,7 @@ namespace Alderto.Web
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "https://localhost/api";
+                    options.Authority = Configuration["OAuth:ApiAuthority"];
                     options.Audience = "api";
                 })
                 .AddCookie("DiscordExt", o => // For storing discord persistent tokens
