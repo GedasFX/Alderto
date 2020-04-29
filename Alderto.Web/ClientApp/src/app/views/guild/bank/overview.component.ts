@@ -87,10 +87,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
     });
   }
 
-  public async openItemDetailsModal(bank: GuildBank, item: IGuildBankItem) {
+  public openItemDetailsModal(bank: GuildBank, item: IGuildBankItem) {
     const modal = this.modal.show(BankItemsDetailsComponent,
       {
-        initialState: { item, canModify: await bank.userCanModify },
+        initialState: { item, canModify: bank.userCanModify },
         ignoreBackdropClick: true
       });
     (modal.content.onItemEdited as Subject<void>).subscribe(() => {

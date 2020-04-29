@@ -92,7 +92,6 @@ export class GuildService {
     );
 
     this.currentGuild$ = nav.currentGuildId$.pipe(
-      tap(id => this.currentGuildId = id),
       switchMap(id => this.mutualGuilds$.pipe(map(g => g
         ? g.find(l => l.id === id)
         : null)))
