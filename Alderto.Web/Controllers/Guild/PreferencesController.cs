@@ -1,6 +1,9 @@
 ﻿using Alderto.Data.Models;
 using Alderto.Services;
+using Alderto.Services.Exceptions;
+using Alderto.Web.Extensions;
 using Alderto.Web.Models.GuildPreferences;
+using Discord;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,10 +13,12 @@ namespace Alderto.Web.Controllers.Guild
     public class PreferencesController : ApiControllerBase
     {
         private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+        private readonly IDiscordClient _client;
 
-        public PreferencesController(IGuildPreferencesProvider guildPreferencesProvider)
+        public PreferencesController(IGuildPreferencesProvider guildPreferencesProvider, IDiscordClient discordClient)
         {
             _guildPreferencesProvider = guildPreferencesProvider;
+            _client = discordClient;
         }
 
         [HttpGet]
@@ -26,6 +31,10 @@ namespace Alderto.Web.Controllers.Guild
         [HttpPatch]
         public async Task<ActionResult> UpdateGuildPreferencesAsync(ulong guildId, GuildPreferencesInputModel model)
         {
+            // Ensure user has admin rights 
+            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
+                throw new UserNotGuildAdminException();
+
             await _guildPreferencesProvider.UpdatePreferencesAsync(guildId, preferences =>
             {
                 if (model.Prefix != null)

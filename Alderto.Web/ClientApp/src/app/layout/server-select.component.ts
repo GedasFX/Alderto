@@ -7,16 +7,17 @@ import { GuildService } from 'src/app/services';
   styleUrls: ['./server-select.component.scss']
 })
 export class ServerSelectComponent implements OnInit {
-  public currentServerIcon = "/assets/img/unknown.svg";
-  public currentServerName = "Please select a server";
+  public currentServerIcon = '/assets/img/unknown.svg';
+  public currentServerName = 'Please select a server';
 
   constructor(
     public readonly guilds: GuildService) { }
 
   public ngOnInit() {
     this.guilds.currentGuild$.subscribe(g => {
-      if (g)
+      if (g) {
         this.currentServerName = g.name;
+      }
     });
   }
 }

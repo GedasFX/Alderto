@@ -144,7 +144,7 @@ namespace Alderto.Bot.Modules
                 return;
             }
 
-            var topN = await _currencyManager.GetRichestUsersAsync(50, (page - 1) * 50);
+            var topN = await _currencyManager.GetRichestUsersAsync(Context.Guild.Id, 50, (page - 1) * 50);
 
             var res = topN.Aggregate(new StringBuilder(), (c, n) => c.Append($"<@{n.MemberId}>: {n.CurrencyCount}\n"));
             await this.ReplyEmbedAsync(res.ToString());
