@@ -15,7 +15,7 @@ export class ServerSelectComponent implements OnInit {
 
   public ngOnInit() {
     this.guilds.currentGuild$.subscribe(g => {
-      if (g !== undefined)
+      if (g)
         this.currentServerName = g.name;
     });
   }

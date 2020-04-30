@@ -1,9 +1,16 @@
 <div class="animated fadeIn">
-  <div class="card">
-    <div class="card-header">
-    </div>
-    <div class="card-body">
-
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card" *ngIf="guildConfiguration$ | async as config">
+        <div class="card-header">
+          Guild Preferences
+        </div>
+        <div class="card-body">
+          <div>
+            {{ config | json }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

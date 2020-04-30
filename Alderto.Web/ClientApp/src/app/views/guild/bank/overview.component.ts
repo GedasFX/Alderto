@@ -31,7 +31,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.subscriptions.push(
       this.guild.currentGuild$.subscribe(async g => {
-        if (g) {
+        if (g != null) {
           this.currentGuild = g;
           this.userIsAdmin = g.userIsAdmin;
           this.guildBanks = await this.bankService.getBanks(g);

@@ -17,12 +17,12 @@ export class AccountComponent implements OnInit {
 
   public ngOnInit() {
     this.userService.user$.subscribe(user => {
-      this.loggedIn = user != null;
+      this.loggedIn = !!user;
 
-      if (user != null)
-        this.userImg = user.avatar == null
-          ? this.getDefaultAvatar(user.discriminator)
-          : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`;
+      if (user)
+        this.userImg = user.avatar
+          ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.jpg?size=64`
+          : this.getDefaultAvatar(user.discriminator);
     });
   }
 

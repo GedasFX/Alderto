@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
+using Alderto.Data;
 using Alderto.Services;
 using Discord;
 using Discord.Commands;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
@@ -13,14 +17,17 @@ namespace Alderto.Bot.Modules
         private readonly IGuildMemberManager _guildMemberManager;
         private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
+        private readonly AldertoDbContext _context;
 
         public CurrencyModule(IGuildMemberManager guildMemberManager,
             IGuildPreferencesProvider guildPreferences,
-            ICurrencyManager currencyManager)
+            ICurrencyManager currencyManager,
+            AldertoDbContext context)
         {
             _guildMemberManager = guildMemberManager;
             _guildPreferences = guildPreferences;
             _currencyManager = currencyManager;
+            _context = context;
         }
 
         [Command("Give")]
@@ -130,6 +137,26 @@ namespace Alderto.Bot.Modules
 
             // Points were given out.
             await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+        }
+
+        [Command("top")]
+        public async Task Top(int page = 1)
+        {
+            if (page < 1)
+            {
+                await this.ReplyErrorEmbedAsync("Selected page must be positive.");
+                return;
+            }
+
+            var topN = await _context.GuildMembers.AsQueryable()
+                .Where(g => g.GuildId == Context.Guild.Id)
+                .OrderByDescending(g => g.CurrencyCount)
+                .Skip((page - 1) * 50)
+                .Take(50)
+                .ToListAsync();
+
+            var res = topN.Aggregate(new StringBuilder(), (c, n) => c.Append($"<@{n.MemberId}>: {n.CurrencyCount}\n"));
+            await this.ReplyEmbedAsync(res.ToString());
         }
     }
 }

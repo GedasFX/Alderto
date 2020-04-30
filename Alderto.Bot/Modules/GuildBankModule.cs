@@ -1,14 +1,16 @@
 ﻿using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Services;
 using Alderto.Services.Exceptions;
+using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
-    [Group, Alias("GuildBank", "GB")]
+    [Group, Alias("GuildBank", "GB", "GuildBanks", "Banks", "Bank")]
     public class GuildBankModule : ModuleBase<SocketCommandContext>
     {
         private readonly IGuildBankManager _guildBankManager;
@@ -18,35 +20,14 @@ namespace Alderto.Bot.Modules
             _guildBankManager = guildBankManager;
         }
 
-        //[Command("Give"), Alias("Add")]
-        //public async Task Give(IGuildUser transactor, string bankName, string itemName, double quantity)
-        //{
-        //    if (itemName == "$")
-        //    {
-        //        // Special case - currency donation.
-        //        await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, quantity);
-        //    }
-        //    else
-        //    {
-        //        await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, quantity);
-        //    }
-        //}
+        [Command("list")]
+        public async Task List()
+        {
+            var banks = await _guildBankManager.GetGuildBanksAsync(Context.Guild.Id);
+            await this.ReplyEmbedAsync(banks.Aggregate(new StringBuilder(), (c, i) => c.Append($"**{i.Name,32}**\n")).ToString());
+        }
 
-        //[Command("Take"), Alias("Remove")]
-        //public async Task Take(IGuildUser transactor, string bankName, string itemName, double quantity)
-        //{
-        //    if (itemName == "$")
-        //    {
-        //        // Special case - currency donation.
-        //        await _guildBankManager.ModifyCurrencyCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, -quantity);
-        //    }
-        //    else
-        //    {
-        //        await _guildBankManager.ModifyItemCountAsync(Context.Guild.Id, bankName, Context.User.Id, transactor.Id, itemName, -quantity);
-        //    }
-        //}
-
-        [Command("Items"), Alias("List")]
+        [Command("items")]
         public async Task Items(string bankName)
         {
             var bank = await _guildBankManager.GetGuildBankAsync(Context.Guild.Id, bankName,
@@ -54,8 +35,9 @@ namespace Alderto.Bot.Modules
             if (bank == null)
                 throw new BankNotFoundException();
 
-            var res = bank.Contents.Aggregate(seed: "", (current, item) => current + $"{item.Name} {item.Description}\n");
-            await this.ReplySuccessEmbedAsync(res);
+            var res = bank.Contents.Aggregate(new StringBuilder(), (current, item) =>
+                current.Append($"**{item.Name}**\n{(string.IsNullOrEmpty(item.Description) ? "N/A" : item.Description)}\n*qty*: {item.Quantity} @ {item.Value} ea.\n\n"));
+            await this.ReplyEmbedAsync(res.ToString());
         }
     }
 }
