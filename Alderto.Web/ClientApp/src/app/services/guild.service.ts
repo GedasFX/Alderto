@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IGuild, IGuildChannel, IGuildRole } from 'src/app/models';
 import { AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
 import { UserService } from './user.service';
+import { map, tap, switchMap } from 'rxjs/operators';
 
 export class Guild {
   public readonly id: string;
@@ -74,46 +75,30 @@ export class Guild {
   providedIn: 'root'
 })
 export class GuildService {
-  public readonly mutualGuilds$: BehaviorSubject<Guild[]>;
-  public readonly currentGuild$: BehaviorSubject<Guild>;
+  public readonly mutualGuilds$: Observable<Guild[]>;
+  public readonly currentGuild$: Observable<Guild>;
+
+  public mutualGuilds: Guild[];
+  public currentGuildId: string;
+  public currentGuild: Guild;
 
   constructor(
     userService: UserService,
     guildApi: AldertoWebGuildApi,
     nav: NavigationService
   ) {
-    this.mutualGuilds$ = new BehaviorSubject<Guild[]>(undefined);
-    this.currentGuild$ = new BehaviorSubject<Guild>(undefined);
+    this.mutualGuilds$ = userService.userGuilds$.pipe(
+      map(u => u ? u.map(g => new Guild(g, guildApi)) : undefined)
+    );
 
-    userService.userGuilds$.subscribe(u => {
-      if (u == null)
-        return;
+    this.currentGuild$ = nav.currentGuildId$.pipe(
+      switchMap(id => this.mutualGuilds$.pipe(map(g => g
+        ? g.find(l => l.id === id)
+        : null)))
+    );
 
-      if (this.mutualGuilds == null) {
-        this.mutualGuilds$.next(u.map(g => new Guild(g, guildApi)));
-
-        // Trigger current guild update.
-        this.currentGuild$.next(this.mutualGuilds.find(l => l.id === nav.currentGuildId$.value));
-      }
-    });
-
-    nav.currentGuildId$.subscribe(id => {
-      if (this.mutualGuilds == null)
-        return;
-
-      this.currentGuild$.next(this.mutualGuilds.find(l => l.id === id));
-    });
-  }
-
-  public get mutualGuilds() {
-    return this.mutualGuilds$.getValue();
-  }
-
-  public get currentGuildId(): string {
-    return this.currentGuild$.getValue().id;
-  }
-
-  public get currentGuild(): Guild {
-    return this.currentGuild$.getValue();
+    nav.currentGuildId$.subscribe(id => this.currentGuildId = id);
+    this.mutualGuilds$.subscribe(g => this.mutualGuilds = g);
+    this.currentGuild$.subscribe(g => this.currentGuild = g);
   }
 }

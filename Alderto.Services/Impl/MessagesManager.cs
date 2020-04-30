@@ -23,7 +23,9 @@ namespace Alderto.Services.Impl
 
         public Task<List<GuildManagedMessage>> ListMessagesAsync(ulong guildId)
         {
-            return _context.GuildManagedMessages.Where(m => m.GuildId == guildId).ToListAsync();
+            return _context.GuildManagedMessages.AsQueryable()
+                .Where(m => m.GuildId == guildId)
+                .ToListAsync();
         }
 
         public async Task<GuildManagedMessage?> GetMessageAsync(ulong guildId, ulong messageId)
@@ -47,8 +49,9 @@ namespace Alderto.Services.Impl
 
         public async Task<GuildManagedMessage> ImportMessageAsync(ulong guildId, ulong channelId, ulong messageId, ulong? moderatorRoleId = null)
         {
-            var dbMsg = await _context.GuildManagedMessages.SingleOrDefaultAsync(m =>
-                m.GuildId == guildId && m.MessageId == messageId);
+            var dbMsg = await _context.GuildManagedMessages.AsQueryable()
+                .SingleOrDefaultAsync(m => m.GuildId == guildId && m.MessageId == messageId);
+
             if (dbMsg != null)
                 return dbMsg;
 
@@ -98,8 +101,9 @@ namespace Alderto.Services.Impl
                 // User can always delete its own posts.
                 var message = await GetDiscordBotMessageAsync(dbMsg);
                 await message.DeleteAsync();
-            } catch (MessageNotFoundException) { /* Message is already gone from discord. Ignore error. */ }
-            
+            }
+            catch (MessageNotFoundException) { /* Message is already gone from discord. Ignore error. */ }
+
 
             _context.GuildManagedMessages.Remove(dbMsg);
             await _context.SaveChangesAsync();

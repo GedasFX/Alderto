@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Discord;
 
@@ -82,5 +83,11 @@ namespace Alderto.Tests.MockedEntities
         public IGuild Guild { get; set; }
         public ulong GuildId { get; set; }
         public IReadOnlyCollection<ulong> RoleIds { get; set; }
+
+        public DateTimeOffset? PremiumSince => throw new NotImplementedException();
+
+        public IImmutableSet<ClientType> ActiveClients => throw new NotImplementedException();
+
+        public bool IsStreaming => throw new NotImplementedException();
     }
 }

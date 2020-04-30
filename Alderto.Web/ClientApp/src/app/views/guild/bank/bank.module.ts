@@ -31,13 +31,8 @@ import { BankItemsDetailsComponent } from './modals/bank-items-details.component
     BankItemsCreateComponent,
     BankItemsDetailsComponent
   ],
-  entryComponents: [
-    BankCreateComponent,
-    BankEditComponent,
-    BankRemoveComponent,
-    BankItemsCreateComponent,
-    BankItemsDetailsComponent
-  ],
-  exports: [ModalModule]
+  exports: [
+    ModalModule
+  ]
 })
 export class BankModule { }

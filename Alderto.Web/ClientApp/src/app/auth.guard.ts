@@ -8,11 +8,11 @@ import { AccountService } from './services/account.service';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private readonly user: AccountService) {  }
+  constructor(private readonly accountService: AccountService) {  }
 
   public canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.user.isLoggedIn();
+    return this.accountService.userLoggedIn$;
   }
 }

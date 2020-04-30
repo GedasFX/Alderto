@@ -27,11 +27,11 @@ export class AccountComponent implements OnInit {
   }
 
   public login() {
-    this.account.authorize();
+    this.account.signIn().subscribe();
   }
 
   public logout() {
-    this.account.logout().subscribe(() => {
+    this.account.signOut().subscribe(() => {
       window.location.href = '/';
     });
   }

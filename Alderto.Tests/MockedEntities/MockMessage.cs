@@ -21,6 +21,12 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => throw new NotImplementedException();
+
         public MessageType Type { get; set; }
         public MessageSource Source { get; set; }
         public bool IsTTS { get; set; }
@@ -38,5 +44,11 @@ namespace Alderto.Tests.MockedEntities
         public IReadOnlyCollection<ulong> MentionedUserIds { get; set; }
         public MessageActivity Activity { get; set; }
         public MessageApplication Application { get; set; }
+
+        public bool IsSuppressed => throw new NotImplementedException();
+
+        public MessageReference Reference => throw new NotImplementedException();
+
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
     }
 }
