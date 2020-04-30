@@ -4,11 +4,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
-using Alderto.Data;
 using Alderto.Services;
 using Discord;
 using Discord.Commands;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
@@ -17,17 +15,15 @@ namespace Alderto.Bot.Modules
         private readonly IGuildMemberManager _guildMemberManager;
         private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
-        private readonly AldertoDbContext _context;
 
-        public CurrencyModule(IGuildMemberManager guildMemberManager,
+        public CurrencyModule(
+            IGuildMemberManager guildMemberManager,
             IGuildPreferencesProvider guildPreferences,
-            ICurrencyManager currencyManager,
-            AldertoDbContext context)
+            ICurrencyManager currencyManager)
         {
             _guildMemberManager = guildMemberManager;
             _guildPreferences = guildPreferences;
             _currencyManager = currencyManager;
-            _context = context;
         }
 
         [Command("Give")]
@@ -148,12 +144,7 @@ namespace Alderto.Bot.Modules
                 return;
             }
 
-            var topN = await _context.GuildMembers.AsQueryable()
-                .Where(g => g.GuildId == Context.Guild.Id)
-                .OrderByDescending(g => g.CurrencyCount)
-                .Skip((page - 1) * 50)
-                .Take(50)
-                .ToListAsync();
+            var topN = await _currencyManager.GetRichestUsersAsync(50, (page - 1) * 50);
 
             var res = topN.Aggregate(new StringBuilder(), (c, n) => c.Append($"<@{n.MemberId}>: {n.CurrencyCount}\n"));
             await this.ReplyEmbedAsync(res.ToString());
