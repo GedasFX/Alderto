@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Services.Impl
 {
@@ -35,6 +38,16 @@ namespace Alderto.Services.Impl
             await _context.SaveChangesAsync();
 
             return null;
+        }
+
+        public async Task<IEnumerable<GuildMember>> GetRichestUsersAsync(ulong guildId, int take = 10, int skip = 0)
+        {
+            return await _context.GuildMembers.AsQueryable()
+                .Where(g => g.GuildId == guildId)
+                .OrderByDescending(g => g.CurrencyCount)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
         }
     }
 }

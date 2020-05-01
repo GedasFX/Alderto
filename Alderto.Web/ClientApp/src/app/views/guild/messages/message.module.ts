@@ -29,11 +29,8 @@ import { NgPipesModule } from 'ngx-pipes';
         MessageEditComponent,
         MessageRemoveComponent
     ],
-    entryComponents: [
-        MessageCreateComponent,
-        MessageEditComponent,
-        MessageRemoveComponent
-    ],
-    exports: [ModalModule]
+  exports: [
+    ModalModule
+  ]
 })
 export class MessageModule { }

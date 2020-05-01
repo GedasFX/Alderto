@@ -101,7 +101,7 @@ namespace Alderto.Services.Impl
 
         public IEnumerable<GuildMember> ListRecruitsAsync(GuildMember member)
         {
-            return _context.GuildMembers
+            return _context.GuildMembers.AsQueryable()
                 .Where(g => g.GuildId == member.GuildId && g.RecruiterMemberId == member.MemberId);
         }
 

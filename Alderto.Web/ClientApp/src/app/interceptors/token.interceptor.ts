@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 
 import { AccountService } from '../services/account.service';
-import { ITokenResponse } from '../services';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +17,7 @@ export class TokenInterceptor implements HttpInterceptor {
     if (this.accountService && this.accountService.accessToken) {
 
       // Ensure request is going to the API.
-      if (request.url.startsWith(`/api/`)) {
+      if (request.url.startsWith('/api')) {
         request = this.addToken(request, this.accountService.accessToken);
       }
     }
@@ -29,7 +28,7 @@ export class TokenInterceptor implements HttpInterceptor {
       if (error instanceof HttpErrorResponse && error.status === 401) {
 
         // Ensure request is going to the API.
-        if (window.location.origin + request.urlWithParams === error.url) {
+        if (request.url.startsWith('/api')) {
           // JWT Expired. Refresh it.
           return this.onTokenExpired(request, next);
         }
@@ -42,21 +41,19 @@ export class TokenInterceptor implements HttpInterceptor {
   private onTokenExpired(request: HttpRequest<any>, next: HttpHandler) {
     if (!this.tokenRefreshing) {
       this.tokenRefreshing = true;
-      this.accountService.accessToken$.next(null);
+      this.accountService.user$.next(null);
 
-      return this.accountService.refreshSession().pipe(
-        switchMap((tokens: ITokenResponse) => {
-          this.accountService.storeTokens(tokens);
+      return this.accountService.renewToken().pipe(
+        switchMap(user => {
           this.tokenRefreshing = false;
-          return next.handle(this.addToken(request, tokens.access_token));
+          return next.handle(this.addToken(request, user.access_token));
         }));
-
     } else {
       // Token is refreshing. Wait for the refresh token to appear.
-      return this.accountService.accessToken$.pipe(
-        filter(token => token != null), take(1), // This is effectively await token.
-        switchMap(token => {
-          return next.handle(this.addToken(request, token as string));
+      return this.accountService.user$.pipe(
+        filter(user => user != null), take(1), // This is effectively await token.
+        switchMap(user => {
+          return next.handle(this.addToken(request, user.access_token));
         }));
     }
   }

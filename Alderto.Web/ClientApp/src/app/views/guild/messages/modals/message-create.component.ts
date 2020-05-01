@@ -14,7 +14,7 @@ import { TabsetComponent } from 'ngx-bootstrap/tabs';
     templateUrl: 'message-create.component.html'
 })
 export class MessageCreateComponent implements OnInit, OnDestroy {
-    @ViewChild('tabset', { static: false }) tabset: TabsetComponent;
+    @ViewChild('tabset') tabset: TabsetComponent;
 
     public onMessageCreated: Subject<IManagedMessage>;
 

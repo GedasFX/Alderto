@@ -5,11 +5,14 @@ import { OverviewComponent } from './overview.component';
 
 import { GuildRoutingModule } from './guild.routing';
 import { GuildLayoutComponent } from './guild.layout';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     CommonModule,
-    GuildRoutingModule
+    GuildRoutingModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
     GuildLayoutComponent,

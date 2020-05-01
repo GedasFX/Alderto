@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
@@ -14,7 +16,8 @@ namespace Alderto.Bot.Modules
         private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
 
-        public CurrencyModule(IGuildMemberManager guildMemberManager,
+        public CurrencyModule(
+            IGuildMemberManager guildMemberManager,
             IGuildPreferencesProvider guildPreferences,
             ICurrencyManager currencyManager)
         {
@@ -130,6 +133,21 @@ namespace Alderto.Bot.Modules
 
             // Points were given out.
             await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+        }
+
+        [Command("top")]
+        public async Task Top(int page = 1)
+        {
+            if (page < 1)
+            {
+                await this.ReplyErrorEmbedAsync("Selected page must be positive.");
+                return;
+            }
+
+            var topN = await _currencyManager.GetRichestUsersAsync(Context.Guild.Id, 50, (page - 1) * 50);
+
+            var res = topN.Aggregate(new StringBuilder(), (c, n) => c.Append($"<@{n.MemberId}>: {n.CurrencyCount}\n"));
+            await this.ReplyEmbedAsync(res.ToString());
         }
     }
 }

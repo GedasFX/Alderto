@@ -78,6 +78,12 @@ namespace Alderto.Services.Exceptions
         public static ErrorMessage BankItemNotFound { get; } =
             new ErrorMessage(404, 2201, "The specified bank item was not found.");
 
+        /// <summary>
+        /// NotFound reason. Used when bot was unable to find the preference.
+        /// </summary>
+        public static ErrorMessage GuildPreferenceNotFound { get; } =
+            new ErrorMessage(404, 2301, "The specified preference was not found,");
+
         // === BadRequest ===
 
         /// <summary>
@@ -126,7 +132,7 @@ namespace Alderto.Services.Exceptions
 
         public static ErrorMessage ChannelNotMessageChannel { get; } =
             new ErrorMessage(400, 3401, "The specified channel is not a message channel.");
-
+        
         /// <summary>
         /// Converts a internal code to ErrorMessage.
         /// </summary>
