@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { IGuild, IGuildChannel, IGuildRole } from 'src/app/models';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { IGuild, IGuildChannel, IGuildRole, GuildConfiguration } from 'src/app/models';
 import { AldertoWebGuildApi } from './web';
 import { NavigationService } from './navigation.service';
 import { UserService } from './user.service';
-import { map, tap, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 export class Guild {
   public readonly id: string;
@@ -13,51 +13,71 @@ export class Guild {
   public readonly icon: string;
 
   public readonly userPermissions: number;
-  public get userIsAdmin(): boolean {
+  public get userIsAdmin() {
     return ((this.userPermissions & 1 << 2) !== 0);
+  }
+
+  private loadedPreferences: GuildConfiguration;
+  public get preferences(): Promise<GuildConfiguration> {
+    return new Promise<GuildConfiguration>(r => {
+      if (this.loadedPreferences) {
+        r(this.loadedPreferences);
+        return;
+      }
+
+      this.guildApi.fetchPreferences(this.id).subscribe(p => {
+        this.loadedPreferences = p;
+        r(this.loadedPreferences);
+      });
+    });
   }
 
   private loadedChannels: IGuildChannel[];
   public get channels(): Promise<IGuildChannel[]> {
-    return new Promise<IGuildChannel[]>(async r => {
-      if (this.loadedChannels != null) {
+    return new Promise<IGuildChannel[]>(r => {
+      if (this.loadedChannels) {
         r(this.loadedChannels);
         return;
       }
 
-      this.loadedChannels = await this.guildApi.fetchChannels(this.id).toPromise();
-      r(this.loadedChannels);
+      this.guildApi.fetchChannels(this.id).subscribe(g => {
+        this.loadedChannels = g;
+        r(this.loadedChannels);
+      });
     });
   }
 
   private loadedRoles: IGuildRole[];
   public get roles(): Promise<IGuildRole[]> {
-    return new Promise<IGuildRole[]>(async r => {
-      if (this.loadedRoles != null) {
+    return new Promise<IGuildRole[]>(r => {
+      if (this.loadedRoles) {
         r(this.loadedRoles);
         return;
       }
 
-      this.loadedRoles = await this.guildApi.fetchRoles(this.id).toPromise();
-      r(this.loadedRoles);
+      this.guildApi.fetchRoles(this.id).subscribe(roles => {
+        this.loadedRoles = roles;
+        r(this.loadedRoles);
+      });
     });
   }
 
   private loadedUserRoles: IGuildRole[];
   public get userRoles(): Promise<IGuildRole[]> {
-    return new Promise<IGuildRole[]>(async r => {
-      if (this.loadedUserRoles != null) {
+    return new Promise<IGuildRole[]>(r => {
+      if (this.loadedUserRoles) {
         r(this.loadedUserRoles);
         return;
       }
 
-      const roleIds = await this.guildApi.fetchUserRoles(this.id).toPromise();
-      const roles = await this.roles;
-      this.loadedUserRoles = [];
-      roleIds.forEach(rid => {
-        this.loadedUserRoles.push(roles.find(i => i.id === rid));
+      this.guildApi.fetchUserRoles(this.id).subscribe(async roleIds => {
+        const roles = await this.roles;
+        this.loadedUserRoles = [];
+        roleIds.forEach(rid => {
+          this.loadedUserRoles.push(roles.find(i => i.id === rid));
+        });
+        r(this.loadedUserRoles);
       });
-      r(this.loadedUserRoles);
     });
   }
 
@@ -75,7 +95,7 @@ export class Guild {
   providedIn: 'root'
 })
 export class GuildService {
-  public readonly mutualGuilds$: Observable<Guild[]>;
+  public readonly mutualGuilds$ = new BehaviorSubject<Guild[]>(undefined);
   public readonly currentGuild$: Observable<Guild>;
 
   public mutualGuilds: Guild[];
@@ -87,9 +107,13 @@ export class GuildService {
     guildApi: AldertoWebGuildApi,
     nav: NavigationService
   ) {
-    this.mutualGuilds$ = userService.userGuilds$.pipe(
-      map(u => u ? u.map(g => new Guild(g, guildApi)) : undefined)
-    );
+    userService.userGuilds$.subscribe(userGuilds => {
+      if (!userGuilds)
+        return;
+
+      const guilds = userGuilds.map(g => new Guild(g, guildApi));
+      this.mutualGuilds$.next(guilds);
+    });
 
     this.currentGuild$ = nav.currentGuildId$.pipe(
       switchMap(id => this.mutualGuilds$.pipe(map(g => g

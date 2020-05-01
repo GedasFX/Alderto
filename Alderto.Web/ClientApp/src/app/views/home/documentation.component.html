@@ -1,0 +1,48 @@
+<tabset>
+  <tab *ngFor="let module of docs.modules" [heading]="module.name">
+    <div *ngFor="let command of module.commands" class="mb-3">
+      <h5>
+        <span>{{ command.trigger }}</span>
+        <span *ngIf="command.alias" class="text-muted">
+          ({{ command.alias.join(', ') }})
+        </span>
+        <span *ngFor="let param of command.params">
+          <span *ngIf="param.defaultValue">
+            <span>
+              [ {{ param.name }}
+            </span>
+            <span class="text-muted">
+              : {{ param.type }} = {{ param.defaultValue }}
+            </span>
+            <span>
+              ]<span *ngIf="param.multiple">...</span>
+            </span>
+          </span>
+          <span *ngIf="!param.defaultValue">
+            <span>
+              {{ '{' }} {{ param.name }}
+            </span>
+            <span class="text-muted">
+              : {{ param.type }}
+            </span>
+            <span>
+              {{ '}' }}<span *ngIf="param.multiple">...</span>
+            </span>
+          </span>
+        </span>
+      </h5>
+      <h6>
+        <span *ngIf="command.requirements" class="text-danger">
+          Requires {{ command.requirements }}.
+        </span>
+        <span>
+          {{ command.notes }}
+        </span>
+      </h6>
+      <p>
+        Example:
+        <span class="text-muted"> {{ command.example }}</span>
+      </p>
+    </div>
+  </tab>
+</tabset>

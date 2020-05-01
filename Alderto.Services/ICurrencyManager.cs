@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Data.Models;
 
@@ -23,5 +24,14 @@ namespace Alderto.Services
         /// <param name="cooldown">Time (in seconds) between timely claims.</param>
         /// <returns>Time remaining until next claim. If null - points were given out.</returns>
         Task<TimeSpan?> GrantTimelyRewardAsync(GuildMember guildMember, int amount, int cooldown);
+
+        /// <summary>
+        /// Gets the richest N users of the guild.
+        /// </summary>
+        /// <param name="guildId">Id of guild to search.</param>
+        /// <param name="take">N</param>
+        /// <param name="skip">Amount of users to ignore (pagination).</param>
+        /// <returns>Top N richest players after skiping some.</returns>
+        Task<IEnumerable<GuildMember>> GetRichestUsersAsync(ulong guildId, int take = 10, int skip = 0);
     }
 }
