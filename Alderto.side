@@ -1,0 +1,704 @@
+{
+  "id": "eac69990-2449-4bb0-94f6-cf7c16736829",
+  "version": "2.0",
+  "name": "Alderto",
+  "url": "https://localhost",
+  "tests": [{
+    "id": "823bedf0-9aa3-498a-919c-fc78340636d2",
+    "name": "Bank CRUD",
+    "commands": [{
+      "id": "cdb17cdf-b758-4ef8-9e35-44ab925d9b49",
+      "comment": "",
+      "command": "open",
+      "target": "/news",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "4b69b4ca-e672-4c11-b4f7-6b8b06ac1247",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1206x737",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2cf46b6c-8feb-499e-ad7b-f320a07cda51",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Please select a server",
+      "targets": [
+        ["linkText=Please select a server", "linkText"],
+        ["css=.btn", "css:finder"],
+        ["xpath=//a[contains(text(),'Please select a server')]", "xpath:link"],
+        ["xpath=//div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Please select a server ')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a6ef30cb-49fa-4ada-9563-4510e539a41d",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Alderto Dev",
+      "targets": [
+        ["linkText=Alderto Dev", "linkText"],
+        ["css=li:nth-child(2) > .dropdown-item", "css:finder"],
+        ["xpath=//a[contains(text(),'Alderto Dev')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/guild/609728856211062785')]", "xpath:href"],
+        ["xpath=//div/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Alderto Dev')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "299e78ad-38ca-4848-9662-ac9cbf04ab52",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Create New Bank",
+      "targets": [
+        ["linkText=Create New Bank", "linkText"],
+        ["css=.card-header > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Create New Bank')]", "xpath:link"],
+        ["xpath=//div/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Create New Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ac812d86-5b8f-43e4-8313-bb1d701818fc",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.form-control", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "hello"
+    }, {
+      "id": "287c521c-332d-4d64-8317-89bcc095f4f5",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "1a3e8f55-9234-4dc8-b6a1-80f87f6a609e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Create New Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "79b82362-f624-4797-858f-e04cd5cd32d8",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "2f41cff9-a3de-4eff-b3d0-97cfc82e4ef4",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Create New Bank",
+      "targets": [
+        ["linkText=Create New Bank", "linkText"],
+        ["css=.card-header > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Create New Bank')]", "xpath:link"],
+        ["xpath=//div/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Create New Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a130303c-affe-4b49-acc1-2af7e60ac4e0",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.form-control", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "hello"
+    }, {
+      "id": "bac58ade-bddc-4687-9b17-f8d1c064ab7e",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-error",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "1edd6597-b060-4127-8b88-a01ce58c2cba",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Create New Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6e41e7bb-0c95-41b7-a2f7-8090f83c9cbe",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-error",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "852f5907-e2ad-4a31-a6f4-b5af90153828",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-secondary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Create New Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "72667b3d-5541-463d-a132-7b6f41ac1550",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type .fa-pencil",
+      "targets": [
+        ["css=.ng-star-inserted > .fa-pencil", "css:finder"],
+        ["xpath=//div[11]/div/div/div/a[2]/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3c8b690d-dc34-4d04-8d38-9fa3c3a84947",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.form-control", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "hello edited"
+    }, {
+      "id": "294f9456-abb0-4785-948f-12b44268bf51",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2be123c9-dd3a-4d16-b818-384d29e58f32",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(2) .ng-option:nth-of-type(1)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ad97c406-345f-4407-9503-091b32326bfc",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "d657ed78-d956-4f57-a955-c54b0f331923",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Edit Bank')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "175ec1e2-cd97-4b53-a3ac-281ea65df8fe",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "c51df97e-19f6-4c59-997d-161af032a61d",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type .fa-plus",
+      "targets": [
+        ["css=.ng-star-inserted > a > .fa", "css:finder"],
+        ["xpath=//div[11]/div/div[2]/div/div/a/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b7101f26-1ab7-4d99-b04f-b01f65833cbe",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-group:nth-child(1) > .form-control",
+      "targets": [
+        ["css=.form-group:nth-child(1) > .form-control", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "db931726-4e05-4c8b-893f-32096ca2813c",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.ng-dirty:nth-child(2)", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "1"
+    }, {
+      "id": "6e7b5dd7-a041-48f8-aa2a-3202c0538097",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(2) textarea",
+      "targets": [
+        ["css=.form-group:nth-child(2) > .form-control", "css:finder"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "2"
+    }, {
+      "id": "48a8654f-2d79-4ef5-ab0d-d00f9543ba59",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(3) input",
+      "targets": [
+        ["css=.form-group:nth-child(3) > .form-control", "css:finder"],
+        ["xpath=//input[@type='number']", "xpath:attributes"],
+        ["xpath=//div[3]/input", "xpath:position"]
+      ],
+      "value": "3"
+    }, {
+      "id": "6f42c57f-5bbf-4a23-803c-70b3e6f17f79",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(4) input",
+      "targets": [
+        ["css=.form-group:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=(//input[@type='number'])[2]", "xpath:attributes"],
+        ["xpath=//div[4]/input", "xpath:position"]
+      ],
+      "value": "4"
+    }, {
+      "id": "658c9044-ac4a-4da6-867d-1687fd8c3056",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "cc0925be-c881-46df-90df-10e396f88904",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Add New Bank Item')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4e2f0f40-1b12-4830-80b1-655a61ac66c9",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "4f6ab0ff-7af9-4eb9-90aa-4ac54d057253",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type .fa-plus",
+      "targets": [
+        ["css=.ng-star-inserted > a > .fa-plus", "css:finder"],
+        ["xpath=//div[11]/div/div[2]/div/div[2]/a/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c178967f-bcb0-4507-924a-78880bcf4554",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [],
+      "value": "5"
+    }, {
+      "id": "a2d5f24e-8076-4483-a009-b667b8072bd4",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(2) textarea",
+      "targets": [
+        ["css=.ng-dirty:nth-child(2)", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "4"
+    }, {
+      "id": "f9bc50fd-95e9-4c6c-aa15-3d89d9b02d1b",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(3) input",
+      "targets": [],
+      "value": "3"
+    }, {
+      "id": "af2f1825-2372-4b9c-abb8-cbe2fdf9ea92",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(4) input",
+      "targets": [
+        ["css=.form-group:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=(//input[@type='number'])[2]", "xpath:attributes"],
+        ["xpath=//div[4]/input", "xpath:position"]
+      ],
+      "value": "2"
+    }, {
+      "id": "907d2621-ee00-4597-ac6c-deea1b5cdf1e",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(5) input",
+      "targets": [
+        ["css=.ng-untouched", "css:finder"],
+        ["xpath=//input[@type='url']", "xpath:attributes"],
+        ["xpath=//div[5]/input", "xpath:position"]
+      ],
+      "value": "1"
+    }, {
+      "id": "2359d85d-c2fc-44d9-9678-8e87435e5ae2",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "d407ab5f-5dc6-439a-acda-2bf8f1f0ce4c",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Add New Bank Item')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "108846e5-a003-4bba-925f-295e06d5d052",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "e08ec5b2-d9fc-4632-9be4-14a2bb40fb3a",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type .fa-trash-o",
+      "targets": [
+        ["css=.row > .ng-star-inserted:nth-child(2)", "css:finder"],
+        ["xpath=//div[11]/div/div[2]/div/div[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "09f8310e-8ec9-42a6-99d5-3903eeee894f",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "f3a1b21d-ae29-4767-9d72-52366789d769",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-danger",
+      "targets": [
+        ["css=.btn-danger", "css:finder"],
+        ["xpath=(//button[@type='button'])[5]", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Remove')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d1d7e018-eabc-4ebe-8b10-b11ad51956ff",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }]
+  }, {
+    "id": "05e308bc-a523-4753-8953-31de421edab7",
+    "name": "Messges CRUD",
+    "commands": [{
+      "id": "f7195d74-300d-448d-b92b-a8ce19fe3639",
+      "comment": "",
+      "command": "open",
+      "target": "/news",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "66aa6340-5fdb-4f6b-ae83-182e056b34fe",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1206x737",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b35c2b33-59ee-477e-b7a3-dd9a04536342",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Please select a server",
+      "targets": [
+        ["linkText=Please select a server", "linkText"],
+        ["css=.btn", "css:finder"],
+        ["xpath=//a[contains(text(),'Please select a server')]", "xpath:link"],
+        ["xpath=//div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Please select a server ')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "eeab24f0-a1b2-40c2-ad5f-1c99e52530cf",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Alderto Dev",
+      "targets": [
+        ["linkText=Alderto Dev", "linkText"],
+        ["css=li:nth-child(2) > .dropdown-item", "css:finder"],
+        ["xpath=//a[contains(text(),'Alderto Dev')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/guild/609728856211062785')]", "xpath:href"],
+        ["xpath=//div/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Alderto Dev')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6ad6efa2-05bf-4774-96b9-520dd2738bc4",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Messages",
+      "targets": [
+        ["linkText=Messages", "linkText"],
+        ["css=.nav-dropdown-items > .nav-item:nth-child(3) > .nav-link", "css:finder"],
+        ["xpath=//a[contains(@href, '/guild/609728856211062785/message')]", "xpath:href"],
+        ["xpath=//app-sidebar-nav-link[3]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Messages')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "af913544-95b6-4635-9857-b24e0026ee8f",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Add New Message",
+      "targets": [
+        ["linkText=Add New Message", "linkText"],
+        ["css=.card-header > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Add New Message')]", "xpath:link"],
+        ["xpath=//div/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Add New Message')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "cf689cfb-404d-4ee2-b188-1883356844ff",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.ng-select-focused input", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3f6f8f62-6278-4d71-b62e-0592bd9d3e96",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(1) .ng-option:nth-of-type(1)",
+      "targets": [
+        ["id=a374be90f1f9-0", "id"],
+        ["css=#a374be90f1f9-0", "css:finder"],
+        ["xpath=//div[@id='a374be90f1f9-0']", "xpath:attributes"],
+        ["xpath=//ng-dropdown-panel[@id='a374be90f1f9']/div/div[2]/div", "xpath:idRelative"],
+        ["xpath=//ng-dropdown-panel/div/div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "fc93bc35-2250-43df-a16e-3f1608c22950",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(2) input",
+      "targets": [
+        ["css=.ng-select-focused input", "css:finder"],
+        ["xpath=(//input[@type='text'])[2]", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4f6ddf69-fd18-46c8-9e86-5651016d3e2e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(2) .ng-option:nth-of-type(2)",
+      "targets": [
+        ["id=a67f286c7849-1", "id"],
+        ["css=#a67f286c7849-1", "css:finder"],
+        ["xpath=//div[@id='a67f286c7849-1']", "xpath:attributes"],
+        ["xpath=//ng-dropdown-panel[@id='a67f286c7849']/div/div[2]/div[2]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "fdaabfff-f5b7-4484-b778-0ef766ff61d3",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(3) textarea",
+      "targets": [
+        ["css=.form-group:nth-child(3) > .ng-dirty", "css:finder"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Hello World!"
+    }, {
+      "id": "b2525285-8781-404e-bef9-064af440386d",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-succes",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "82ed2942-67e4-476a-881a-261ba8fa46a9",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='button'])[5]", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Add New Message')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "69fb3c47-ab61-484a-b1b1-34ce6602fd1b",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "e62f56ef-da3b-43ef-8710-854430b94383",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type table .fa-pencil",
+      "targets": [
+        ["css=.ng-star-inserted:nth-child(4) > .card .fa-pencil", "css:finder"],
+        ["xpath=//div[4]/div/div[2]/table/tr[2]/td[4]/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e0d3ed9d-9fdb-4e50-985c-c52ab0ff57df",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(1) input",
+      "targets": [
+        ["css=.modal", "css:finder"],
+        ["xpath=//modal-container", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a4be2b3f-9392-4073-866e-e5c0526a4904",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-body .form-group:nth-of-type(1) .ng-option:nth-of-type(1)",
+      "targets": [
+        ["id=a374be90f1f9-0", "id"],
+        ["css=#a374be90f1f9-0", "css:finder"],
+        ["xpath=//div[@id='a374be90f1f9-0']", "xpath:attributes"],
+        ["xpath=//ng-dropdown-panel[@id='a374be90f1f9']/div/div[2]/div", "xpath:idRelative"],
+        ["xpath=//ng-dropdown-panel/div/div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6cbc91ba-eac1-40d6-998a-737de5482527",
+      "comment": "",
+      "command": "type",
+      "target": "css=.modal-body .form-group:nth-of-type(2) textarea",
+      "targets": [
+        ["css=.form-control", "css:finder"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Goodbye World!"
+    }, {
+      "id": "17dd0f1a-9605-49dd-bfe0-ea03fb1fca8e",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "5fa9e5a7-43bb-44da-bee1-2c2a09422714",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=(//button[@type='button'])[5]", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Edit Message')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "730156a1-e995-4e29-862f-994e2c22d366",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "5b205c99-4a5b-4424-988c-9efe0fa16268",
+      "comment": "",
+      "command": "click",
+      "target": "css=.animated.fadeIn > div:last-of-type table .fa-trash",
+      "targets": [
+        ["css=.ng-star-inserted:nth-child(4) > .card .fa-trash", "css:finder"],
+        ["xpath=//div[4]/div/div[2]/table/tr[2]/td[4]/i[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "1e5876db-edef-498b-8ffb-b6efcafae44e",
+      "comment": "",
+      "command": "waitForElementNotPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "75306f2d-6c6d-47b8-81f2-5eda1a6bd4c2",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer .btn-danger",
+      "targets": [
+        ["css=.btn-danger", "css:finder"],
+        ["xpath=(//button[@type='button'])[5]", "xpath:attributes"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Remove')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "206502b4-f637-42f2-85b5-a5163ab1b892",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.overlay-container .toast-container .ngx-toastr.toast-success",
+      "targets": [],
+      "value": "30000"
+    }]
+  }],
+  "suites": [{
+    "id": "f77acaf2-1686-42a0-a673-5067505958f2",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["823bedf0-9aa3-498a-919c-fc78340636d2"]
+  }],
+  "urls": ["https://localhost/"],
+  "plugins": []
+}
