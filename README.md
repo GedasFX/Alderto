@@ -3,8 +3,8 @@ A discord accountant bot with a Web user interface.
 
 ## Versions:
 * Full version
-  > Harder to set up, has Web user interface.
-
+> Harder to set up, has Web user interface.
+  
 * Lite version
   > Faster, less setup time, cannot control it thru Web.
 
@@ -17,7 +17,7 @@ Process:
 3) Find `appsettings.json` file and fill it out (see Configuration file below);
 4) Launch the bot using command `dotnet Alderto.Web.dll` (`dotnet Alderto.Bot.dll` for lite version).
 > Based on the configuration of the machine and `appsettings.json`, you may have to run it in administrator mode for port allocation (not applicable to lite version). adding `sudo` in front of the command on Linux would do the trick.
-   
+
 ### Configuration file
 Bot's configuration can be found at `appsettings.json` file.
 Tutorial how to set up the configuration:
@@ -31,24 +31,9 @@ Tutorial how to set up the configuration:
 ### Https
 >In order to use SSL, you must first have a certificate present on the host device. Big cloud hosting providers, such as AWS of Azure can issue a certificate, otherwise you will have to issue one yourself. [Let's encrypt](https://letsencrypt.org/) is a project that can help you achieve that.
 
-To activate SSL in `appsettings.json` remove the two comments surrounding `Kestrel:Endpoints:Https`:
-```
-  "Kestrel": {
-    "Endpoints": {
-      /* If you wish to use SSL, uncomment the part "Https". Requires certificate present on the device. See Kestrel help for more info. */
-      /*  <- REMOVE!!!
-      "Https": {
-        "Url": "https://*"
-      },
-      */  <- REMOVE!!!
-      "Http": {
-        "Url": "http://*"
-      }
-    }
-  }
-```
+To activate SSL on Kestrel server, set the environment variable `ASPNETCORE_URLS=https://*`.
 ## Development
-Requirements: [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) with [.Net Core 3.0 **SDK**](https://dotnet.microsoft.com/download/dotnet-core/3.0), [Node.js version 10.9.0 or later](https://nodejs.org/en/) (for WebUI only)
+Requirements: [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) with [.Net Core 3.1 **SDK**](https://dotnet.microsoft.com/download/dotnet-core/3.1), [Node.js version 10.9.0 or later](https://nodejs.org/en/) (for WebUI only)
 
 Process:
 1) Clone the repository 
