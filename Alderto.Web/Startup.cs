@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -68,6 +69,12 @@ namespace Alderto.Web
             services.AddMessagesManager();
 
             // === <Web> ===
+            // For use behind reverse proxy
+            services.Configure<ForwardedHeadersOptions>(o =>
+            {
+                o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
             // Use discord as authentication service.
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -206,14 +213,12 @@ namespace Alderto.Web
             // Start the bot.
             Task.Run(cmdHandler.StartAsync);
 
-            // Check if https is configured
-            if (Configuration["Kestrel:Endpoints:Https:Url"] != null)
-            {
-                if (env.IsProduction())
-                    app.UseHsts();
+            app.UseForwardedHeaders();
 
-                app.UseHttpsRedirection();
-            }
+            if (env.IsProduction())
+                app.UseHsts();
+
+            app.UseHttpsRedirection();
 
             // Configure api routing.
             app.Map("/api", api =>
