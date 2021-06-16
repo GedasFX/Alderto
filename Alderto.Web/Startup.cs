@@ -73,6 +73,8 @@ namespace Alderto.Web
             services.Configure<ForwardedHeadersOptions>(o =>
             {
                 o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                o.KnownNetworks.Clear();
+                o.KnownProxies.Clear();
             });
 
             // Use discord as authentication service.
