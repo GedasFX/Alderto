@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  alderto:
+    image: gedasfx/alderto
+    ports:
+      - "5001:80"
+    environment:
+      Database__Host: postgres
+      Database__Database: postgres
+      Database__Username: postgres
+      Database__Password: A67E2DB2-A419-4570-AEC1-8C2E8C5D7D8E
+
+      DiscordAPI__ClientId: 595936593592844306
+      DiscordAPI__ClientSecret: 9Hg9AFb-d2_flDKcXimW7X0a1fYov2F9
+      DiscordAPI__BotToken: NTk1OTM2NTkzNTkyODQ0MzA2.XRyPUg.xu1rCHuZkTk6aXWS4ZhO23woT3A
+      
+      Discord__ErrorLogChannelId: 623150451268911104
+      Discord__NewsChannelId: 622411693376405521
+      
+      OAuth__RedirectUris: https://alderto.gedas.dev/oauth/signin-callback.html;https://alderto.gedas.dev/oauth/refresh-callback.html
+      OAuth__PostLogoutRedirectUris: https://alderto.gedas.dev/oauth/signout-callback.html
+      OAuth__AllowedCorsOrigins: https://alderto.gedas.dev
+      OAuth__ApiAuthority: https://alderto.gedas.dev/api
+    restart: unless-stopped
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD:
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    
+volumes:
+  pg-data:
