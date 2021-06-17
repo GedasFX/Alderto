@@ -15,9 +15,9 @@ namespace Alderto.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "3.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("Alderto.Data.Models.CustomCommand", b =>
                 {
@@ -25,13 +25,13 @@ namespace Alderto.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("TriggerKeyword")
-                        .HasColumnType("character varying(20)")
-                        .HasMaxLength(20);
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("LuaCode")
                         .IsRequired()
-                        .HasColumnType("character varying(2000)")
-                        .HasMaxLength(2000);
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.HasKey("GuildId", "TriggerKeyword");
 
@@ -69,8 +69,8 @@ namespace Alderto.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.HasKey("Id");
 
@@ -88,20 +88,20 @@ namespace Alderto.Data.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Description")
-                        .HasColumnType("character varying(280)")
-                        .HasMaxLength(280);
+                        .HasMaxLength(280)
+                        .HasColumnType("character varying(280)");
 
                     b.Property<int>("GuildBankId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("character varying(140)")
-                        .HasMaxLength(140);
+                        .HasMaxLength(140)
+                        .HasColumnType("character varying(140)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(70)")
-                        .HasMaxLength(70);
+                        .HasMaxLength(70)
+                        .HasColumnType("character varying(70)");
 
                     b.Property<double>("Quantity")
                         .HasColumnType("double precision");
@@ -126,13 +126,13 @@ namespace Alderto.Data.Migrations
 
                     b.Property<string>("CurrencySymbol")
                         .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Prefix")
                         .IsRequired()
-                        .HasColumnType("character varying(20)")
-                        .HasMaxLength(20);
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("TimelyCooldown")
                         .HasColumnType("integer");
@@ -157,8 +157,8 @@ namespace Alderto.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Content")
-                        .HasColumnType("character varying(2000)")
-                        .HasMaxLength(2000);
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -189,8 +189,8 @@ namespace Alderto.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Nickname")
-                        .HasColumnType("character varying(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.Property<decimal?>("RecruiterMemberId")
                         .HasColumnType("numeric(20,0)");
@@ -208,12 +208,12 @@ namespace Alderto.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Discriminator")
-                        .HasColumnType("character varying(4)")
-                        .HasMaxLength(4);
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
 
                     b.Property<string>("Username")
-                        .HasColumnType("character varying(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.HasKey("Id");
 
@@ -227,6 +227,8 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
@@ -236,6 +238,8 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBankItem", b =>
@@ -245,6 +249,8 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("GuildBankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GuildBank");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildConfiguration", b =>
@@ -254,6 +260,8 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("Alderto.Data.Models.GuildConfiguration", "GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildManagedMessage", b =>
@@ -263,6 +271,8 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.GuildMember", b =>
@@ -278,6 +288,31 @@ namespace Alderto.Data.Migrations
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.Guild", b =>
+                {
+                    b.Navigation("Configuration");
+
+                    b.Navigation("CustomCommands");
+
+                    b.Navigation("GuildBanks");
+
+                    b.Navigation("GuildMembers");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.GuildBank.GuildBank", b =>
+                {
+                    b.Navigation("Contents");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.Member", b =>
+                {
+                    b.Navigation("GuildMembers");
                 });
 #pragma warning restore 612, 618
         }
