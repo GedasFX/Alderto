@@ -6,22 +6,25 @@ namespace Alderto.Data
 {
     public class AldertoDbContext : DbContext
     {
-        public DbSet<Guild> Guilds { get; set; }
-        public DbSet<GuildMember> GuildMembers { get; set; }
-        public DbSet<Member> Members { get; set; }
+        public DbSet<Guild> Guilds => Set<Guild>();
+        public DbSet<GuildMember> GuildMembers => Set<GuildMember>();
+        public DbSet<Member> Members => Set<Member>();
 
-        public DbSet<CustomCommand> CustomCommands { get; set; }
+        public DbSet<CustomCommand> CustomCommands => Set<CustomCommand>();
 
-        public DbSet<GuildConfiguration> GuildPreferences { get; set; }
+        public DbSet<GuildConfiguration> GuildPreferences => Set<GuildConfiguration>();
 
-        public DbSet<GuildBank> GuildBanks { get; set; }
-        public DbSet<GuildBankItem> GuildBankItems { get; set; }
+        public DbSet<GuildBank> GuildBanks => Set<GuildBank>();
+        public DbSet<GuildBankItem> GuildBankItems => Set<GuildBankItem>();
 
-        public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
+        public DbSet<GuildManagedMessage> GuildManagedMessages => Set<GuildManagedMessage>();
 
-#nullable disable
-        public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options) { }
-#nullable restore
+        public DbSet<Currency> Currencies => Set<Currency>();
+        public DbSet<GuildMemberWallet> GuildMemberWallets => Set<GuildMemberWallet>();
+
+        public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

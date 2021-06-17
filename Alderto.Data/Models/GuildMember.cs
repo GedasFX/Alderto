@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -53,6 +54,8 @@ namespace Alderto.Data.Models
         /// </summary>
         [ForeignKey(nameof(MemberId))]
         public virtual Member? Member { get; set; }
+        
+        public virtual IList<GuildMemberWallet>? Wallets { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.
