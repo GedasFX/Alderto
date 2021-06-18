@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Alderto.Application;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
@@ -67,6 +68,8 @@ namespace Alderto.Web
             _ = ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
             services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
             services.AddMessagesManager();
+
+            services.AddAlderto();
 
             // === <Web> ===
             // For use behind reverse proxy

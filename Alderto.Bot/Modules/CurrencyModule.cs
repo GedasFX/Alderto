@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Currency;
 using Alderto.Bot.Extensions;
 using Alderto.Bot.Preconditions;
 using Alderto.Services;
 using Discord;
 using Discord.Commands;
+using MediatR;
 
 namespace Alderto.Bot.Modules
 {
@@ -15,15 +17,18 @@ namespace Alderto.Bot.Modules
         private readonly IGuildMemberManager _guildMemberManager;
         private readonly IGuildPreferencesProvider _guildPreferences;
         private readonly ICurrencyManager _currencyManager;
+        private readonly IMediator _mediator;
 
         public CurrencyModule(
             IGuildMemberManager guildMemberManager,
             IGuildPreferencesProvider guildPreferences,
-            ICurrencyManager currencyManager)
+            ICurrencyManager currencyManager,
+            IMediator mediator)
         {
             _guildMemberManager = guildMemberManager;
             _guildPreferences = guildPreferences;
             _currencyManager = currencyManager;
+            _mediator = mediator;
         }
 
         [Command("Give")]
@@ -76,9 +81,26 @@ namespace Alderto.Bot.Modules
             await ReplyAsync(embed: reply);
         }
 
+        [Command("AddCurrency")]
+        public async Task AddNewCurrencyAsync(string name, string currencySymbol, [Remainder] string description)
+        {
+            if (Context.Message.Author is not IGuildUser author)
+            {
+                await this.ReplyErrorEmbedAsync("This command is not available outside of guild.");
+                return;
+            }
+
+            await _mediator.Send(new AddNewCurrency.Command(author.GuildId, author.Id, name, currencySymbol)
+            {
+                Description = description
+            });
+
+            await this.ReplySuccessEmbedAsync($"Currency {name} {currencySymbol} created successfully.");
+        }
+
         private async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
         {
-            var author = (IGuildUser)Context.Message.Author;
+            var author = (IGuildUser) Context.Message.Author;
             var currencySymbol = (await _guildPreferences.GetPreferencesAsync(author.GuildId)).CurrencySymbol;
             var reply = new EmbedBuilder()
                 .WithDefault(embedColor: EmbedColor.Success, author: author);
@@ -90,7 +112,8 @@ namespace Alderto.Bot.Modules
                 await _currencyManager.ModifyPointsAsync(member, qty);
 
                 // Format a nice output.
-                reply.AddField($"No. {no++}:", $"{user.Mention}: {member.CurrencyCount - qty} -> {member.CurrencyCount} {currencySymbol}");
+                reply.AddField($"No. {no++}:",
+                    $"{user.Mention}: {member.CurrencyCount - qty} -> {member.CurrencyCount} {currencySymbol}");
             }
 
             return reply.Build();
@@ -99,10 +122,11 @@ namespace Alderto.Bot.Modules
         [Command("$")]
         [Summary("Checks the amount of points a given user has.")]
         public async Task CheckAsync(
-            [Summary("Person to check. If no user was provided, checks personal points.")] IGuildUser? user = null)
+            [Summary("Person to check. If no user was provided, checks personal points.")]
+            IGuildUser? user = null)
         {
             if (user == null)
-                user = (IGuildUser)Context.Message.Author;
+                user = (IGuildUser) Context.Message.Author;
 
             var currencySymbol = (await _guildPreferences.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
             var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user))!;
@@ -114,7 +138,7 @@ namespace Alderto.Bot.Modules
         [Summary("Grants a timely currency reward.")]
         public async Task Timely()
         {
-            var user = (IGuildUser)Context.User;
+            var user = (IGuildUser) Context.User;
             var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id))!;
 
             var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
@@ -127,12 +151,14 @@ namespace Alderto.Bot.Modules
             // If null - points were given out. Otherwise its time remaining until next claim.
             if (timeRemaining != null)
             {
-                await this.ReplyErrorEmbedAsync($"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");
+                await this.ReplyErrorEmbedAsync(
+                    $"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");
                 return;
             }
 
             // Points were given out.
-            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+            await this.ReplySuccessEmbedAsync(
+                ($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
         }
 
         [Command("top")]

@@ -29,7 +29,7 @@ namespace Alderto.Data.Models
         public string CurrencySymbol { get; set; }
 
         [MaxLength(50)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
         
         [MaxLength(2000)]
         public string? Description { get; set; }
