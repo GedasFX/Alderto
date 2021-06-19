@@ -6,17 +6,12 @@ namespace Alderto.Data.Models
 {
     public class Currency
     {
-        public Currency(string currencySymbol)
-        {
-            CurrencySymbol = currencySymbol;
-        }
-
         /// <summary>
         /// Key. Currency Id.
         /// </summary>
         [Key]
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// Discord guild identifier. Foreign key for <see cref="Models.Guild"/>.
         /// </summary>
@@ -25,12 +20,12 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Text/EmoteString used for displaying currency.
         /// </summary>
-        [MaxLength(50), MinLength(1), Required]
-        public string CurrencySymbol { get; set; }
+        [MaxLength(50), MinLength(1)]
+        public string Symbol { get; set; }
 
         [MaxLength(50)]
         public string Name { get; set; }
-        
+
         [MaxLength(2000)]
         public string? Description { get; set; }
 
@@ -41,11 +36,23 @@ namespace Alderto.Data.Models
         /// </summary>
         [Range(1, int.MaxValue)]
         public int? TimelyInterval { get; set; }
-        
+
+        /// <summary>
+        /// Timely amount.
+        /// Amount of currency user is allowed to claim within a given <see cref="TimelyInterval"/>
+        /// </summary>
+        public int TimelyAmount { get; set; }
+
         /// <summary>
         /// <see cref="Guild"/> of which owns this currency.
         /// </summary>
         [ForeignKey(nameof(GuildId))]
         public virtual Guild? Guild { get; set; }
+
+        public Currency(string symbol, string name)
+        {
+            Symbol = symbol;
+            Name = name;
+        }
     }
 }

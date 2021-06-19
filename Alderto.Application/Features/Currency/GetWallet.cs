@@ -62,7 +62,7 @@ namespace Alderto.Application.Features.Currency
             public MapperProfile()
             {
                 CreateMap<Data.Models.Currency, Model>()
-                    .ForMember(d => d.CurrencySymbol, o => o.MapFrom(s => s.CurrencySymbol));
+                    .ForMember(d => d.CurrencySymbol, o => o.MapFrom(s => s.Symbol));
             }
         }
     }

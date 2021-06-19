@@ -61,23 +61,17 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Id of role to add the user to, whenever user was accepted to the guild.
         /// </summary>
-        public ulong AcceptedMemberRoleId { get; set; }
+        public ulong? ModeratorRoleId { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/> of which owns this configuration.
         /// </summary>
         public virtual Guild? Guild { get; set; }
 
-        public GuildConfiguration(
-            string prefix = Defaults.Prefix,
-            string currencySymbol = Defaults.CurrencySymbol,
-            int timelyRewardQuantity = Defaults.TimelyRewardQuantity,
-            int timelyCooldown = Defaults.TimelyCooldown)
+        public GuildConfiguration(string prefix = Defaults.Prefix, ulong? moderatorRoleId = null)
         {
             Prefix = prefix;
-            CurrencySymbol = currencySymbol;
-            TimelyRewardQuantity = timelyRewardQuantity;
-            TimelyCooldown = timelyCooldown;
+            ModeratorRoleId = moderatorRoleId;
         }
     }
 }

@@ -35,7 +35,10 @@ namespace Alderto.Bot
 
         private class DiscordSocketClientWrapper : DiscordSocketClient
         {
-            public DiscordSocketClientWrapper(ILogger logger, IOptions<DiscordSocketConfigWrapper> config)
+            // ReSharper disable once ContextualLoggerProblem
+            public DiscordSocketClientWrapper(
+                ILogger<DiscordSocketClient> logger,
+                IOptions<DiscordSocketConfigWrapper> config)
                 : base(config.Value)
             {
                 Log += message =>

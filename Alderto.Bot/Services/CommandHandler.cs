@@ -104,9 +104,9 @@ namespace Alderto.Bot.Services
                 return originalCommand;
 
             var firstTokenEndIdx = originalCommand.IndexOf(" ", StringComparison.Ordinal);
-            var firstToken = originalCommand[..firstTokenEndIdx];
+            var firstToken = firstTokenEndIdx > 0 ? originalCommand[..firstTokenEndIdx] : originalCommand;
 
-            return aliasMap.TryGetValue(firstToken, out var storedCommand) ? storedCommand : originalCommand;
+            return aliasMap.TryGetValue(firstToken, out var storedCommand) ? storedCommand + originalCommand[firstTokenEndIdx..] : originalCommand;
         }
     }
 }

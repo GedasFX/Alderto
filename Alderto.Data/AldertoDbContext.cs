@@ -44,8 +44,15 @@ namespace Alderto.Data
                 .HasIndex(b => new { b.GuildId, b.Name })
                 .IsUnique();
 
+            modelBuilder.Entity<Currency>()
+                .HasIndex(c => new { c.GuildId, c.Name })
+                .IsUnique();
+
             modelBuilder.Entity<GuildManagedMessage>()
                 .HasKey(m => new { m.GuildId, m.MessageId });
+
+            modelBuilder.Entity<GuildCommandAlias>()
+                .HasKey(c => new { c.GuildId, c.Alias });
 
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });

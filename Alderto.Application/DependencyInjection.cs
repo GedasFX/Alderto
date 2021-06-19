@@ -1,9 +1,7 @@
 using Alderto.Application.Behaviors;
-using Alderto.Application.Features.Currency;
-using Alderto.Data;
+using Alderto.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Application
@@ -12,11 +10,16 @@ namespace Alderto.Application
     {
         public static IServiceCollection AddAlderto(this IServiceCollection collection)
         {
-            collection.AddMediatR(typeof(DependencyInjection));
-            collection.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            collection.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+            collection
+                .AddMediatR(typeof(DependencyInjection))
+                .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
+                .AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
-            collection.AddAutoMapper(typeof(DependencyInjection));
+            collection
+                .AddAutoMapper(typeof(DependencyInjection));
+
+            collection
+                .AddAldertoDomainServices();
 
             return collection;
         }

@@ -5,10 +5,8 @@ namespace Alderto.Data.Models
 {
     public class GuildCommandAlias
     {
-        [Key, Column(Order = 0)]
         public ulong GuildId { get; set; }
 
-        [Key, Column(Order = 1)]
         [MaxLength(50)]
         public string Alias { get; set; }
 
