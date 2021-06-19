@@ -44,12 +44,6 @@ namespace Alderto.Data.Models
         public virtual IList<GuildBank.GuildBank>? GuildBanks { get; set; }
 
         /// <summary>
-        /// Initializes a new empty instance of <see cref="Guild"/>.
-        /// For use by Entity Framework.
-        /// </summary>
-        private Guild() { }
-
-        /// <summary>
         /// Initializes a new instance of <see cref="Guild"/>, with primary key <see cref="Id"/> set.
         /// </summary>
         /// <param name="id"><see cref="Id"/> property.</param>

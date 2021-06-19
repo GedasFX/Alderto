@@ -11,21 +11,6 @@ namespace Alderto.Data.Models
             /// Default value for <see cref="Prefix"/>
             /// </summary>
             public const string Prefix = ".";
-
-            /// <summary>
-            /// Default value for <see cref="CurrencySymbol"/>
-            /// </summary>
-            public const string CurrencySymbol = "⚽";
-
-            /// <summary>
-            /// Default value for <see cref="TimelyRewardQuantity"/>
-            /// </summary>
-            public const int TimelyRewardQuantity = 1;
-
-            /// <summary>
-            /// Default value for <see cref="TimelyCooldown"/>
-            /// </summary>
-            public const int TimelyCooldown = 86400; // 24h
         }
 
 
@@ -39,24 +24,8 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Prefix for commands.
         /// </summary>
-        [MaxLength(20), MinLength(1), Required]
+        [MaxLength(20), MinLength(1)]
         public string Prefix { get; set; }
-
-        /// <summary>
-        /// Text/EmoteString used for displaying currency.
-        /// </summary>
-        [MaxLength(50), MinLength(1), Required]
-        public string CurrencySymbol { get; set; }
-
-        /// <summary>
-        /// Timely currency claim reward quantity.
-        /// </summary>
-        public int TimelyRewardQuantity { get; set; }
-
-        /// <summary>
-        /// Timely currency claim reward cooldown. This is time measured in seconds.
-        /// </summary>
-        public int TimelyCooldown { get; set; }
 
         /// <summary>
         /// Id of role to add the user to, whenever user was accepted to the guild.

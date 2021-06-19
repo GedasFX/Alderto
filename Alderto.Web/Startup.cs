@@ -62,6 +62,8 @@ namespace Alderto.Web
                     builder => builder.MigrationsAssembly("Alderto.Data"));
             });
 
+            services.AddMemoryCache();
+
             // Add database accessors.
             services.AddBotManagers();
 
@@ -173,7 +175,8 @@ namespace Alderto.Web
                         var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
                         var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
                                        value.Errors[0].ErrorMessage;
-                        return new BadRequestObjectResult(new Alderto.Services.Exceptions.ErrorMessage(400, 0, errorMsg));
+                        return new BadRequestObjectResult(
+                            new Alderto.Services.Exceptions.ErrorMessage(400, 0, errorMsg));
                     };
                 })
                 .AddJsonOptions(options =>
@@ -267,7 +270,8 @@ namespace Alderto.Web
                             });
 
                             await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                                JsonSerializer.Serialize(apiException.Error,
+                                    new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                         }
                         else if (e is HttpException discordException)
                         {
@@ -320,8 +324,10 @@ namespace Alderto.Web
             applicationDbContextLogger.LogInformation("Database Application Ready!");
 
 
-            await using var persistedGrantDbContext = serviceScope.ServiceProvider.GetService<PersistedGrantDbContext>();
-            var persistedGrantDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<PersistedGrantDbContext>>();
+            await using var persistedGrantDbContext =
+                serviceScope.ServiceProvider.GetService<PersistedGrantDbContext>();
+            var persistedGrantDbContextLogger =
+                serviceScope.ServiceProvider.GetService<ILogger<PersistedGrantDbContext>>();
 
             persistedGrantDbContextLogger.LogInformation("Initializing Auth Database...");
             await persistedGrantDbContext.Database.MigrateAsync();

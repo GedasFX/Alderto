@@ -10,7 +10,7 @@ namespace Alderto.Data.Models
         [MaxLength(50)]
         public string Alias { get; set; }
 
-        [Required, MaxLength(2000)]
+        [MaxLength(2000)]
         public string Command { get; set; }
 
         [ForeignKey(nameof(GuildId))]
