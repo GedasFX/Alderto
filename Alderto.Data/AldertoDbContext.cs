@@ -13,6 +13,7 @@ namespace Alderto.Data
         public DbSet<CustomCommand> CustomCommands => Set<CustomCommand>();
 
         public DbSet<GuildConfiguration> GuildPreferences => Set<GuildConfiguration>();
+        public DbSet<GuildCommandAlias> GuildCommandAliases => Set<GuildCommandAlias>();
 
         public DbSet<GuildBank> GuildBanks => Set<GuildBank>();
         public DbSet<GuildBankItem> GuildBankItems => Set<GuildBankItem>();

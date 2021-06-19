@@ -1,8 +1,8 @@
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Bot.Extensions;
-using Alderto.Services;
+using Alderto.Domain.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -13,105 +13,69 @@ namespace Alderto.Bot.Services
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-        private readonly CommandService _commands;
+        private readonly CommandService _commandService;
         private readonly IServiceProvider _services;
-        private readonly IGuildPreferencesProvider _guildPreferences;
+        private readonly IGuildConfigurationService _guildConfigurationService;
 
         public CommandHandler(
             IDiscordClient client,
-            CommandService commands,
+            CommandService commandService,
             IServiceProvider services,
-            IGuildPreferencesProvider guildPreferences)
+            IGuildConfigurationService guildConfigurationService)
         {
-            if (!(client is DiscordSocketClient socketClient))
+            if (client is not DiscordSocketClient socketClient)
                 throw new ArgumentException("Discord client must be of Socket type to use Command Handler.");
 
             _client = socketClient;
-            _commands = commands;
+            _commandService = commandService;
             _services = services;
-            _guildPreferences = guildPreferences;
+            _guildConfigurationService = guildConfigurationService;
         }
 
         public async Task StartAsync()
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;
-            _client.UserUpdated += (before, after) =>
-            {
-                if (before.Username != after.Username)
-                {
-                    Console.WriteLine($"{before.Username} + {after.Username}");
-                }
-                return Task.CompletedTask;
-            };
 
-            // Here we discover all of the command modules in the entry 
-            // assembly and load them. Starting from Discord.NET 2.0, a
-            // service provider is required to be passed into the
-            // module registration method to inject the 
-            // required dependencies.
-            //
-            // If you do not use Dependency Injection, pass null.
-            // See Dependency Injection guide for more information.
             using var scope = _services.CreateScope();
-            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
+            await _commandService.AddModulesAsync(typeof(CommandHandler).Assembly, scope.ServiceProvider);
         }
-        
-        public async Task HandleCommandAsync(SocketMessage messageParam)
+
+        private async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
-            if (!(messageParam is SocketUserMessage message))
+            if (messageParam is not SocketUserMessage message)
                 return;
-
-            // Create a number to track where the prefix ends and the command begins
-            var argPos = 0;
 
             // Check if message was sent in a guild context. If not - ignore.
-            // TODO: Make a redirect messages channel and maybe add command handler to DM
-            if (!(message.Author is SocketGuildUser guildUser))
+            if (message.Author is not SocketGuildUser author || message.Author.IsBot)
                 return;
 
-            // Get the prefix preference of a guild (if applicable)
-            var prefix = (await _guildPreferences.GetPreferencesAsync(guildUser.Guild.Id)).Prefix;
+            // Fetch the configuration for prefix / command aliases.
+            var guildSetup = await _guildConfigurationService.GetGuildSetupAsync(author.Guild.Id);
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            // TODO: Re add || message.Author.IsBot
-            if (!(message.HasStringPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
+            var argPos = 0;
+            if (!(message.HasStringPrefix(guildSetup.Configuration.Prefix, ref argPos) ||
+                  message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
+
+            // Extract the string command from message;
+            var cmd = ParseCommand(message.Content, argPos, guildSetup.Aliases);
 
             // Create a WebSocket-based command context based on the message
             var context = new SocketCommandContext(_client, message);
 
-            // Execute the command with the command context we just
-            // created, along with the service provider for precondition checks.
-
-            // Create a scope to prevent leaks.
+            // Execute the command on the Discord API
             using var scope = _services.CreateScope();
-            // TODO: Upgrade this to RunMode.Async
-
-            // Keep in mind that result does not indicate a return value
-            // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
-
-            // Delete successful triggers.
-            if (result.IsSuccess)
-            {
-                try
-                {
-                    await message.DeleteAsync();
-                }
-                catch (Discord.Net.HttpException)
-                {
-                    // Delete most likely failed due to no ManageMessages permission. Ignore regardless.
-                }
-            }
+            var result = await _commandService.ExecuteAsync(context, cmd, scope.ServiceProvider);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
 
-            else if (result.Error != CommandError.UnknownCommand)
+            if (result.Error != CommandError.UnknownCommand)
             {
                 try
                 {
@@ -126,6 +90,23 @@ namespace Alderto.Bot.Services
                             "Bot requires guild permission EmbedLinks to function properly.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Parses command, potentially transforming the message into an alias.
+        /// </summary>
+        private static string ParseCommand(string messageContent, int argPos,
+            IReadOnlyDictionary<string, string>? aliasMap)
+        {
+            var originalCommand = messageContent[argPos..];
+
+            if (aliasMap == null)
+                return originalCommand;
+
+            var firstTokenEndIdx = originalCommand.IndexOf(" ", StringComparison.Ordinal);
+            var firstToken = originalCommand[..firstTokenEndIdx];
+
+            return aliasMap.TryGetValue(firstToken, out var storedCommand) ? storedCommand : originalCommand;
         }
     }
 }

@@ -24,19 +24,24 @@ namespace Alderto.Data.Models
         public virtual GuildConfiguration? Configuration { get; set; }
 
         /// <summary>
+        /// The registered aliases for the specified guild.
+        /// </summary>
+        public virtual IList<GuildCommandAlias>? Aliases { get; set; }
+
+        /// <summary>
         /// A collection of members of the guild.
         /// </summary>
-        public virtual IEnumerable<GuildMember>? GuildMembers { get; set; }
+        public virtual IList<GuildMember>? GuildMembers { get; set; }
 
         /// <summary>
         /// A collection of custom commands registered to the guild.
         /// </summary>
-        public virtual IEnumerable<CustomCommand>? CustomCommands { get; set; }
+        public virtual IList<CustomCommand>? CustomCommands { get; set; }
 
         /// <summary>
         /// A collection of guild managed banks.
         /// </summary>
-        public virtual IEnumerable<GuildBank.GuildBank>? GuildBanks { get; set; }
+        public virtual IList<GuildBank.GuildBank>? GuildBanks { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="Guild"/>.

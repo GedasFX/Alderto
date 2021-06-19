@@ -1,23 +1,23 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
-using Alderto.Data.Models;
+using Alderto.Domain.Models;
 
-namespace Alderto.Services
+namespace Alderto.Domain.Services
 {
-    public interface IGuildPreferencesProvider
+    public interface IGuildConfigurationService
     {
         /// <summary>
         /// Gets the guild's preferences. Can never be null.
         /// </summary>
         /// <param name="guildId">Id of guild, to get preferences of</param>
         /// <returns>Guild's specific (or default) preferences.</returns>
-        Task<GuildConfiguration> GetPreferencesAsync(ulong guildId);
+        Task<GuildSetup> GetGuildSetupAsync(ulong guildId);
 
         /// <summary>
         /// Updates the guild preferences.
         /// </summary>
         /// <param name="guildId">Discord guild id.</param>
         /// <param name="changes">Changes to apply to the config.</param>
-        Task UpdatePreferencesAsync(ulong guildId, Action<GuildConfiguration> changes);
+        Task UpdateGuildSetupAsync(ulong guildId, Action<GuildSetup> changes);
     }
 }

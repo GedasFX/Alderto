@@ -23,8 +23,10 @@ namespace Alderto.Application
 
     public abstract class RequestBase
     {
-        [Required] public ulong GuildId { get; set; }
+        [Required]
+        protected internal ulong GuildId { get; protected init; }
 
-        [Required] public ulong MemberId { get; set; }
+        [Required]
+        protected ulong MemberId { get; init; }
     }
 }

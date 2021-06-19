@@ -32,16 +32,17 @@ namespace Alderto.Bot
         {
             public string? BotToken { get; set; }
         }
+
         private class DiscordSocketClientWrapper : DiscordSocketClient
         {
-            public DiscordSocketClientWrapper(ILogger<DiscordSocketClient> logger,
-                IOptions<DiscordSocketConfigWrapper> config) : base(config.Value)
+            public DiscordSocketClientWrapper(ILogger logger, IOptions<DiscordSocketConfigWrapper> config)
+                : base(config.Value)
             {
                 Log += message =>
                 {
                     logger.Log(
-                        (LogLevel)Math.Abs((int)message.Severity - 5),
-                        eventId: 0,
+                        (LogLevel) Math.Abs((int) message.Severity - 5),
+                        0,
                         message,
                         message.Exception,
                         delegate { return message.ToString(); });
@@ -74,7 +75,7 @@ namespace Alderto.Bot
             {
                 if (ulong.TryParse(config["LoggingChannelId"], out var loggingChannelId))
                 {
-                    var channel = (IMessageChannel)client.GetChannelAsync(loggingChannelId).Result;
+                    var channel = (IMessageChannel) client.GetChannelAsync(loggingChannelId).Result;
                     Log += async message =>
                     {
                         if (message.Exception is CommandException commandException)
@@ -88,7 +89,7 @@ namespace Alderto.Bot
                 Log += message =>
                 {
                     logger.Log(
-                        (LogLevel)Math.Abs((int)message.Severity - 5),
+                        (LogLevel) Math.Abs((int) message.Severity - 5),
                         eventId: 0,
                         message,
                         message.Exception,
