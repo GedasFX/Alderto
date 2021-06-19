@@ -24,19 +24,9 @@ namespace Alderto.Data.Models
         public string? Nickname { get; set; }
 
         /// <summary>
-        /// Time of last currency claim.
-        /// </summary>
-        public DateTimeOffset CurrencyLastClaimed { get; set; }
-
-        /// <summary>
         /// Time the user joined the guild.
         /// </summary>
         public DateTimeOffset? JoinedAt { get; set; }
-
-        /// <summary>
-        /// Amount of currency a person has.
-        /// </summary>
-        public int CurrencyCount { get; set; }
 
         /// <summary>
         /// Id of member, who recruited the current member.
@@ -54,8 +44,6 @@ namespace Alderto.Data.Models
         /// </summary>
         [ForeignKey(nameof(MemberId))]
         public virtual Member? Member { get; set; }
-        
-        public virtual IList<GuildMemberWallet>? Wallets { get; set; }
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="GuildMember"/>.

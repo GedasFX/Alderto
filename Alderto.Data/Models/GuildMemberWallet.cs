@@ -10,19 +10,15 @@ namespace Alderto.Data.Models
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Key. Discord Guild Id in which member is member of.
+        /// Currency Id. FK for <see cref="Currency" />
         /// </summary>
-        public ulong GuildId { get; set; }
+        public Guid CurrencyId { get; set; }
 
         /// <summary>
         /// Discord Member Id.
         /// </summary>
         public ulong MemberId { get; set; }
 
-        /// <summary>
-        /// Currency Id. FK for <see cref="Currency" />
-        /// </summary>
-        public Guid CurrencyId { get; set; }
 
         /// <summary>
         /// Amount of currency this user owns.
@@ -34,17 +30,16 @@ namespace Alderto.Data.Models
         /// </summary>
         public DateTimeOffset TimelyLastClaimed { get; set; }
 
-        [ForeignKey("GuildId, MemberId")]
-        public virtual GuildMember? GuildMember { get; set; }
+        [ForeignKey(nameof(MemberId))]
+        public virtual Member? Member { get; set; }
 
         [ForeignKey(nameof(CurrencyId))]
         public virtual Currency? Currency { get; set; }
 
-        public GuildMemberWallet(ulong guildId, ulong memberId, Guid currencyId, int amount = 0)
+        public GuildMemberWallet(Guid currencyId, ulong memberId, int amount = 0)
         {
-            GuildId = guildId;
-            MemberId = memberId;
             CurrencyId = currencyId;
+            MemberId = memberId;
             Amount = amount;
         }
     }

@@ -51,8 +51,8 @@ namespace Alderto.Application.Features.Currency
                     .ProjectTo<Model>(_context.GuildMemberWallets
                         .Include(w => w.Currency)
                         .Where(w =>
-                            w.GuildId == request.GuildId && w.MemberId == request.MemberId &&
-                            w.Currency!.Name == request.Name))
+                            w.Currency!.Name == request.Name && w.Currency!.GuildId == request.GuildId &&
+                            w.MemberId == request.MemberId))
                     .SingleOrDefaultAsync(cancellationToken: cancellationToken);
             }
         }

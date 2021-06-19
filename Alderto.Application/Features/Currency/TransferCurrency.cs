@@ -56,13 +56,13 @@ namespace Alderto.Application.Features.Currency
                     throw new BadRequestDomainException("Specified currency was not found");
 
                 var recipientWallet = await _context.GuildMemberWallets.SingleOrDefaultAsync(w =>
-                        w.GuildId == request.GuildId && w.MemberId == request.RecipientId &&
+                        w.MemberId == request.RecipientId &&
                         w.CurrencyId == currency.Id,
                     cancellationToken: cancellationToken);
 
                 if (recipientWallet == null)
                 {
-                    recipientWallet = new GuildMemberWallet(request.GuildId, request.RecipientId, currency.Id);
+                    recipientWallet = new GuildMemberWallet(currency.Id, request.RecipientId);
                     _context.GuildMemberWallets.Add(recipientWallet);
                 }
 
@@ -71,7 +71,7 @@ namespace Alderto.Application.Features.Currency
                 if (!request.IsAward)
                 {
                     var senderWallet = await _context.GuildMemberWallets.SingleOrDefaultAsync(w =>
-                            w.GuildId == request.GuildId && w.MemberId == request.MemberId &&
+                            w.MemberId == request.MemberId &&
                             w.CurrencyId == currency.Id,
                         cancellationToken: cancellationToken);
 

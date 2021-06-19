@@ -29,6 +29,8 @@ namespace Alderto.Data.Models
         /// A collection of guilds the user is in.
         /// </summary>
         public virtual IEnumerable<GuildMember>? GuildMembers { get; set; }
+        
+        public virtual IList<GuildMemberWallet>? Wallets { get; set; } 
 
         /// <summary>
         /// Initializes a new empty instance of <see cref="Member"/>.

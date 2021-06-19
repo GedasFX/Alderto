@@ -3,15 +3,17 @@ using System;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    partial class AldertoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210619180422_RemoveCurrencyFromGuildConfig2")]
+    partial class RemoveCurrencyFromGuildConfig2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,6 +259,12 @@ namespace Alderto.Data.Migrations
 
                     b.Property<decimal>("MemberId")
                         .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("CurrencyCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CurrencyLastClaimed")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
