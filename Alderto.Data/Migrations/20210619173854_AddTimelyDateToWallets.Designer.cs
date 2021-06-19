@@ -3,15 +3,17 @@ using System;
 using Alderto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Alderto.Data.Migrations
 {
     [DbContext(typeof(AldertoDbContext))]
-    partial class AldertoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210619173854_AddTimelyDateToWallets")]
+    partial class AddTimelyDateToWallets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -29,6 +29,11 @@ namespace Alderto.Data.Models
         /// </summary>
         public int Amount { get; set; }
 
+        /// <summary>
+        /// Time of last currency claim.
+        /// </summary>
+        public DateTimeOffset TimelyLastClaimed { get; set; }
+
         [ForeignKey("GuildId, MemberId")]
         public virtual GuildMember? GuildMember { get; set; }
 
