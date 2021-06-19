@@ -19,7 +19,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IGuildMemberManager, GuildMemberManager>()
 
                 // Add providers for various bot activities
-                .AddScoped<ICurrencyManager, CurrencyManager>()
 
                 // Add Guild bank managers
                 .AddScoped<IGuildBankManager, GuildBankManager>()
