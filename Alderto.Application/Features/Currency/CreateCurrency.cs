@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Alderto.Application.Features.Currency
 {
-    public static class AddNewCurrency
+    public static class CreateCurrency
     {
         public class Command : Request<Guid>
         {

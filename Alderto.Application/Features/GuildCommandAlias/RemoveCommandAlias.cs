@@ -1,9 +1,7 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Alderto.Data;
-using Alderto.Domain.Exceptions;
+using Alderto.Domain.Services;
 using AutoMapper;
 using MediatR;
 
@@ -36,35 +34,19 @@ namespace Alderto.Application.Features.GuildCommandAlias
 
         public class CommandHandler : IRequestHandler<RhCommand, Model>
         {
-            private readonly AldertoDbContext _context;
+            private readonly IGuildSetupService _setupService;
             private readonly IMapper _mapper;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper)
+            public CommandHandler(IGuildSetupService setupService, IMapper mapper)
             {
-                _context = context;
+                _setupService = setupService;
                 _mapper = mapper;
             }
 
             public async Task<Model> Handle(RhCommand request, CancellationToken cancellationToken)
             {
-                var commandAlias = await _context.GuildCommandAliases.FindAsync(
-                    new object[] { request.GuildId, request.Alias }, cancellationToken);
-
-                if (commandAlias == null)
-                    throw new BadRequestDomainException("Requested Alias was not found.");
-
-                _context.GuildCommandAliases.Remove(commandAlias);
-                await _context.SaveChangesAsync(cancellationToken);
-
+                var commandAlias = await _setupService.RemoveCommandAlias(request.GuildId, request.Alias);
                 return _mapper.Map<Model>(commandAlias);
-            }
-        }
-
-        public class MapperProfile : Profile
-        {
-            public MapperProfile()
-            {
-                CreateMap<Data.Models.GuildCommandAlias, Model>();
             }
         }
     }

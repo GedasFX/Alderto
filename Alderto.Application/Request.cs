@@ -27,6 +27,6 @@ namespace Alderto.Application
         protected internal ulong GuildId { get; protected init; }
 
         [Required]
-        protected ulong MemberId { get; init; }
+        protected internal ulong MemberId { get; protected init; }
     }
 }

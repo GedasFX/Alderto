@@ -35,7 +35,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Amount of money that was transferred.
         /// </summary>
-        public int AmountTransferred { get; set; }
+        public int Amount { get; set; }
         
         /// <summary>
         /// Is award. Means that the sender did not lose money in this transaction.

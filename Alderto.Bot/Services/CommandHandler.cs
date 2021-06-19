@@ -15,13 +15,13 @@ namespace Alderto.Bot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commandService;
         private readonly IServiceProvider _services;
-        private readonly IGuildConfigurationService _guildConfigurationService;
+        private readonly IGuildSetupService _guildSetupService;
 
         public CommandHandler(
             IDiscordClient client,
             CommandService commandService,
             IServiceProvider services,
-            IGuildConfigurationService guildConfigurationService)
+            IGuildSetupService guildSetupService)
         {
             if (client is not DiscordSocketClient socketClient)
                 throw new ArgumentException("Discord client must be of Socket type to use Command Handler.");
@@ -29,7 +29,7 @@ namespace Alderto.Bot.Services
             _client = socketClient;
             _commandService = commandService;
             _services = services;
-            _guildConfigurationService = guildConfigurationService;
+            _guildSetupService = guildSetupService;
         }
 
         public async Task StartAsync()
@@ -52,7 +52,7 @@ namespace Alderto.Bot.Services
                 return;
 
             // Fetch the configuration for prefix / command aliases.
-            var guildSetup = await _guildConfigurationService.GetGuildSetupAsync(author.Guild.Id);
+            var guildSetup = await _guildSetupService.GetGuildSetupAsync(author.Guild.Id);
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             var argPos = 0;

@@ -1,10 +1,10 @@
-using System;
 using System.Threading.Tasks;
+using Alderto.Data.Models;
 using Alderto.Domain.Models;
 
 namespace Alderto.Domain.Services
 {
-    public interface IGuildConfigurationService
+    public interface IGuildSetupService
     {
         /// <summary>
         /// Gets the guild's preferences. Can never be null.
@@ -17,7 +17,10 @@ namespace Alderto.Domain.Services
         /// Updates the guild preferences.
         /// </summary>
         /// <param name="guildId">Discord guild id.</param>
-        /// <param name="changes">Changes to apply to the config.</param>
-        Task UpdateGuildSetupAsync(ulong guildId, Action<GuildSetup> changes);
+        /// <param name="newConfiguration">New configuration.</param>
+        Task UpdateGuildConfigurationAsync(ulong guildId, GuildConfiguration newConfiguration);
+
+        Task CreateCommandAlias(ulong guildId, string alias, string command);
+        Task<GuildCommandAlias> RemoveCommandAlias(ulong guildId, string alias);
     }
 }

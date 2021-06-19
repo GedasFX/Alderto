@@ -8,7 +8,7 @@ namespace Alderto.Data.Models
     {
         [Key]
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// Key. Discord Guild Id in which member is member of.
         /// </summary>
@@ -27,12 +27,20 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Amount of currency this user owns.
         /// </summary>
-        public int Count { get; set; }
+        public int Amount { get; set; }
 
         [ForeignKey("GuildId, MemberId")]
         public virtual GuildMember? GuildMember { get; set; }
-        
+
         [ForeignKey(nameof(CurrencyId))]
         public virtual Currency? Currency { get; set; }
+
+        public GuildMemberWallet(ulong guildId, ulong memberId, Guid currencyId, int amount = 0)
+        {
+            GuildId = guildId;
+            MemberId = memberId;
+            CurrencyId = currencyId;
+            Amount = amount;
+        }
     }
 }

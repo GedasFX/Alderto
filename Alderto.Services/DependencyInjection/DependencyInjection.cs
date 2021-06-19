@@ -19,7 +19,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IGuildMemberManager, GuildMemberManager>()
 
                 // Add providers for various bot activities
-                .AddSingleton<IGuildPreferencesProvider, GuildPreferencesProvider>()
                 .AddScoped<ICurrencyManager, CurrencyManager>()
 
                 // Add Guild bank managers
@@ -35,7 +34,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <param name="options"></param>
-        public static IServiceCollection AddNewsProvider(this IServiceCollection services, Action<NewsProviderOptions>? options = null) =>
+        public static IServiceCollection AddNewsProvider(this IServiceCollection services,
+            Action<NewsProviderOptions>? options = null) =>
             services.AddSingleton<INewsProvider, NewsProvider>().Configure(options);
 
         public sealed class NewsProviderOptions

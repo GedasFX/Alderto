@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
+using Alderto.Domain.Exceptions;
 using Alderto.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,12 +12,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Domain.Services
 {
-    public class GuildConfigurationService : IGuildConfigurationService
+    public class GuildSetupService : IGuildSetupService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _cache;
 
-        public GuildConfigurationService(IServiceProvider serviceProvider, IMemoryCache cache)
+        public GuildSetupService(IServiceProvider serviceProvider, IMemoryCache cache)
         {
             _serviceProvider = serviceProvider;
             _cache = cache;
@@ -57,34 +58,51 @@ namespace Alderto.Domain.Services
             return setup;
         }
 
-        public async Task UpdateGuildSetupAsync(ulong guildId, Action<GuildSetup> changes)
+        public async Task UpdateGuildConfigurationAsync(ulong guildId, GuildConfiguration newConfiguration)
         {
             // First get the preferences.
-            var config = await GetGuildSetupAsync(guildId);
-
-            // If config.GuildId == 0, then it means that the guild uses default preferences.
-            // Default preferences [id == 0] are applied only when the GetPreferencesAsync() cannot find them in database.
-            var guildPreferencesPresentInDatabase = config.GuildId > 0;
-
-            // Apply changes to Object.
-            changes(config);
-
-            // Continue with the the update
-
-            // Ensure the correct guild Id is applied.
-            config.GuildId = guildId;
+            var setup = await GetGuildSetupAsync(guildId);
 
             // Then update the database.
             using var scope = _serviceProvider.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>();
 
-
-            if (guildPreferencesPresentInDatabase)
-                context.GuildPreferences.Update(config);
+            if (newConfiguration.GuildId > 0)
+                context.GuildPreferences.Update(newConfiguration);
             else
-                context.GuildPreferences.Add(config);
+                context.GuildPreferences.Add(newConfiguration);
 
             await context.SaveChangesAsync();
+            _cache.Remove($"GUILD_CFG:{guildId}");
+        }
+
+        public async Task CreateCommandAlias(ulong guildId, string alias, string command)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>();
+
+            context.GuildCommandAliases.Add(new GuildCommandAlias(guildId, alias, command));
+            await context.SaveChangesAsync();
+
+            _cache.Remove($"GUILD_CFG:{guildId}");
+        }
+
+        public async Task<GuildCommandAlias> RemoveCommandAlias(ulong guildId, string alias)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>();
+
+            var command = await context.GuildCommandAliases.FindAsync(guildId, alias);
+
+            if (command == null)
+                throw new BadRequestDomainException("Requested Alias was not found.");
+
+            context.GuildCommandAliases.Remove(command);
+            await context.SaveChangesAsync();
+
+            _cache.Remove($"GUILD_CFG:{guildId}");
+
+            return command;
         }
     }
 }

@@ -6,26 +6,32 @@ using Alderto.Web.Models.GuildPreferences;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Alderto.Application.Features.GuildConfiguration;
+using Alderto.Domain.Services;
+using MediatR;
 
 namespace Alderto.Web.Controllers.Guild
 {
     [Route("guilds/{guildId}/preferences")]
     public class PreferencesController : ApiControllerBase
     {
-        private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+        private readonly IGuildSetupService _guildSetupService;
+        private readonly IMediator _mediator;
         private readonly IDiscordClient _client;
 
-        public PreferencesController(IGuildPreferencesProvider guildPreferencesProvider, IDiscordClient discordClient)
+        public PreferencesController(IGuildSetupService guildSetupService, IMediator mediator,
+            IDiscordClient discordClient)
         {
-            _guildPreferencesProvider = guildPreferencesProvider;
+            _guildSetupService = guildSetupService;
+            _mediator = mediator;
             _client = discordClient;
         }
 
         [HttpGet]
         public async Task<ActionResult<GuildConfiguration>> GetGuildPreferencesAsync(ulong guildId)
         {
-            var preferences = await _guildPreferencesProvider.GetPreferencesAsync(guildId);
-            return preferences;
+            var preferences = await _guildSetupService.GetGuildSetupAsync(guildId);
+            return preferences.Configuration;
         }
 
         [HttpPatch]
@@ -35,33 +41,7 @@ namespace Alderto.Web.Controllers.Guild
             if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
                 throw new UserNotGuildAdminException();
 
-            await _guildPreferencesProvider.UpdatePreferencesAsync(guildId, preferences =>
-            {
-                if (model.Prefix != null)
-                {
-                    preferences.Prefix = model.Prefix;
-                }
-
-                if (model.TimelyRewardQuantity != null)
-                {
-                    preferences.TimelyRewardQuantity = (int)model.TimelyRewardQuantity;
-                }
-
-                if (model.TimelyCooldown != null)
-                {
-                    preferences.TimelyCooldown = (int)model.TimelyCooldown;
-                }
-
-                if (model.CurrencySymbol != null)
-                {
-                    preferences.CurrencySymbol = model.CurrencySymbol;
-                }
-
-                if (model.AcceptedMemberRoleId != null)
-                {
-                    preferences.AcceptedMemberRoleId = (ulong)model.AcceptedMemberRoleId;
-                }
-            });
+            await _mediator.Send(new UpdateGuildConfiguration.Command(guildId, User.GetId(), model.Prefix));
 
             return Ok();
         }

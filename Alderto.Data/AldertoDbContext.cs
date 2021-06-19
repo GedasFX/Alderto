@@ -21,6 +21,7 @@ namespace Alderto.Data
         public DbSet<GuildManagedMessage> GuildManagedMessages => Set<GuildManagedMessage>();
 
         public DbSet<Currency> Currencies => Set<Currency>();
+        public DbSet<CurrencyTransaction> CurrencyTransactions => Set<CurrencyTransaction>();
         public DbSet<GuildMemberWallet> GuildMemberWallets => Set<GuildMemberWallet>();
 
         public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options)
