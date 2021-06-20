@@ -62,8 +62,9 @@ namespace Alderto.Application.Features.Currency
 
                 if (recipientWallet == null)
                 {
+                    await _mediator.Send(new CreateWallet.Command(request.GuildId, request.RecipientId,
+                        request.CurrencyName), cancellationToken);
                     recipientWallet = new GuildMemberWallet(currency.Id, request.RecipientId);
-                    _context.GuildMemberWallets.Add(recipientWallet);
                 }
 
                 recipientWallet.Amount += request.Amount;
@@ -88,7 +89,7 @@ namespace Alderto.Application.Features.Currency
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                await _mediator.Send(new LogCurrencyTransaction.Command(request.GuildId, request.MemberId,
+                await _mediator.Send(new LogCurrencyTransaction.Command(request.GuildId, request.MemberId, currency.Id,
                     request.RecipientId, request.Amount, request.IsAward), cancellationToken);
 
                 return Unit.Value;

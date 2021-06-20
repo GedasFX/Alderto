@@ -4,10 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
 using Alderto.Data.Models;
-using Alderto.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Application.Features.Currency
 {
@@ -21,13 +19,18 @@ namespace Alderto.Application.Features.Currency
             [Required]
             public int Amount { get; }
 
+            [Required]
+            public Guid CurrencyId { get; }
+
             public bool IsAward { get; }
 
-            public Command(ulong guildId, ulong memberId, ulong recipientId, int amount, bool isAward = false)
+            public Command(ulong guildId, ulong memberId, Guid currencyId, ulong recipientId, int amount,
+                bool isAward = false)
                 : base(guildId, memberId)
             {
                 RecipientId = recipientId;
                 Amount = amount;
+                CurrencyId = currencyId;
                 IsAward = isAward;
             }
         }
@@ -61,7 +64,7 @@ namespace Alderto.Application.Features.Currency
             {
                 CreateMap<Command, CurrencyTransaction>()
                     .ForMember(d => d.SenderId, o => o.MapFrom(s => s.MemberId))
-                    .ForMember(d => d.Date, o => o.MapFrom(s => new DateTimeOffset()));
+                    .ForMember(d => d.Date, o => o.MapFrom(s => DateTimeOffset.Now));
             }
         }
     }

@@ -11,41 +11,59 @@ namespace Alderto.Data.Models
         /// </summary>
         [Key]
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Date of transaction.
         /// </summary>
         public DateTimeOffset Date { get; set; }
-        
+
         /// <summary>
-        /// Id of guild, where the transaction occured.
+        /// Id of currency, which was sent.
         /// </summary>
-        public ulong GuildId { get; set; }
-        
+        public Guid CurrencyId { get; set; }
+
         /// <summary>
         /// Id of sender, who sent the currency.
         /// </summary>
         public ulong SenderId { get; set; }
-        
+
         /// <summary>
         /// Id of recipient, who received the currency.
         /// </summary>
         public ulong RecipientId { get; set; }
-        
+
         /// <summary>
         /// Amount of money that was transferred.
         /// </summary>
         public int Amount { get; set; }
-        
+
         /// <summary>
         /// Is award. Means that the sender did not lose money in this transaction.
         /// </summary>
         public bool IsAward { get; set; }
 
-        [ForeignKey("GuildId, SenderId")]
-        public virtual GuildMember? Sender { get; set; }
+        [ForeignKey(nameof(SenderId))]
+        public virtual Member? Sender { get; set; }
 
-        [ForeignKey("GuildId, RecipientId")]
-        public virtual GuildMember? Recipient { get; set; }
+        [ForeignKey(nameof(RecipientId))]
+        public virtual Member? Recipient { get; set; }
+
+        [ForeignKey(nameof(CurrencyId))]
+        public virtual Currency? Currency { get; set; }
+
+        public CurrencyTransaction()
+        {
+            
+        }
+        public CurrencyTransaction(Guid currencyId, ulong senderId, ulong recipientId, int amount,
+            bool isAward = false)
+        {
+            // Date = date != default ? date : DateTimeOffset.Now;
+            CurrencyId = currencyId;
+            SenderId = senderId;
+            RecipientId = recipientId;
+            Amount = amount;
+            IsAward = isAward;
+        }
     }
 }

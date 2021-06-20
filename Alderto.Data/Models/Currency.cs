@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -48,6 +49,8 @@ namespace Alderto.Data.Models
         /// </summary>
         [ForeignKey(nameof(GuildId))]
         public virtual Guild? Guild { get; set; }
+
+        public virtual IList<CurrencyTransaction> Transactions { get; set; }
 
         public Currency(ulong guildId, string symbol, string name)
         {

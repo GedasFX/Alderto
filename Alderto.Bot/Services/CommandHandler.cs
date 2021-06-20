@@ -7,6 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Alderto.Bot.Services
 {
@@ -38,7 +39,15 @@ namespace Alderto.Bot.Services
             _client.MessageReceived += HandleCommandAsync;
 
             using var scope = _services.CreateScope();
-            await _commandService.AddModulesAsync(typeof(CommandHandler).Assembly, scope.ServiceProvider);
+            try
+            {
+                await _commandService.AddModulesAsync(typeof(CommandHandler).Assembly, scope.ServiceProvider);
+            }
+            catch (Exception e)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<CommandService>>();
+                logger.Log(LogLevel.Error, "{Message}\n{StackTrace}", e.Message, e.StackTrace);
+            }
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)

@@ -82,6 +82,10 @@ namespace Alderto.Application.Features.Currency
 
                 await _context.SaveChangesAsync(cancellationToken);
 
+                await _mediator.Send(
+                    new LogCurrencyTransaction.Command(request.GuildId, request.MemberId, wallet.CurrencyId,
+                        request.MemberId, wallet.Currency.TimelyAmount, true), cancellationToken);
+
                 return new Model(true, TimeSpan.FromSeconds((int) wallet.Currency.TimelyInterval),
                     wallet.Currency.Symbol, wallet.Currency.TimelyAmount);
             }

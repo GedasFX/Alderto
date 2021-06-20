@@ -107,7 +107,66 @@ namespace Alderto.Bot.Modules
                 case "timely":
                     await Timely(currencyName, author);
                     return;
+
+                case "history":
+                case "logs":
+                    await Logs(currencyName, tokens, author);
+                    return;
             }
+        }
+
+        private async Task Logs(string currencyName, IReadOnlyList<string> tokens, IGuildUser author)
+        {
+            if (tokens.Count == 0 || !MentionUtils.TryParseUser(tokens[0], out var memberId))
+                throw new EntryPointNotFoundException("Mention the user to view logs of");
+
+            if (!(tokens.Count > 0 && int.TryParse(tokens[0], out var pageNo)))
+                pageNo = 1;
+
+            pageNo -= 1;
+
+            var logs = await _mediator.Send(new CurrencyTransactions.List(author.GuildId, memberId,
+                currencyName, pageNo));
+
+            (string, string, string) GetSymbols(CurrencyTransactions.Dto.TransactionEntry t)
+            {
+                if (t.IsAward)
+                {
+                    if (t.SenderId == t.RecipientId)
+                        return ("⏰", "👌", MentionUtils.MentionUser(t.RecipientId));
+
+                    if (t.SenderId == memberId)
+                        return ("🎁", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+                    if (t.RecipientId == memberId)
+                        return ("🏆", "👈", MentionUtils.MentionUser(t.SenderId));
+                }
+
+                if (t.SenderId == memberId)
+                    return ("📉", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+                if (t.RecipientId == memberId)
+                    return ("📈", "👈", MentionUtils.MentionUser(t.SenderId));
+
+                // Should never happen
+                return ("❓", "❓", MentionUtils.MentionUser(memberId));
+            }
+
+            var fields = logs.Transactions.Select(t =>
+            {
+                var date = $"{t.Date:dd MMM yyy HH\\:mm\\:ss}";
+                var (symbol, direction, otherParty) = GetSymbols(t);
+                return (date, $"{symbol} **{t.Amount}** {logs.Symbol} {direction} {otherParty}");
+            });
+
+            await this.ReplyEmbedAsync($"Showing results {20 * pageNo + 1}-{20 * (pageNo + 1)}",
+                $"Transaction history for currency '{logs.Name}'", extra: b =>
+                {
+                    foreach (var (name, value) in fields)
+                    {
+                        b.AddField(name, value, true);
+                    }
+                });
         }
 
         private async Task Timely(string currencyName, IGuildUser author)
@@ -161,11 +220,11 @@ namespace Alderto.Bot.Modules
             foreach (var token in tokens[1..])
             {
                 if (!MentionUtils.TryParseUser(token, out var recipientId))
-                    throw new ValidationException($"Expected discord mention. Found '{tokens}'");
+                    throw new ValidationException($"Expected discord mention. Found '{token}'");
 
                 await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id, recipientId,
                     currencyName,
-                    amount));
+                    amount, action == "award"));
             }
 
             await this.ReplySuccessEmbedAsync(
