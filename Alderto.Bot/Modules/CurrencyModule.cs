@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +25,57 @@ namespace Alderto.Bot.Modules
             _setupService = setupService;
         }
 
+        [Command("list"), Priority(1)]
+        public async Task ListAsync()
+        {
+            if (Context.User is not IGuildUser author)
+                return;
+
+            var list = await _mediator.Send(new Currencies.List(author.GuildId, author.Id));
+            var fields = list.Select(c =>
+            {
+                var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
+                    ? $"✅ Timely grants {c.TimelyAmount} {c.Symbol} every {TimeSpan.FromSeconds((int) c.TimelyInterval):g}"
+                    : "❌ Timely is disabled";
+                return ($"[{c.Name}] {c.Symbol}",
+                    $"{c.Description}```{timelyString}```");
+            });
+
+            await this.ReplyEmbedAsync($"List of currencies in {author.Guild.Name}", extra: b =>
+            {
+                foreach (var (name, value) in fields)
+                {
+                    b.AddField(name, value);
+                }
+            });
+        }
+
         [Command]
+        public async Task GetAsync(string currencyName)
+        {
+            if (Context.User is not IGuildUser author)
+                return;
+
+            var currency = await _mediator.Send(new Currencies.FindByName(author.GuildId, author.Id, currencyName));
+
+            if (currency == null)
+            {
+                await this.ReplyErrorEmbedAsync("Currency not found");
+                return;
+            }
+
+            var timelyString = currency.TimelyAmount > 0 && currency.TimelyInterval > 0
+                ? $"✅ Timely grants {currency.TimelyAmount} {currency.Symbol} every {TimeSpan.FromSeconds((int) currency.TimelyInterval):g}"
+                : "❌ Timely is disabled";
+
+            await this.ReplyEmbedAsync($"List of currencies in {author.Guild.Name}",
+                extra: b =>
+                {
+                    b.AddField($"[{currency.Name}] {currency.Symbol}", $"{currency.Description}```{timelyString}```");
+                });
+        }
+
+        [Command, Priority(1)]
         public async Task HandleAsync(
             [Summary("")] string currencyName,
             [Summary("")] string action,
@@ -36,6 +87,12 @@ namespace Alderto.Bot.Modules
             action = action.ToLowerInvariant();
             switch (action)
             {
+                case "get":
+                case "info":
+                case "inspect":
+                    await GetAsync(currencyName);
+                    return;
+
                 case "give":
                 case "send":
                 case "award":

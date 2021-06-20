@@ -6,6 +6,7 @@ using Alderto.Data;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Application.Features.Currency
 {
@@ -26,17 +27,17 @@ namespace Alderto.Application.Features.Currency
         {
             public Guid Id { get; }
             public ulong GuildId { get; }
-            public string CurrencySymbol { get; }
+            public string Symbol { get; }
             public string Name { get; }
             public string? Description { get; }
             public int? TimelyInterval { get; }
 
-            public Model(Guid id, ulong guildId, string currencySymbol, string name, string? description,
+            public Model(Guid id, ulong guildId, string symbol, string name, string? description,
                 int? timelyInterval)
             {
                 Id = id;
                 GuildId = guildId;
-                CurrencySymbol = currencySymbol;
+                Symbol = symbol;
                 Name = name;
                 Description = description;
                 TimelyInterval = timelyInterval;
@@ -57,13 +58,13 @@ namespace Alderto.Application.Features.Currency
             public async Task<Model> Handle(Command request, CancellationToken cancellationToken)
             {
                 var currency =
-                    await _context.Currencies.FindAsync(new object[] { request.GuildId, request.Name },
-                        cancellationToken);
+                    await _context.Currencies.SingleOrDefaultAsync(c =>
+                        c.GuildId == request.GuildId && c.Name == request.Name, cancellationToken: cancellationToken);
 
                 if (currency == null)
                     throw new BadRequestDomainException($"Currency with the name '{request.Name}' was not found");
 
-                _context.Currencies.Add(currency);
+                _context.Currencies.Remove(currency);
                 await _context.SaveChangesAsync(cancellationToken);
 
                 return _mapper.Map<Model>(currency);

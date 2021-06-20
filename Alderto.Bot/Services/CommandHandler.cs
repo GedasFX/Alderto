@@ -75,12 +75,12 @@ namespace Alderto.Bot.Services
             // as it may clog up the request queue should a user spam a
             // command.
 
-            if (result.Error != CommandError.UnknownCommand)
+            if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
             {
                 try
                 {
                     await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                        .WithDefault(result.ErrorReason, EmbedColor.Error).Build());
+                        .WithDefault(result.ErrorReason, embedColor: EmbedColor.Error).Build());
                 }
                 catch (Discord.Net.HttpException e)
                 {

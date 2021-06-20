@@ -17,8 +17,8 @@ namespace Alderto.Bot.Modules.Admin
             _mediator = mediator;
         }
 
-        [Command("add")]
-        public async Task AddCurrencyAsync(string name, string currencySymbol, [Remainder] string description)
+        [Command("add"), Alias("insert", "create")]
+        public async Task AddCurrencyAsync(string name, string currencySymbol, [Remainder] string? description = null)
         {
             if (Context.Message.Author is not IGuildUser author)
                 return;
@@ -40,7 +40,7 @@ namespace Alderto.Bot.Modules.Admin
             public int? TimelyInterval { get; set; }
         }
 
-        [Command("edit")]
+        [Command("edit"), Alias("update")]
         public async Task EditCurrencyAsync(string name, EditCurrencyArgs args)
         {
             if (Context.Message.Author is not IGuildUser author)
@@ -57,7 +57,7 @@ namespace Alderto.Bot.Modules.Admin
             await this.ReplySuccessEmbedAsync($"Currency '{name}' updated successfully.");
         }
 
-        [Command("remove")]
+        [Command("remove"), Alias("delete")]
         public async Task RemoveCurrencyAsync(string name)
         {
             if (Context.Message.Author is not IGuildUser author)
@@ -66,7 +66,7 @@ namespace Alderto.Bot.Modules.Admin
             var currency = await _mediator.Send(new DeleteCurrency.Command(author.GuildId, author.Id, name));
 
             await this.ReplySuccessEmbedAsync(
-                $"Currency {currency.Name} {currency.CurrencySymbol} was removed successfully. All records were cleared.");
+                $"Currency {currency.Name} {currency.Symbol} was removed successfully. All records were cleared.");
         }
     }
 }
