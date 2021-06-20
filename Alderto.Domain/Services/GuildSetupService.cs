@@ -81,7 +81,19 @@ namespace Alderto.Domain.Services
             using var scope = _serviceProvider.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>();
 
-            context.GuildCommandAliases.Add(new GuildCommandAlias(guildId, alias, command));
+            var commandAlias = await context.GuildCommandAliases.FindAsync(guildId, alias);
+            if (commandAlias == null)
+            {
+                commandAlias = new GuildCommandAlias(guildId, alias, command);
+                context.GuildCommandAliases.Add(commandAlias);
+            }
+            else
+            {
+                commandAlias.Command = command;
+                context.GuildCommandAliases.Update(commandAlias);
+            }
+
+
             await context.SaveChangesAsync();
 
             _cache.Remove($"GUILD_CFG:{guildId}");
@@ -95,7 +107,7 @@ namespace Alderto.Domain.Services
             var command = await context.GuildCommandAliases.FindAsync(guildId, alias);
 
             if (command == null)
-                throw new BadRequestDomainException("Requested Alias was not found.");
+                throw new BadRequestDomainException("Requested alias was not found.");
 
             context.GuildCommandAliases.Remove(command);
             await context.SaveChangesAsync();

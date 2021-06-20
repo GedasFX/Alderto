@@ -1,7 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
+using Alderto.Application.Features.Currency.Query;
 using Alderto.Bot.Extensions;
 using Alderto.Domain.Services;
 using Discord;
@@ -23,162 +25,157 @@ namespace Alderto.Bot.Modules
         }
 
         [Command]
-        public async Task TransferAsync(
+        public async Task HandleAsync(
             [Summary("")] string currencyName,
             [Summary("")] string action,
-            [Summary("Amount of currency")] int amount,
-            [Summary("Users to interact with")] params IGuildUser[] recipients)
+            params string[] tokens)
         {
-            if (Context.User is not IGuildUser user)
+            if (Context.User is not IGuildUser author)
                 return;
 
-            switch (action.ToLowerInvariant())
+            action = action.ToLowerInvariant();
+            switch (action)
             {
                 case "give":
                 case "send":
-                    if (amount <= 0)
-                        throw new EntryPointNotFoundException("Please send more than nothing :)");
-                    foreach (var recipient in recipients)
-                    {
-                        await _mediator.Send(new TransferCurrency.Command(user.GuildId, user.Id, recipient.Id,
-                            currencyName,
-                            amount));
-                        await Task.Delay(50);
-                    }
-
-                    break;
                 case "award":
-                    if (!user.GuildPermissions.Administrator)
-                    {
-                        var setup = await _setupService.GetGuildSetupAsync(user.GuildId);
-                        if (setup.Configuration.ModeratorRoleId == null ||
-                            user.RoleIds.Contains((ulong) setup.Configuration.ModeratorRoleId))
-                            throw new EntryPointNotFoundException("Only admins are allowed to use this command");
-                    }
+                    await TransferCurrency(currencyName, action, tokens, author);
+                    return;
 
-                    foreach (var recipient in recipients)
-                    {
-                        await _mediator.Send(new TransferCurrency.Command(user.GuildId, user.Id, recipient.Id,
-                            currencyName,
-                            amount,
-                            true));
-                        await Task.Delay(50);
-                    }
+                case "$":
+                case "check":
+                    await CheckCurrency(currencyName, tokens, author);
+                    return;
 
-                    break;
-                default:
-                    throw new EntryPointNotFoundException("The only valid actions are give/send or award");
+                case "timely":
+                    await Timely(currencyName, author);
+                    return;
+            }
+        }
+
+        private async Task Timely(string currencyName, IGuildUser author)
+        {
+            var gtrResult =
+                await _mediator.Send(new GrantTimelyReward.Command(author.GuildId, author.Id, currencyName));
+
+            var nextClaim = gtrResult.NextClaim.Days > 0
+                ? $"{gtrResult.NextClaim:d}d {gtrResult.NextClaim:hh\\:mm\\:ss}"
+                : $"{gtrResult.NextClaim:hh\\:mm\\:ss}";
+
+            if (gtrResult.Success)
+                await this.ReplySuccessEmbedAsync(
+                    $"{author.Mention} has received {gtrResult.ReceivedAmount} {gtrResult.CurrencySymbol}!\nCan claim again in **{nextClaim}**");
+            else
+                await this.ReplyErrorEmbedAsync(
+                    $"{author.Mention} will be able to claim more {gtrResult.CurrencySymbol} in **{nextClaim}**.");
+        }
+
+        private async Task CheckCurrency(string currencyName, IReadOnlyList<string> tokens, IGuildUser author)
+        {
+            if (!(tokens.Count > 0 && MentionUtils.TryParseUser(tokens[0], out var memberId)))
+                memberId = author.Id;
+
+            var wallet = await _mediator.Send(new Wallets.FindByName(author.GuildId, memberId, currencyName));
+
+            await this.ReplyEmbedAsync(
+                $"{MentionUtils.MentionUser(memberId)} has {wallet.Amount} {wallet.CurrencySymbol}");
+        }
+
+        private async Task TransferCurrency(string currencyName, string action, string[] tokens, IGuildUser author)
+        {
+            if (tokens.Length < 2)
+                throw new ValidationException($"Amount to send and recipients are required");
+
+            if (!int.TryParse(tokens[0], out var amount))
+                throw new ValidationException($"Expected amount to transfer. Found '{tokens[0]}'");
+
+            if (action != "award" && amount <= 0)
+                throw new ValidationException("Amount to send must be positive ;)");
+
+            if (action == "award")
+                if (!author.GuildPermissions.Administrator)
+                {
+                    var setup = await _setupService.GetGuildSetupAsync(author.GuildId);
+                    if (setup.Configuration.ModeratorRoleId == null ||
+                        author.RoleIds.Contains((ulong) setup.Configuration.ModeratorRoleId))
+                        throw new ValidationException("Only admins are allowed to award currency");
+                }
+
+            foreach (var token in tokens[1..])
+            {
+                if (!MentionUtils.TryParseUser(token, out var recipientId))
+                    throw new ValidationException($"Expected discord mention. Found '{tokens}'");
+
+                await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id, recipientId,
+                    currencyName,
+                    amount));
             }
 
             await this.ReplySuccessEmbedAsync(
-                $"Successfully sent {amount} to {string.Join(", ", recipients.Select(r => r.Mention))}");
+                $"Successfully sent {amount} to {string.Join(", ", tokens[1..])}");
+        }
+    }
+
+    [Group("currencyadm"), RequireUserPermission(GuildPermission.Administrator)]
+    public class CurrencyAdminModule : ModuleBase<SocketCommandContext>
+    {
+        private readonly IMediator _mediator;
+
+        public CurrencyAdminModule(IMediator mediator)
+        {
+            _mediator = mediator;
         }
 
-        [Command]
-        [Summary("Checks the amount of points a given user has.")]
-        public async Task CheckAsync(
-            [Summary("")] string currencyName,
-            [Summary("")] string action,
-            [Summary("Person to check. If no user was provided, checks personal points.")]
-            IGuildUser? user = null)
+        [Command("create")]
+        public async Task CreateCurrencyAsync(string name, string currencySymbol, [Remainder] string description)
         {
-            user ??= (IGuildUser) Context.User;
+            if (Context.Message.Author is not IGuildUser author)
+                return;
 
-            switch (action.ToLowerInvariant())
+            await _mediator.Send(new CreateCurrency.Command(author.GuildId, author.Id, name, currencySymbol)
             {
-                case "check":
-                case "$":
-                    var wallet = await _mediator.Send(new GetWallet.QueryByName(user.GuildId, user.Id, currencyName));
-                    await this.ReplyEmbedAsync($"{user.Mention} has {wallet.Amount} {wallet.CurrencySymbol}");
-                    break;
-            }
+                Description = description
+            });
+
+            await this.ReplySuccessEmbedAsync($"Currency {name} {currencySymbol} created successfully.");
         }
 
-        [Command]
-        [Summary("Grants a timely currency reward.")]
-        public async Task Timely()
+        [NamedArgumentType]
+        public abstract class EditCurrencyArgs
         {
-            // var user = (IGuildUser) Context.User;
-            // var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id))!;
-            //
-            // var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
-            // var timelyCooldown = preferences.TimelyCooldown;
-            // var currencySymbol = preferences.CurrencySymbol;
-            // var timelyAmount = preferences.TimelyRewardQuantity;
-            //
-            // var timeRemaining = await _currencyManager.GrantTimelyRewardAsync(dbUser, timelyAmount, timelyCooldown);
-            //
-            // // If null - points were given out. Otherwise its time remaining until next claim.
-            // if (timeRemaining != null)
-            // {
-            //     await this.ReplyErrorEmbedAsync(
-            //         $"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");
-            //     return;
-            // }
-            //
-            // // Points were given out.
-            // await this.ReplySuccessEmbedAsync(
-            //     ($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+            public string? Description { get; set; }
+            public string? CurrencySymbol { get; set; }
+            public int? TimelyAmount { get; set; }
+            public int? TimelyInterval { get; set; }
         }
 
-        [Group("manage"), RequireUserPermission(GuildPermission.Administrator)]
-        public abstract class Manage : ModuleBase<SocketCommandContext>
+        [Command("edit")]
+        public async Task EditCurrencyAsync(string name, EditCurrencyArgs args)
         {
-            private readonly IMediator _mediator;
+            if (Context.Message.Author is not IGuildUser author)
+                return;
 
-            public Manage(IMediator mediator)
+            await _mediator.Send(new EditCurrency.Command(author.GuildId, author.Id, name)
             {
-                _mediator = mediator;
-            }
+                Description = args.Description,
+                CurrencySymbol = args.CurrencySymbol,
+                TimelyAmount = args.TimelyAmount,
+                TimelyInterval = args.TimelyInterval
+            });
 
-            [Command("create")]
-            public async Task CreateCurrencyAsync(string name, string currencySymbol, [Remainder] string description)
-            {
-                if (Context.Message.Author is not IGuildUser author)
-                    return;
+            await this.ReplySuccessEmbedAsync($"Currency '{name}' updated successfully.");
+        }
 
-                await _mediator.Send(new CreateCurrency.Command(author.GuildId, author.Id, name, currencySymbol)
-                {
-                    Description = description
-                });
+        [Command("remove")]
+        public async Task RemoveCurrencyAsync(string name)
+        {
+            if (Context.Message.Author is not IGuildUser author)
+                return;
 
-                await this.ReplySuccessEmbedAsync($"Currency {name} {currencySymbol} created successfully.");
-            }
+            var currency = await _mediator.Send(new RemoveCurrency.Command(author.GuildId, author.Id, name));
 
-
-            [NamedArgumentType]
-            public abstract class EditCurrencyArgs
-            {
-                public string? Description { get; init; }
-                public string? CurrencySymbol { get; init; }
-            }
-
-            [Command("edit")]
-            public async Task EditCurrencyAsync(string name, EditCurrencyArgs args)
-            {
-                if (Context.Message.Author is not IGuildUser author)
-                    return;
-
-                await _mediator.Send(new EditCurrency.Command(author.GuildId, author.Id, name)
-                {
-                    Description = args.Description,
-                    CurrencySymbol = args.CurrencySymbol
-                });
-
-                await this.ReplySuccessEmbedAsync($"Currency {name} updated successfully.");
-            }
-
-            [Command("remove")]
-            public async Task RemoveCurrencyAsync(string name)
-            {
-                if (Context.Message.Author is not IGuildUser author)
-                    return;
-
-                var currency = await _mediator.Send(new RemoveCurrency.Command(author.GuildId, author.Id, name));
-
-                await this.ReplySuccessEmbedAsync(
-                    $"Currency {currency.Name} {currency.CurrencySymbol} was removed successfully. All records were cleared.");
-            }
+            await this.ReplySuccessEmbedAsync(
+                $"Currency {currency.Name} {currency.CurrencySymbol} was removed successfully. All records were cleared.");
         }
     }
 }

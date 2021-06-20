@@ -1,7 +1,6 @@
 using Alderto.Application.Behaviors;
 using Alderto.Domain;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Alderto.Application
@@ -22,11 +21,6 @@ namespace Alderto.Application
                 .AddAldertoDomainServices();
 
             return collection;
-        }
-
-        public static IApplicationBuilder UseAlderto(this IApplicationBuilder app)
-        {
-            return app;
         }
     }
 }

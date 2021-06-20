@@ -37,12 +37,14 @@ namespace Alderto.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment env)
         {
             Configuration = configuration;
+            Env = env;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostEnvironment Env { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices([NotNull] IServiceCollection services)
@@ -60,6 +62,9 @@ namespace Alderto.Web
             {
                 options.UseNpgsql(dbConnectionString,
                     builder => builder.MigrationsAssembly("Alderto.Data"));
+
+                if (Env.IsDevelopment())
+                    options.EnableSensitiveDataLogging();
             });
 
             services.AddMemoryCache();

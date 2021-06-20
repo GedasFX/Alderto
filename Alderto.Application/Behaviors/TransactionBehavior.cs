@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Alderto.Application.Behaviors
 {
@@ -9,20 +10,33 @@ namespace Alderto.Application.Behaviors
         where TRequest : class
     {
         private readonly AldertoDbContext _context;
+        private readonly ILogger<TransactionBehavior<TRequest, TResponse>> _logger;
 
-        public TransactionBehavior(AldertoDbContext context)
+        public TransactionBehavior(AldertoDbContext context, ILogger<TransactionBehavior<TRequest, TResponse>> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
+            // Skip creating a transaction if one is already in place
+            if (_context.Database.CurrentTransaction != null)
+                return await next();
+
             try
             {
-                await _context.Database.BeginTransactionAsync(cancellationToken);
+                await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                _logger.Log(LogLevel.Information, "=== Begin transaction {TransactionId}  ===",
+                    transaction.TransactionId);
+
                 var response = await next();
-                await _context.Database.CommitTransactionAsync(cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+                _logger.Log(LogLevel.Information, "=== Commit transaction {TransactionId}  ===",
+                    transaction.TransactionId);
+
                 return response;
             }
             catch

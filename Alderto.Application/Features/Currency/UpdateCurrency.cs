@@ -21,7 +21,11 @@ namespace Alderto.Application.Features.Currency
             [MaxLength(50), MinLength(1)]
             public string? CurrencySymbol { get; init; }
 
-            public Command(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
+            public int? TimelyInterval { get; init; }
+            public int? TimelyAmount { get; init; }
+
+            public Command(ulong guildId, ulong memberId, string name)
+                : base(guildId, memberId)
             {
                 Name = name;
             }

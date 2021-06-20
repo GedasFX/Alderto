@@ -25,7 +25,7 @@ namespace Alderto.Application.Features.GuildConfiguration
             }
         }
 
-        public class CommandHandler : IRequestHandler<RegisterCommandAlias.RhCommand>
+        public class CommandHandler : IRequestHandler<UpdateGuildConfiguration.Command>
         {
             private readonly IGuildSetupService _guildSetupService;
             private readonly IMapper _mapper;
@@ -36,7 +36,7 @@ namespace Alderto.Application.Features.GuildConfiguration
                 _mapper = mapper;
             }
 
-            public async Task<Unit> Handle(RegisterCommandAlias.RhCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
                 var setup = await _guildSetupService.GetGuildSetupAsync(request.GuildId);
                 var configuration = setup.Configuration;

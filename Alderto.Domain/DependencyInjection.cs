@@ -12,7 +12,8 @@ namespace Alderto.Domain
         public static IServiceCollection AddAldertoDomainServices(this IServiceCollection services)
         {
             services
-                .AddSingleton<IGuildSetupService, GuildSetupService>();
+                .AddSingleton<IGuildSetupService, GuildSetupService>()
+                .AddScoped<IGuildMemberManagementService, GuildMemberManagementService>();
 
             return services;
         }

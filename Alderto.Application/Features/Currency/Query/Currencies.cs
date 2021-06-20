@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -8,16 +7,16 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Application.Features.Currency
+namespace Alderto.Application.Features.Currency.Query
 {
-    public static class GetCurrency
+    public static class Currencies
     {
-        public class QueryByName : Request<Model>
+        public class FindByName : Request<Model?>
         {
             [MaxLength(50)]
             public string Name { get; }
 
-            public QueryByName(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
+            public FindByName(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
             {
                 Name = name;
             }
@@ -27,18 +26,18 @@ namespace Alderto.Application.Features.Currency
         {
         }
 
-        public class CommandHandler : IRequestHandler<QueryByName, Model>
+        public class QueryHandler : IRequestHandler<FindByName, Model?>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper)
+            public QueryHandler(AldertoDbContext context, IMapper mapper)
             {
                 _context = context;
                 _mapper = mapper;
             }
 
-            public async Task<Model> Handle(QueryByName request, CancellationToken cancellationToken)
+            public async Task<Model?> Handle(FindByName request, CancellationToken cancellationToken)
             {
                 return await _mapper
                     .ProjectTo<Model>(_context.Currencies.Where(c =>
