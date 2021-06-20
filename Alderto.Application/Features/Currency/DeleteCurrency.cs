@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Alderto.Application.Features.Currency
 {
-    public static class RemoveCurrency
+    public static class DeleteCurrency
     {
         public class Command : Request<Model>
         {

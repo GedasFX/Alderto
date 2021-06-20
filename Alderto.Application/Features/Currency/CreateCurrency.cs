@@ -19,12 +19,12 @@ namespace Alderto.Application.Features.Currency
             public string? Description { get; init; }
 
             [MaxLength(50), MinLength(1), Required]
-            public string CurrencySymbol { get; }
+            public string Symbol { get; }
 
-            public Command(ulong guildId, ulong memberId, string name, string currencySymbol) : base(guildId, memberId)
+            public Command(ulong guildId, ulong memberId, string name, string symbol) : base(guildId, memberId)
             {
                 Name = name;
-                CurrencySymbol = currencySymbol;
+                Symbol = symbol;
             }
         }
 

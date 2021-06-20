@@ -41,7 +41,9 @@ namespace Alderto.Application.Behaviors
             }
             catch
             {
-                await _context.Database.RollbackTransactionAsync(cancellationToken);
+                // If error originated from the database side, transaction was already rolled back.
+                if (_context.Database.CurrentTransaction != null)
+                    await _context.Database.RollbackTransactionAsync(cancellationToken);
                 throw;
             }
         }

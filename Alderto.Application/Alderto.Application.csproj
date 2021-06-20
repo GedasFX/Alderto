@@ -13,23 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
     <ProjectReference Include="..\Alderto.Domain\Alderto.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Events\GuildMemberUpdated.cs">
-      <Link>Events\GuildMemberUpdated.cs</Link>
-    </Compile>
-    <Compile Remove="Events\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Events\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Events\**" />
   </ItemGroup>
 
 </Project>

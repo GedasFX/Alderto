@@ -5,10 +5,11 @@ using Alderto.Data;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Application.Features.Currency
 {
-    public static class EditCurrency
+    public static class UpdateCurrency
     {
         public class Command : Request
         {
@@ -19,7 +20,7 @@ namespace Alderto.Application.Features.Currency
             public string? Description { get; init; }
 
             [MaxLength(50), MinLength(1)]
-            public string? CurrencySymbol { get; init; }
+            public string? Symbol { get; init; }
 
             public int? TimelyInterval { get; init; }
             public int? TimelyAmount { get; init; }
@@ -45,8 +46,8 @@ namespace Alderto.Application.Features.Currency
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
                 var currency =
-                    await _context.Currencies.FindAsync(new object[] { request.GuildId, request.Name },
-                        cancellationToken);
+                    await _context.Currencies.SingleOrDefaultAsync(c =>
+                        c.GuildId == request.GuildId && c.Name == request.Name, cancellationToken: cancellationToken);
 
                 if (currency == null)
                     throw new BadRequestDomainException($"Currency with the name '{request.Name}' was not found");
@@ -64,7 +65,12 @@ namespace Alderto.Application.Features.Currency
         {
             public MapperProfile()
             {
-                CreateMap<Command, Data.Models.Currency>();
+                CreateMap<Command, Data.Models.Currency>()
+                    .ForMember(d => d.TimelyInterval,
+                        o => o.MapFrom(s => s.TimelyInterval > 0 ? s.TimelyInterval : null))
+                    .ForMember(d => d.TimelyAmount,
+                        o => o.MapFrom(s => s.TimelyAmount >= 0 ? s.TimelyAmount : 0))
+                    .ForAllMembers(o => o.Condition((_, _, m) => m != null));
             }
         }
     }

@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Alderto.Application.Features.GuildCommandAlias;
 using Alderto.Bot.Extensions;
+using Discord;
 using Discord.Commands;
 using MediatR;
 
 namespace Alderto.Bot.Modules
 {
-    [Group("alias")]
+    [Group("alias"), RequireUserPermission(GuildPermission.Administrator)]
     public class AliasModule : ModuleBase<SocketCommandContext>
     {
         private readonly IMediator _mediator;
@@ -16,7 +17,7 @@ namespace Alderto.Bot.Modules
             _mediator = mediator;
         }
 
-        [Command("register")]
+        [Command("register"), Alias("add", "create")]
         [Summary("Registers a given alias to a specified command")]
         public async Task RegisterCommand(string alias, [Remainder] string command)
         {
@@ -25,7 +26,7 @@ namespace Alderto.Bot.Modules
             await this.ReplySuccessEmbedAsync($"Command '{command}' can now be triggered by typing '{alias}' instead.");
         }
 
-        [Command("remove")]
+        [Command("unregister"), Alias("remove", "delete")]
         [Summary("Registers a given alias to a specified command")]
         public async Task RegisterCommand(string alias)
         {

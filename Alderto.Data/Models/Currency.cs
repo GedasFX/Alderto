@@ -49,8 +49,9 @@ namespace Alderto.Data.Models
         [ForeignKey(nameof(GuildId))]
         public virtual Guild? Guild { get; set; }
 
-        public Currency(string symbol, string name)
+        public Currency(ulong guildId, string symbol, string name)
         {
+            GuildId = guildId;
             Symbol = symbol;
             Name = name;
         }
