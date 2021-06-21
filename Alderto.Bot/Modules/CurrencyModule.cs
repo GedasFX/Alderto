@@ -120,7 +120,7 @@ namespace Alderto.Bot.Modules
             if (tokens.Count == 0 || !MentionUtils.TryParseUser(tokens[0], out var memberId))
                 throw new EntryPointNotFoundException("Mention the user to view logs of");
 
-            if (!(tokens.Count > 0 && int.TryParse(tokens[0], out var pageNo)))
+            if (!(tokens.Count > 1 && int.TryParse(tokens[1], out var pageNo)))
                 pageNo = 1;
 
             pageNo -= 1;
@@ -217,15 +217,12 @@ namespace Alderto.Bot.Modules
                         throw new ValidationException("Only admins are allowed to award currency");
                 }
 
-            foreach (var token in tokens[1..])
-            {
-                if (!MentionUtils.TryParseUser(token, out var recipientId))
-                    throw new ValidationException($"Expected discord mention. Found '{token}'");
-
-                await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id, recipientId,
-                    currencyName,
-                    amount, action == "award"));
-            }
+            await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id,
+                tokens[1..].Select(t =>
+                    MentionUtils.TryParseUser(t, out var id)
+                        ? id
+                        : throw new ValidationException($"Expected discord mention. Found '{t}'")
+                ), currencyName, amount, action == "award"));
 
             await this.ReplySuccessEmbedAsync(
                 $"Successfully sent {amount} to {string.Join(", ", tokens[1..])}");
