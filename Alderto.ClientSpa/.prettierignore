@@ -1,0 +1,14 @@
+.next
+out
+node_modules
+
+public
+
+.eslintrc
+.prettierrc
+tsconfig.json
+next.config.js
+
+package.json
+package-lock.json
+yarn.lock
