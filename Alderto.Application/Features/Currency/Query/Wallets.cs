@@ -12,7 +12,7 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class Wallets
     {
-        public class FindByName : Request<Model>
+        public class FindByName<T> : Request<T>
         {
             [MaxLength(50)]
             public string Name { get; }
@@ -23,18 +23,7 @@ namespace Alderto.Application.Features.Currency.Query
             }
         }
 
-        public class Model
-        {
-            public Model(string currencySymbol)
-            {
-                CurrencySymbol = currencySymbol;
-            }
-
-            public int Amount { get; set; }
-            public string CurrencySymbol { get; set; }
-        }
-
-        public class CommandHandler : IRequestHandler<FindByName, Model>
+        public class CommandHandler<T> : IRequestHandler<FindByName<T>, T>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -47,10 +36,10 @@ namespace Alderto.Application.Features.Currency.Query
                 _mediator = mediator;
             }
 
-            public async Task<Model> Handle(FindByName request, CancellationToken cancellationToken)
+            public async Task<T> Handle(FindByName<T> request, CancellationToken cancellationToken)
             {
                 var result = await _mapper
-                    .ProjectTo<Model>(_context.GuildMemberWallets
+                    .ProjectTo<T>(_context.GuildMemberWallets
                         .Include(w => w.Currency)
                         .Where(w =>
                             w.Currency!.Name == request.Name && w.Currency!.GuildId == request.GuildId &&
@@ -65,7 +54,7 @@ namespace Alderto.Application.Features.Currency.Query
                 await _mediator.Send(new CreateWallet.Command(request.GuildId, request.MemberId, request.Name),
                     cancellationToken);
                 result = await _mapper
-                    .ProjectTo<Model>(_context.GuildMemberWallets
+                    .ProjectTo<T>(_context.GuildMemberWallets
                         .Include(w => w.Currency)
                         .Where(w =>
                             w.Currency!.Name == request.Name && w.Currency!.GuildId == request.GuildId &&
@@ -74,16 +63,6 @@ namespace Alderto.Application.Features.Currency.Query
 
 
                 return result;
-            }
-        }
-
-        public class MapperProfile : Profile
-        {
-            public MapperProfile()
-            {
-                CreateMap<GuildMemberWallet, Model>()
-                    .ForMember(d => d.CurrencySymbol,
-                        o => o.MapFrom(s => s.Currency != null ? s.Currency.Symbol : "$"));
             }
         }
     }
