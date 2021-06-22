@@ -13,9 +13,9 @@
     "next.config.js"
   ],
   "extends": [
+    "next",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended"
   ],
@@ -28,7 +28,6 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["warn", 2],
     "linebreak-style": ["warn", "unix"],
     "quotes": ["warn", "single"],
     "semi": ["warn", "always"],
@@ -37,7 +36,10 @@
     "react/react-in-jsx-scope": "off",
 
     // Allow implicit return types.
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+
+    // Managed by next/link
+    "jsx-a11y/anchor-is-valid": "off"
   },
   "settings": {
     "react": {
