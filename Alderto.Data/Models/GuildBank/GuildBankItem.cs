@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Alderto.Data.Models.GuildBank
 {
@@ -54,9 +55,10 @@ namespace Alderto.Data.Models.GuildBank
         /// Initializes a new empty instance of <see cref="GuildBankItem"/>.
         /// For use by Entity Framework.
         /// </summary>
-#nullable disable
-        private GuildBankItem() { }
-#nullable restore
+        [JsonConstructor]
+        public GuildBankItem()
+        {
+        }
 
         public GuildBankItem(string name)
         {
@@ -72,7 +74,7 @@ namespace Alderto.Data.Models.GuildBank
 
         public new GuildBankItem MemberwiseClone()
         {
-            return (GuildBankItem)base.MemberwiseClone();
+            return (GuildBankItem) base.MemberwiseClone();
         }
     }
 }

@@ -59,18 +59,18 @@ namespace Alderto.Bot
 
             using (var scope = services.CreateScope())
             {
-                Console.Out.WriteLine("Initializing database...");
+                await Console.Out.WriteLineAsync("Initializing database...");
                 await using (var context = scope.ServiceProvider.GetRequiredService<AldertoDbContext>())
                 {
                     await context.Database.MigrateAsync();
                 }
-                Console.Out.WriteLine("Database ready!");
+                await Console.Out.WriteLineAsync("Database ready!");
             }
 
             // Effectively start the bot.
             // Initializes all of the necessary singleton services from the the IServiceProvider.
             // There has to be a better way to do this, but this does the job well enough.
-            await services.GetService<CommandHandler>().StartAsync();
+            await services.GetRequiredService<CommandHandler>().StartAsync();
 
             // Lock main thread to run indefinitely.
             await Task.Delay(-1);

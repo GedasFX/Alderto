@@ -50,7 +50,7 @@ namespace Alderto.Data.Models
         [ForeignKey(nameof(GuildId))]
         public virtual Guild? Guild { get; set; }
 
-        public virtual IList<CurrencyTransaction> Transactions { get; set; }
+        public virtual IList<CurrencyTransaction>? Transactions { get; set; }
 
         public Currency(ulong guildId, string symbol, string name)
         {
