@@ -1,0 +1,27 @@
+@layer components {
+  .dropdown-menu {
+    z-index: 9999;
+    inset: 0px auto auto 0px;
+    transform: translate3d(-10000px, 0px, 0px);
+    transition: visibility 0s ease-in-out 0.2s, opacity 0.2s 0s;
+    @apply invisible opacity-0 absolute;
+    &.show {
+      transition: visibility 0s ease-in-out 0s, opacity 0.2s 0s;
+      @apply visible opacity-100;
+      > .dropdown-menu__content {
+        @apply mt-1;
+        .tab-content .tab-pane {
+          @apply visible;
+        }
+      }
+    }
+    .dropdown-menu__content {
+      transition: margin-top 0.2s;
+      box-shadow: 0px 3px 10px #00000017;
+      @apply w-full mt-5;
+      .tab-content .tab-pane {
+        @apply invisible;
+      }
+    }
+  }
+}

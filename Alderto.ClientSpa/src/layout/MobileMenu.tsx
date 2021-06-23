@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import { FiBarChart2, FiChevronDown, FiHome, FiActivity } from 'react-icons/fi';
 import styles from './MobileMenu.module.css';
-import Image from 'next/image';
 import Link from 'next/link';
-import logo from 'public/images/logo.svg';
 import { useState } from 'react';
+import Logo from './Logo';
 
 type RouteCommon = {
   name: string;
@@ -71,12 +70,12 @@ function MenuRouteGroup({ route }: { route: RouteGroup }) {
             <FiChevronDown
               size={24}
               strokeWidth={1.5}
-              className={clsx(styles['menu__sub-icon'], 'transform', !open && 'rotate-180')}
+              className={clsx(styles['menu__sub-icon'], 'transform', open && 'rotate-180')}
             />
           </div>
         </a>
       </button>
-      <ul className={clsx(!open && styles['menu__sub-open'])}>
+      <ul className={clsx(open && styles['menu__sub-open'])}>
         {route.children.map(c => (
           <li key={c.name}>
             <Link href={c.path}>
@@ -103,7 +102,7 @@ export default function MobileMenu() {
       <div className={clsx(styles['mobile-menu-bar'])}>
         <Link href="/">
           <a className="flex mr-auto">
-            <Image alt="Icewall Tailwind HTML Admin Template" src={logo} height={24} width={24} />
+            <Logo />
           </a>
         </Link>
         <button

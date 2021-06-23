@@ -1,5 +1,8 @@
+@import 'core/intro.css';
+@import 'core/dropdown.css';
+
 @import 'fonts/roboto.css';
-@import 'components/_main.css';
+@import 'components/main.css';
 
 html {
   @apply bg-theme-14;
