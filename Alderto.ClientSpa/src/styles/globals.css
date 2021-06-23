@@ -1,16 +1,24 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+@import 'fonts/roboto.css';
+@import 'components/_main.css';
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
+html {
+  @apply bg-theme-14;
+  &.dark {
+    @apply bg-dark-2;
+    body {
+      @apply text-gray-300;
+      *,
+      ::before,
+      ::after {
+        @apply border-dark-3;
+      }
+    }
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    @apply overflow-x-hidden pt-3 px-8 font-roboto text-sm text-gray-800;
+    @screen xs {
+      @apply px-3;
+    }
+  }
 }

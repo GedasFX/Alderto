@@ -3,11 +3,18 @@ import Head from 'next/head';
 
 import 'tailwindcss/tailwind.css';
 import 'src/styles/globals.css';
+import MobileMenu from 'src/layout/MobileMenu';
+import { useEffect } from 'react';
 
 const APP_NAME = 'Next.JS Starter';
 const APP_DESCRIPTION = 'Next.JS Starter';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('main');
+  }, []);
+
   return (
     <>
       <Head>
@@ -28,6 +35,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/manifest.json" />
         <link rel="shortcut icon" href="/icons/favicon.ico" />
       </Head>
+      <MobileMenu />
       <Component {...pageProps} />
     </>
   );
