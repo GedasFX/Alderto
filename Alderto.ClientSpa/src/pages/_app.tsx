@@ -3,7 +3,7 @@ import Head from 'next/head';
   
 import 'tailwindcss/tailwind.css';
 import 'src/styles/globals.css';
-import { useEffect } from 'react';
+
 import Layout from 'src/layout';
 
 const APP_NAME = 'Next.JS Starter';

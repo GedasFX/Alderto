@@ -7,10 +7,10 @@ export type HomeProps = {
 export default function Home({ news }: HomeProps) {
   return (
     <div>
-      <div className="intro-y flex flex-col sm:flex-row items-center mt-8">
+      <div className="intro-y flex flex-col sm:flex-row items-center mt-8 mb-6">
         <h2 className="text-lg font-medium mr-auto">Latest news</h2>
       </div>
-      <div className="mt-6 grid grid-cols-1 space-y-4">
+      <div className="grid grid-cols-1 space-y-4">
         {news.map(n => (
           <NewsPost key={n.createdAt} {...n} />
         ))}

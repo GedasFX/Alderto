@@ -1,4 +1,4 @@
-import { FiHome, FiActivity } from 'react-icons/fi';
+import { FiHome, FiActivity, FiNavigation, FiFolder } from 'react-icons/fi';
 
 export type RouteCommon = {
   name: string;
@@ -21,8 +21,14 @@ const routes: Route[] = [
   {
     type: 'link',
     path: '/',
-    name: 'Home',
+    name: 'News',
     icon: <FiHome size={24} strokeWidth={1.5} />,
+  },
+  {
+    type: 'link',
+    path: '/docs',
+    name: 'Docs',
+    icon: <FiFolder size={24} strokeWidth={1.5} />,
   },
   {
     type: 'group',
@@ -61,6 +67,12 @@ const routes: Route[] = [
         icon: <FiActivity size={24} strokeWidth={1.5} />,
       },
     ],
+  },
+  {
+    type: 'link',
+    path: 'https://discordapp.com/api/oauth2/authorize?client_id=595936593592844306&permissions=8&scope=bot',
+    name: 'Invite to Server',
+    icon: <FiNavigation size={24} strokeWidth={1.5} />,
   },
 ];
 
