@@ -1,9 +1,9 @@
 module.exports = {
   plugins: [
     'postcss-import',
-    'postcss-for',
-    'postcss-nested',
     'postcss-calc',
+    'postcss-nested',
+    'postcss-for',
     'tailwindcss',
     'autoprefixer',
   ],

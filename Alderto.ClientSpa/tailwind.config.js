@@ -103,7 +103,10 @@ module.exports = {
         '3/4': '75%',
       },
       screens: {
-        xs: { max: '640px' },
+        'xl-d': { max: '1279px' },
+        'lg-d': { max: '1023px' },
+        'md-d': { max: '767px' },
+        'sm-d': { max: '639px' },
       },
       strokeWidth: {
         0.5: 0.5,

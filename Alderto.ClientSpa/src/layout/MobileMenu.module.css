@@ -1,13 +1,13 @@
 @layer components {
   .mobile-menu {
     @apply border-b border-theme-2 -mt-5 -mx-8 mb-6;
-    @screen xs {
+    @screen sm-d {
       @apply -mx-3;
     }
     .mobile-menu-bar {
       height: 70px;
       @apply px-8 flex items-center;
-      @screen xs {
+      @screen sm-d {
         @apply px-3;
       }
     }
@@ -22,7 +22,7 @@
 
         ul {
           @apply hidden bg-theme-20 bg-opacity-50 rounded-md mx-6 my-1 dark:bg-dark-4;
-          @screen xs {
+          @screen sm-d {
             @apply mx-3;
           }
 
@@ -43,7 +43,7 @@
       height: 50px;
       @apply flex items-center text-white px-10;
 
-      @screen xs {
+      @screen sm-d {
         @apply px-5;
       }
       .menu__title {

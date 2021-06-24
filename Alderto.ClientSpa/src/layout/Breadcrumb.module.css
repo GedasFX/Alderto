@@ -1,7 +1,7 @@
 @layer components {
   .breadcrumb {
     @apply h-full ml-10 pl-10 border-l border-theme-2 text-theme-4 dark:border-dark-3 dark:text-theme-33 flex items-center;
-    @screen xs {
+    @screen sm-d {
       @apply ml-0 pl-0 border-l-0;
     }
     .breadcrumb__icon {

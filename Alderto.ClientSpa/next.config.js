@@ -12,15 +12,15 @@ module.exports = withPlugins([
     {
     }
   ],
-  [
-    pwa, {
-      pwa: {
-        dest: 'public',
-        runtimeCaching,
-        disable: process.env.NODE_ENV === 'development',
-        publicExcludes: [],
-      },
-    },
+  [{}
+    // pwa, {
+    //   pwa: {
+    //     dest: 'public',
+    //     runtimeCaching,
+    //     disable: process.env.NODE_ENV === 'development',
+    //     publicExcludes: [],
+    //   },
+    // },
   ],
   [
     bundleAnalyzer, {}

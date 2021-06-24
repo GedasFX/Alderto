@@ -1,5 +1,6 @@
 import { PropsWithChildren, useEffect } from 'react';
 import MobileMenu from './MobileMenu';
+import SideNav from './SideNav';
 import TopBar from './TopBar';
 
 export default function Layout({ children }: PropsWithChildren<unknown>) {
@@ -12,7 +13,12 @@ export default function Layout({ children }: PropsWithChildren<unknown>) {
     <>
       <MobileMenu />
       <TopBar />
-      {children}
+      <div className="wrapper">
+        <div className="wrapper-box dark:bg-dark-8">
+          <SideNav />
+          <div className="content">{children}</div>
+        </div>
+      </div>
     </>
   );
 }
