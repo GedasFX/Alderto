@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,14 +13,14 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class Currencies
     {
-        public class List<T> : Request<IList<T>>
+        public class List : Request<IList<Dto>>
         {
             public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {
             }
         }
 
-        public class FindByName<T> : Request<T?>
+        public class FindByName : Request<Dto?>
         {
             [MaxLength(50)]
             public string Name { get; }
@@ -30,8 +31,27 @@ namespace Alderto.Application.Features.Currency.Query
             }
         }
 
+        public class Dto
+        {
+            public Guid Id { get; set; }
+            public string Symbol { get; set; }
+            public string Name { get; set; }
+            public string? Description { get; set; }
+            public int? TimelyInterval { get; set; }
+            public int TimelyAmount { get; set; }
 
-        public class QueryHandler<T> : IRequestHandler<FindByName<T>, T?>, IRequestHandler<List<T>, IList<T>>
+            public Dto(Guid id, string symbol, string name, string? description, int? timelyInterval, int timelyAmount)
+            {
+                Id = id;
+                Symbol = symbol;
+                Name = name;
+                Description = description;
+                TimelyInterval = timelyInterval;
+                TimelyAmount = timelyAmount;
+            }
+        }
+
+        public class QueryHandler : IRequestHandler<FindByName, Dto?>, IRequestHandler<List, IList<Dto>>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -42,19 +62,26 @@ namespace Alderto.Application.Features.Currency.Query
                 _mapper = mapper;
             }
 
-            public async Task<T?> Handle(FindByName<T> request, CancellationToken cancellationToken)
+            public async Task<Dto?> Handle(FindByName request, CancellationToken cancellationToken)
             {
                 return await _mapper
-                    .ProjectTo<T>(_context.Currencies.Where(c =>
+                    .ProjectTo<Dto>(_context.Currencies.Where(c =>
                         c.GuildId == request.GuildId && c.Name == request.Name))
                     .SingleOrDefaultAsync(cancellationToken: cancellationToken);
             }
 
-            public async Task<IList<T>> Handle(List<T> request, CancellationToken cancellationToken)
+            public async Task<IList<Dto>> Handle(List request, CancellationToken cancellationToken)
             {
-                return await _mapper
-                    .ProjectTo<T>(_context.Currencies.Where(c => c.GuildId == request.GuildId))
+                return await _mapper.ProjectTo<Dto>(_context.Currencies.Where(c => c.GuildId == request.GuildId))
                     .ToListAsync(cancellationToken: cancellationToken);
+            }
+        }
+
+        public class MapperProfile : Profile
+        {
+            public MapperProfile()
+            {
+                CreateMap<Data.Models.Currency, Dto>();
             }
         }
     }

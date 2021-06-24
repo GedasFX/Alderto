@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
-using Alderto.Application.Features.Currency.Dto;
 using Alderto.Application.Features.Currency.Query;
 using Alderto.Bot.Extensions;
 using Alderto.Domain.Services;
@@ -32,7 +31,7 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var list = await _mediator.Send(new Currencies.List<Currency.Dto>(author.GuildId, author.Id));
+            var list = await _mediator.Send(new Currencies.List(author.GuildId, author.Id));
             var fields = list.Select(c =>
             {
                 var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
@@ -57,8 +56,7 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var currency =
-                await _mediator.Send(new Currencies.FindByName<Currency.Dto>(author.GuildId, author.Id, currencyName));
+            var currency = await _mediator.Send(new Currencies.FindByName(author.GuildId, author.Id, currencyName));
 
             if (currency == null)
             {
@@ -193,10 +191,10 @@ namespace Alderto.Bot.Modules
             if (!(tokens.Count > 0 && MentionUtils.TryParseUser(tokens[0], out var memberId)))
                 memberId = author.Id;
 
-            var wallet = await _mediator.Send(new Wallets.FindByName<Wallet.BriefDto>(author.GuildId, memberId, currencyName));
+            var wallet = await _mediator.Send(new Wallets.FindByName(author.GuildId, memberId, currencyName));
 
             await this.ReplyEmbedAsync(
-                $"{MentionUtils.MentionUser(memberId)} has {wallet.Amount} {wallet.Symbol}");
+                $"{MentionUtils.MentionUser(memberId)} has {wallet.Amount} {wallet.CurrencySymbol}");
         }
 
         private async Task TransferCurrency(string currencyName, string action, string[] tokens, IGuildUser author)
