@@ -4,6 +4,12 @@
 @import 'fonts/roboto.css';
 @import 'components/main.css';
 @import 'components/wrapper.css';
+@import 'components/content.css';
+
+@import 'components/layout/mobile-menu.css';
+@import 'components/layout/top-bar.css';
+@import 'components/layout/breadcrumb.css';
+@import 'components/layout/side-nav.css';
 
 html {
   @apply bg-theme-14;

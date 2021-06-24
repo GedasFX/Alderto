@@ -16,7 +16,7 @@ export default function Layout({ children }: PropsWithChildren<unknown>) {
       <div className="wrapper">
         <div className="wrapper-box dark:bg-dark-8">
           <SideNav />
-          <div className="content">{children}</div>
+          <div className="content w-full">{children}</div>
         </div>
       </div>
     </>

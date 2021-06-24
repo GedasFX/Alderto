@@ -1,13 +1,11 @@
-import clsx from 'clsx';
 import { FiChevronRight } from 'react-icons/fi';
-import styles from './Breadcrumb.module.css';
 
 export default function Breadcrumb() {
   return (
-    <div className={clsx('-intro-x mr-auto', styles['breadcrumb'])}>
+    <div className="-intro-x mr-auto breadcrumb">
       <a href="">Application</a>
-      <FiChevronRight className={styles['breadcrumb__icon']} />
-      <a href="" className={styles['breadcrumb--active']}>
+      <FiChevronRight className="breadcrumb__icon" />
+      <a href="" className="breadcrumb--active">
         Dashboard
       </a>
     </div>

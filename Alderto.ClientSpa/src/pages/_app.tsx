@@ -1,9 +1,8 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-
+  
 import 'tailwindcss/tailwind.css';
 import 'src/styles/globals.css';
-import MobileMenu from 'src/layout/MobileMenu';
 import { useEffect } from 'react';
 import Layout from 'src/layout';
 

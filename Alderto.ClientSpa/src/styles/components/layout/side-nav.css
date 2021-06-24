@@ -45,41 +45,7 @@
       }
     }
     > ul {
-      /* @for $i from 1 to 50 {
-        > li:nth-child($i) {
-          &.side-nav__devider {
-            @apply opacity-0;
-            animation: 0.4s intro-devider-animation ease-in-out 0.33333s;
-            animation-fill-mode: forwards;
-            animation-delay: calc($i * 0.1s);
-          }
-          & > a {
-            &:not(.side-menu--active) {
-              @apply opacity-0;
-              transform: translateX(50px);
-              animation: 0.4s intro-menu-animation ease-in-out 0.33333s;
-              animation-fill-mode: forwards;
-              animation-delay: calc($i * 0.1s);
-            }
-            &.side-menu--active {
-              animation: 0.4s intro-active-menu-animation ease-in-out 0.33333s;
-              animation-fill-mode: forwards;
-            }
-          }
-        }
-      } */
       ul {
-        /* @for $i from 1 to 50 {
-          li:nth-child($i) {
-            & > a {
-              @apply opacity-0;
-              transform: translateX(50px);
-              animation: 0.2s intro-submenu-animation ease-in-out 0.33333s;
-              animation-fill-mode: forwards;
-              animation-delay: calc($i * 0.1s);
-            }
-          }
-        } */
         @apply hidden bg-theme-20 rounded-lg dark:bg-dark-4;
         &.side-menu__sub-open {
           @apply block;
@@ -87,7 +53,8 @@
         .side-menu__icon:before {
           @apply hidden;
         }
-        li a {
+        li a,
+        li button {
           &.side-menu--active {
             .side-menu__icon {
               @apply text-theme-19;

@@ -1,87 +1,44 @@
 import clsx from 'clsx';
-import { FiBarChart2, FiChevronDown, FiHome, FiActivity } from 'react-icons/fi';
-import styles from './MobileMenu.module.css';
+import { FiBarChart2, FiChevronDown } from 'react-icons/fi';
 import Link from 'next/link';
 import { useState } from 'react';
 import Logo from './Logo';
-
-type RouteCommon = {
-  name: string;
-  icon: JSX.Element;
-};
-type RouteLink = RouteCommon & {
-  type: 'link';
-  path: string;
-};
-type RouteGroup = RouteCommon & {
-  type: 'group';
-  children: RouteLink[];
-};
-type Route = RouteLink | RouteGroup;
-
-const routes: Route[] = [
-  {
-    type: 'link',
-    path: '/',
-    name: 'Home',
-    icon: <FiHome size={24} strokeWidth={1.5} />,
-  },
-  {
-    type: 'group',
-    name: 'Lome',
-    icon: <FiHome size={24} strokeWidth={1.5} />,
-    children: [
-      {
-        type: 'link',
-        path: '/',
-        name: 'Child #2',
-        icon: <FiActivity size={24} strokeWidth={1.5} />,
-      },
-      {
-        type: 'link',
-        path: '/',
-        name: 'Child #3',
-        icon: <FiActivity size={24} strokeWidth={1.5} />,
-      },
-    ],
-  },
-];
+import routes, { Route, RouteGroup, RouteLink } from 'src/conf/routes';
 
 function MenuRouteLink({ route }: { route: RouteLink }) {
   return (
     <Link href={route.path}>
-      <a className={styles['menu']}>
-        <div className={styles['menu__icon']}>{route.icon}</div>
-        <div className={styles['menu__title']}>{route.name}</div>
+      <a className="menu">
+        <div className="menu__icon">{route.icon}</div>
+        <div className="menu__title">{route.name}</div>
       </a>
     </Link>
   );
 }
+
 function MenuRouteGroup({ route }: { route: RouteGroup }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <button className="w-full" onClick={() => setOpen(o => !o)}>
-        <a className={styles['menu']}>
-          <div className={styles['menu__icon']}>{route.icon}</div>
-          <div className={styles['menu__title']}>
-            {route.name}
-            <FiChevronDown
-              size={24}
-              strokeWidth={1.5}
-              className={clsx(styles['menu__sub-icon'], 'transform', open && 'rotate-180')}
-            />
-          </div>
-        </a>
+      <button className="menu w-full" onClick={() => setOpen(o => !o)}>
+        <div className="menu__icon">{route.icon}</div>
+        <div className="menu__title">
+          {route.name}
+          <FiChevronDown
+            size={24}
+            strokeWidth={1.5}
+            className={clsx('menu__sub-icon', 'transform', open && 'rotate-180')}
+          />
+        </div>
       </button>
-      <ul className={clsx(open && styles['menu__sub-open'])}>
+      <ul className={clsx(open && 'menu__sub-open')}>
         {route.children.map(c => (
           <li key={c.name}>
             <Link href={c.path}>
-              <a className={styles['menu']}>
-                <div className={styles['menu__icon']}>{c.icon}</div>
-                <div className={styles['menu__title']}>{c.name}</div>
+              <a className="menu">
+                <div className="menu__icon">{c.icon}</div>
+                <div className="menu__title">{c.name}</div>
               </a>
             </Link>
           </li>
@@ -98,8 +55,8 @@ export default function MobileMenu() {
   const [navVisible, setNavVisible] = useState(false);
 
   return (
-    <div className={clsx(styles['mobile-menu'], 'md:hidden')}>
-      <div className={clsx(styles['mobile-menu-bar'])}>
+    <div className={clsx('mobile-menu', 'md:hidden')}>
+      <div className="mobile-menu-bar">
         <Link href="/">
           <a className="flex mr-auto">
             <Logo />

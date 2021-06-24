@@ -1,0 +1,25 @@
+{
+  "plugins": [
+    // [
+    //   "postcss-preset-env",
+    //   {
+    //     "stage": 3,
+    //     "features": {
+    //       "nesting-rules": true
+    //     }
+    //   }
+    // ],
+    "postcss-import",
+    "postcss-calc",
+    "postcss-for",
+    [
+        "tailwindcss/nesting",
+        {
+            
+        }
+    ],
+    // "postcss-nesting",
+    "tailwindcss",
+    "autoprefixer"
+  ]
+}
