@@ -5,6 +5,7 @@
 @import 'components/main.css';
 @import 'components/wrapper.css';
 @import 'components/content.css';
+@import 'components/box.css';
 
 @import 'components/layout/mobile-menu.css';
 @import 'components/layout/top-bar.css';
