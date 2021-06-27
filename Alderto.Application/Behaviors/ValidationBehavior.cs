@@ -19,7 +19,7 @@ namespace Alderto.Application.Behaviors
                 return await next();
             }
 
-            throw new Exception("Validation failed.");
+            throw new Exception(validationResult[0].ErrorMessage);
         }
     }
 }

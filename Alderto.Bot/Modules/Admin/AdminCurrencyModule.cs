@@ -38,6 +38,7 @@ namespace Alderto.Bot.Modules.Admin
             public string? Symbol { get; set; }
             public int? TimelyAmount { get; set; }
             public int? TimelyInterval { get; set; }
+            public bool? IsLocked { get; set; }
         }
 
         [Command("edit"), Alias("update")]
@@ -51,7 +52,8 @@ namespace Alderto.Bot.Modules.Admin
                 Description = args.Description,
                 Symbol = args.Symbol,
                 TimelyAmount = args.TimelyAmount,
-                TimelyInterval = args.TimelyInterval
+                TimelyInterval = args.TimelyInterval,
+                IsLocked = args.IsLocked,
             });
 
             await this.ReplySuccessEmbedAsync($"Currency '{name}' updated successfully.");

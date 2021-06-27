@@ -45,6 +45,11 @@ namespace Alderto.Data.Models
         public int TimelyAmount { get; set; }
 
         /// <summary>
+        /// If set to true, indicates that the currency is locked, and only award command works.
+        /// </summary>
+        public bool IsLocked { get; set; }
+
+        /// <summary>
         /// <see cref="Guild"/> of which owns this currency.
         /// </summary>
         [ForeignKey(nameof(GuildId))]

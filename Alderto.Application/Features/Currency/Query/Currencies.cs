@@ -39,6 +39,7 @@ namespace Alderto.Application.Features.Currency.Query
             public string? Description { get; set; }
             public int? TimelyInterval { get; set; }
             public int TimelyAmount { get; set; }
+            public bool IsLocked { get; set; }
 
             public Dto(Guid id, string symbol, string name, string? description, int? timelyInterval, int timelyAmount)
             {

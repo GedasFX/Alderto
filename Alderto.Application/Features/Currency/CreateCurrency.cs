@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
+using Alderto.Domain.Services;
 using AutoMapper;
 using MediatR;
 
@@ -32,17 +33,21 @@ namespace Alderto.Application.Features.Currency
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
+            private readonly IGuildMemberManagementService _memberManagementService;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper)
+            public CommandHandler(AldertoDbContext context, IMapper mapper,
+                IGuildMemberManagementService memberManagementService)
             {
                 _context = context;
                 _mapper = mapper;
+                _memberManagementService = memberManagementService;
             }
 
             public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
             {
                 var currency = _mapper.Map<Data.Models.Currency>(request);
 
+                await _memberManagementService.GetGuildMemberAsync(request.GuildId, request.MemberId);
                 _context.Currencies.Add(currency);
                 await _context.SaveChangesAsync(cancellationToken);
 

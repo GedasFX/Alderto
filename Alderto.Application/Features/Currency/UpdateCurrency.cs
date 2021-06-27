@@ -24,6 +24,7 @@ namespace Alderto.Application.Features.Currency
 
             public int? TimelyInterval { get; init; }
             public int? TimelyAmount { get; init; }
+            public bool? IsLocked { get; set; }
 
             public Command(ulong guildId, ulong memberId, string name)
                 : base(guildId, memberId)

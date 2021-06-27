@@ -58,6 +58,9 @@ namespace Alderto.Application.Features.Currency
                 if (currency == null)
                     throw new BadRequestDomainException("Specified currency was not found");
 
+                if (!request.IsAward && currency.IsLocked)
+                    throw new BadRequestDomainException("This currency is locked and can only be given out by admins");
+
                 var recipientWallets = await _context.GuildMemberWallets
                     .Where(w => w.CurrencyId == currency.Id)
                     .Where(w => request.RecipientIds.Any(i => w.MemberId == i))

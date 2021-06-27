@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace Alderto.Application.Features.Currency.Query
         {
             public string CurrencyName { get; }
 
+            [Range(1, Int32.MaxValue)]
             public int Page { get; }
 
             public List(ulong guildId, ulong memberId, string currencyName, int page = 1) : base(guildId, memberId)
