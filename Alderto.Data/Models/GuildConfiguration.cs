@@ -28,6 +28,11 @@ namespace Alderto.Data.Models
         public string Prefix { get; set; }
 
         /// <summary>
+        /// Log channel id for logging messages to.
+        /// </summary>
+        public ulong? LogChannelId { get; set; }
+
+        /// <summary>
         /// Id of role to add the user to, whenever user was accepted to the guild.
         /// </summary>
         public ulong? ModeratorRoleId { get; set; }

@@ -4,11 +4,11 @@ using Alderto.Data.Models;
 
 namespace Alderto.Domain.Services
 {
-    public class GuildMemberManagementService : IGuildMemberManagementService
+    public class GuildMemberService : IGuildMemberService
     {
         private readonly AldertoDbContext _context;
 
-        public GuildMemberManagementService(AldertoDbContext context)
+        public GuildMemberService(AldertoDbContext context)
         {
             _context = context;
         }

@@ -33,21 +33,21 @@ namespace Alderto.Application.Features.Currency
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
-            private readonly IGuildMemberManagementService _memberManagementService;
+            private readonly IGuildMemberService _memberService;
 
             public CommandHandler(AldertoDbContext context, IMapper mapper,
-                IGuildMemberManagementService memberManagementService)
+                IGuildMemberService memberService)
             {
                 _context = context;
                 _mapper = mapper;
-                _memberManagementService = memberManagementService;
+                _memberService = memberService;
             }
 
             public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
             {
                 var currency = _mapper.Map<Data.Models.Currency>(request);
 
-                await _memberManagementService.GetGuildMemberAsync(request.GuildId, request.MemberId);
+                await _memberService.GetGuildMemberAsync(request.GuildId, request.MemberId);
                 _context.Currencies.Add(currency);
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -6,7 +6,7 @@ using Alderto.Data.Models;
 
 namespace Alderto.Domain.Services
 {
-    public interface IGuildMemberManagementService
+    public interface IGuildMemberService
     {
         /// <summary>
         /// Adds a member to <see cref="AldertoDbContext.GuildMembers"/> and, if needed,

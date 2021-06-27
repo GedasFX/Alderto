@@ -5,7 +5,6 @@ namespace Alderto.Domain.Models
 {
     public class GuildSetup
     {
-        public ulong GuildId { get; set; }
         public GuildConfiguration Configuration { get; }
         public Dictionary<string, string>? Aliases { get; }
 

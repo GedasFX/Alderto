@@ -71,8 +71,6 @@ namespace Alderto.Web
             // Add database accessors.
             services.AddBotManagers();
 
-            _ = ulong.TryParse(Configuration["Discord:NewsChannelId"], out var newsChannelId);
-            services.AddNewsProvider(o => o.NewsChannelId = newsChannelId);
             services.AddMessagesManager();
 
             services.AddAlderto();

@@ -13,7 +13,7 @@ namespace Alderto.Domain
         {
             services
                 .AddSingleton<IGuildSetupService, GuildSetupService>()
-                .AddScoped<IGuildMemberManagementService, GuildMemberManagementService>();
+                .AddScoped<IGuildMemberService, GuildMemberService>();
 
             return services;
         }

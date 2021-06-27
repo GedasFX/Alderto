@@ -16,9 +16,9 @@ namespace Alderto.Application.Features.GuildMember
 
         public class CommandHandler : IRequestHandler<Command>
         {
-            private readonly IGuildMemberManagementService _userService;
+            private readonly IGuildMemberService _userService;
 
-            public CommandHandler(IGuildMemberManagementService userService)
+            public CommandHandler(IGuildMemberService userService)
             {
                 _userService = userService;
             }

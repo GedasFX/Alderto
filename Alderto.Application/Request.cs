@@ -23,9 +23,15 @@ namespace Alderto.Application
 
     public abstract class RequestBase
     {
+        /// <summary>
+        /// Guild Id. If set to 0, means the request was outside of guild scope.
+        /// </summary>
         [Required]
         public ulong GuildId { get; protected init; }
 
+        /// <summary>
+        /// Member id. If set to 0, means the request is anonymous.
+        /// </summary>
         [Required]
         public ulong MemberId { get; protected init; }
     }
