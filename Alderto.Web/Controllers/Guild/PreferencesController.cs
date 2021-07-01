@@ -1,6 +1,5 @@
-﻿using Alderto.Data.Models;
-using Alderto.Services;
-using Alderto.Services.Exceptions;
+﻿using System;
+using Alderto.Data.Models;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.GuildPreferences;
 using Discord;
@@ -39,7 +38,7 @@ namespace Alderto.Web.Controllers.Guild
         {
             // Ensure user has admin rights 
             if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+                throw new NotImplementedException();
 
             await _mediator.Send(new UpdateGuildConfiguration.Command(guildId, User.GetId(), model.Prefix));
 

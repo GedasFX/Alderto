@@ -57,7 +57,7 @@ namespace Alderto.Application.Features.Currency.Query
             public async Task<Dto> Handle(List request, CancellationToken cancellationToken)
             {
                 return await _mapper
-                    .ProjectTo<Dto>(_context.Currencies
+                    .ProjectTo<Dto>(_context.Currencies.AsQueryable()
                             .Where(c => c.GuildId == request.GuildId && c.Name == request.CurrencyName),
                         new { memberId = request.MemberId, page = request.Page })
                     .SingleOrDefaultAsync(cancellationToken: cancellationToken);

@@ -62,7 +62,7 @@ namespace Alderto.Application.Features.Currency
                         c.GuildId == request.GuildId && c.Name == request.Name, cancellationToken: cancellationToken);
 
                 if (currency == null)
-                    throw new BadRequestDomainException($"Currency with the name '{request.Name}' was not found");
+                    throw new ValidationDomainException($"Currency with the name '{request.Name}' was not found");
 
                 _context.Currencies.Remove(currency);
                 await _context.SaveChangesAsync(cancellationToken);

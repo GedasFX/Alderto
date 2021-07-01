@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions;
+using Alderto.Domain.Exceptions;
 using Alderto.Web.Models;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,7 @@ namespace Alderto.Web.Controllers.Guild
         {
             var guild = await _client.GetGuildAsync(guildId);
             if (guild == null)
-                throw new GuildNotFoundException();
+                throw new NotFoundDomainException();
 
             var channels = await guild.GetTextChannelsAsync();
 

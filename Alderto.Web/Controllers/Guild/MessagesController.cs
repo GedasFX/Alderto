@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Alderto.Services;
-using Alderto.Services.Exceptions;
+using Alderto.Application.Features.ManagedMessage;
+using Alderto.Application.Features.ManagedMessage.Dto;
+using Alderto.Application.Features.ManagedMessage.Query;
+using Alderto.Data.Models;
 using Alderto.Web.Extensions;
-using Alderto.Web.Models;
-using Discord;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild
@@ -12,84 +13,59 @@ namespace Alderto.Web.Controllers.Guild
     [Route("guilds/{guildId}/messages")]
     public class MessagesController : ApiControllerBase
     {
-        private readonly IMessagesManager _msgManager;
-        private readonly IDiscordClient _client;
+        private readonly IMediator _mediator;
 
-        public MessagesController(IMessagesManager msgManager, IDiscordClient client)
+        public MessagesController(IMediator mediator)
         {
-            _msgManager = msgManager;
-            _client = client;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListMessages(ulong guildId)
+        public async Task<IList<ManagedMessageDto>> ListMessages(ulong guildId)
         {
-            var messages = await _msgManager.ListMessagesAsync(guildId);
-            return Content(messages.Select(g => new ApiManagedMessage(g)));
+            return await _mediator.Send(new Messages.List<ManagedMessageDto>(guildId, User.GetId()));
         }
 
         [HttpGet("{messageId}")]
-        public async Task<IActionResult> GetMessage(ulong guildId, ulong messageId)
+        public async Task<ManagedMessageDto?> GetMessage(ulong guildId, ulong messageId)
         {
-            var msg = await _msgManager.GetMessageAsync(guildId, messageId);
-            if (msg == null)
-                throw new MessageNotFoundException();
-
-            return Content(new ApiManagedMessage(msg));
+            return await _mediator.Send(new Messages.Find<ManagedMessageDto>(guildId, User.GetId(), messageId));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage(ulong guildId,
-            [Bind(nameof(ApiManagedMessage.Content), nameof(ApiManagedMessage.ChannelId), nameof(ApiManagedMessage.Id), nameof(ApiManagedMessage.ModeratorRoleId))]
-            ApiManagedMessage message)
+        public async Task<GuildManagedMessage> CreateMessage(ulong guildId,
+            CreateMessage.Command command)
         {
-            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+            // if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
+            //     throw new UserNotGuildAdminException();
 
-            // If create new message
-            if (message.Content != null)
-            {
-                var msg = await _msgManager.PostMessageAsync(guildId, message.ChannelId, message.Content, message.ModeratorRoleId);
-                return Content(new ApiManagedMessage(msg));
-            }
+            command.GuildId = guildId;
+            command.MemberId = User.GetId();
 
-            // If import a message
-            if (message.Id != 0)
-            {
-                var msg = await _msgManager.ImportMessageAsync(guildId, message.ChannelId, message.Id, message.ModeratorRoleId);
-                return Content(new ApiManagedMessage(msg));
-            }
-
-            throw new ContentNotProvidedException();
+            return await _mediator.Send(command);
         }
 
         [HttpPatch("{messageId}")]
-        public async Task<IActionResult> EditMessage(ulong guildId, ulong messageId,
-            [Bind(nameof(ApiManagedMessage.Content), nameof(ApiManagedMessage.ModeratorRoleId))]
-            ApiManagedMessage message)
+        public async Task<GuildManagedMessage> EditMessage(ulong guildId, ulong messageId,
+            UpdateMessage.Command command)
         {
-            if (message.ModeratorRoleId != null && !await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+            // if (message.ModeratorRoleId != null && !await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
+            //     throw new UserNotGuildAdminException();
 
-            var dbMsg = await _msgManager.GetMessageAsync(guildId, messageId);
-            if (dbMsg == null)
-                throw new MessageNotFoundException();
+            command.GuildId = guildId;
+            command.MemberId = User.GetId();
+            command.MessageId = messageId;
 
-            if (!await _client.ValidateResourceModeratorAsync(User.GetId(), guildId, dbMsg.ModeratorRoleId))
-                throw new UserNotGuildModeratorException();
-
-            await _msgManager.EditMessageAsync(guildId, messageId, message.Content, message.ModeratorRoleId);
-            return Ok();
+            return await _mediator.Send(command);
         }
 
         [HttpDelete("{messageId}")]
-        public async Task<IActionResult> RemoveMessage(ulong guildId, ulong messageId)
+        public async Task<GuildManagedMessage> RemoveMessage(ulong guildId, ulong messageId)
         {
-            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+            // if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
+            //     throw new UserNotGuildAdminException();
 
-            await _msgManager.RemoveMessageAsync(guildId, messageId);
-            return NoContent();
+            return await _mediator.Send(new DeleteMessage.Command(guildId, User.GetId(), messageId));
         }
     }
 }

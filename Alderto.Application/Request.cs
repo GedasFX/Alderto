@@ -27,12 +27,12 @@ namespace Alderto.Application
         /// Guild Id. If set to 0, means the request was outside of guild scope.
         /// </summary>
         [Required]
-        public ulong GuildId { get; protected init; }
+        public ulong GuildId { get; set; }
 
         /// <summary>
         /// Member id. If set to 0, means the request is anonymous.
         /// </summary>
         [Required]
-        public ulong MemberId { get; protected init; }
+        public ulong MemberId { get; set; }
     }
 }

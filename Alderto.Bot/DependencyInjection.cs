@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +14,14 @@ namespace Alderto.Bot
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddDiscordBot(this IServiceCollection services, string botToken,
+            Action<DiscordSocketConfig>? clientConfig = null, Action<CommandServiceConfig>? commandConfig = null) =>
+            services
+                .AddDiscordSocketClient(botToken, clientConfig)
+                .AddCommandService(commandConfig)
+                .AddCommandHandler();
+
+
         /// <summary>
         /// Adds a singleton instance of <see cref="DiscordSocketClient"/> to the service collection. Can specify a Log Level.
         /// </summary>
@@ -73,6 +82,7 @@ namespace Alderto.Bot
 
         private class CommandServiceWrapper : CommandService
         {
+            // ReSharper disable once ContextualLoggerProblem
             public CommandServiceWrapper(IDiscordClient client, ILogger<CommandService> logger,
                 IOptions<CommandServiceConfig> cmdServiceConfig, IConfiguration config) : base(cmdServiceConfig.Value)
             {
@@ -109,5 +119,16 @@ namespace Alderto.Bot
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         public static IServiceCollection AddCommandHandler(this IServiceCollection services) =>
             services.AddSingleton<CommandHandler>();
+
+        /// <summary>
+        /// Adds the discord logger.
+        /// </summary>
+        public static ILoggingBuilder AddDiscordLogger(
+            this ILoggingBuilder builder)
+        {
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DiscordLoggerProvider>());
+
+            return builder;
+        }
     }
 }

@@ -1,117 +1,67 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Bank;
+using Alderto.Application.Features.Bank.Dto;
+using Alderto.Application.Features.Bank.Query;
 using Alderto.Data.Models.GuildBank;
-using Alderto.Services;
-using Alderto.Services.Exceptions;
+using Alderto.Domain.Exceptions;
 using Alderto.Web.Extensions;
-using Alderto.Web.Models.Bank;
-using Discord;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
     [Route("guilds/{guildId}/banks")]
     public class BanksController : ApiControllerBase
     {
-        private readonly IGuildBankManager _bank;
-        private readonly IDiscordClient _client;
+        private readonly IMediator _mediator;
 
-        public BanksController(IGuildBankManager bank, IDiscordClient client)
+        public BanksController(IMediator mediator)
         {
-            _bank = bank;
-            _client = client;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListBanks(ulong guildId)
+        public async Task<IList<BankDto>> ListBanks(ulong guildId)
         {
-            var guild = await _client.GetGuildAsync(guildId);
-            if (guild == null)
-                throw new GuildNotFoundException();
-
-            var user = await guild.GetUserAsync(User.GetId());
-            if (user == null)
-                throw new UserNotFoundException();
-
-            var banks = await _bank.GetGuildBanksAsync(guildId, o => o.Include(b => b.Contents));
-            var outBanks = banks.Select(b => new ApiGuildBank(b));
-
-            return Content(outBanks);
+            return await _mediator.Send(new Banks.List<BankDto>(guildId, User.GetId()));
         }
 
-        [HttpGet("{bankId}")]
-        public async Task<IActionResult> GetBank(ulong guildId, int bankId)
+        [HttpGet("{bankId:int}")]
+        public async Task<BankDto?> GetBank(ulong guildId, int bankId)
         {
-            // Check if user even exists in the guild.
-            var bank = await _bank.GetGuildBankAsync(guildId, bankId);
+            var bank = await _mediator.Send(new Banks.Find<BankDto>(guildId, User.GetId(), bankId));
             if (bank == null)
-                throw new BankNotFoundException();
+                throw new NotFoundDomainException(ErrorMessage.BANK_NOT_FOUND);
 
-            return Content(new ApiGuildBank(bank));
+            return bank;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBank(ulong guildId,
-            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
-            ApiGuildBank bank)
+        public async Task<GuildBank> CreateBank(ulong guildId,
+            CreateBank.Command command)
         {
-            var userId = User.GetId();
+            command.GuildId = guildId;
+            command.MemberId = User.GetId();
 
-            // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
-                throw new UserNotGuildAdminException();
-
-            if (await _bank.GetGuildBankAsync(guildId, bank!.Name) != null)
-                throw new BankNameAlreadyExistsException();
-
-            var b = await _bank.CreateGuildBankAsync(guildId, userId, new GuildBank(guildId, bank.Name)
-            {
-                LogChannelId = bank.LogChannelId,
-                ModeratorRoleId = bank.ModeratorRoleId
-            });
-
-            return Content(new ApiGuildBank(b));
+            return await _mediator.Send(command);
         }
 
-        [HttpPatch("{bankId}")]
-        public async Task<IActionResult> EditBank(ulong guildId, int bankId,
-            [Bind(nameof(GuildBank.Name), nameof(GuildBank.LogChannelId), nameof(GuildBank.ModeratorRoleId))]
-            GuildBank bank)
+        [HttpPatch("{bankId:int}")]
+        public async Task<GuildBank> EditBank(ulong guildId, int bankId,
+            UpdateBank.Command command)
         {
-            var userId = User.GetId();
+            command.GuildId = guildId;
+            command.MemberId = User.GetId();
+            command.Id = bankId;
 
-            // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
-                throw new UserNotGuildAdminException();
-
-            // If not renaming this would always return itself. Check for id difference instead.
-            var dbBank = await _bank.GetGuildBankAsync(guildId, bank.Name);
-            if (dbBank != null && dbBank.Id != bankId)
-                throw new BankNameAlreadyExistsException();
-
-            await _bank.UpdateGuildBankAsync(guildId, bankId, userId, b =>
-            {
-                b.Name = bank.Name;
-                b.LogChannelId = bank.LogChannelId;
-                b.ModeratorRoleId = bank.ModeratorRoleId;
-            });
-
-            return Ok();
+            return await _mediator.Send(command);
         }
 
-        [HttpDelete("{bankId}")]
-        public async Task<IActionResult> RemoveBank(ulong guildId, int bankId)
+        [HttpDelete("{bankId:int}")]
+        public async Task<GuildBank> RemoveBank(ulong guildId, int bankId)
         {
-            var userId = User.GetId();
-
-            // Ensure user has admin rights 
-            if (!await _client.ValidateGuildAdminAsync(userId, guildId))
-                throw new UserNotGuildAdminException();
-
-            await _bank.RemoveGuildBankAsync(guildId, bankId, userId);
-
-            return NoContent();
+            return await _mediator.Send(new DeleteBank.Command(guildId, User.GetId(), bankId));
         }
     }
 }

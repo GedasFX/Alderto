@@ -32,6 +32,9 @@ namespace Alderto.Data.Migrations
                     b.Property<decimal>("GuildId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -213,6 +216,9 @@ namespace Alderto.Data.Migrations
                     b.Property<decimal>("GuildId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<decimal?>("LogChannelId")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<decimal?>("ModeratorRoleId")
                         .HasColumnType("numeric(20,0)");
 
@@ -336,7 +342,7 @@ namespace Alderto.Data.Migrations
             modelBuilder.Entity("Alderto.Data.Models.CurrencyTransaction", b =>
                 {
                     b.HasOne("Alderto.Data.Models.Currency", "Currency")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -462,6 +468,11 @@ namespace Alderto.Data.Migrations
                     b.Navigation("Currency");
 
                     b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("Alderto.Data.Models.Currency", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Alderto.Data.Models.Guild", b =>

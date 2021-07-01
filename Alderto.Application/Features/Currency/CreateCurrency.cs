@@ -55,7 +55,7 @@ namespace Alderto.Application.Features.Currency
             }
         }
 
-        public class MapperProfile : Profile
+        private class MapperProfile : Profile
         {
             public MapperProfile()
             {

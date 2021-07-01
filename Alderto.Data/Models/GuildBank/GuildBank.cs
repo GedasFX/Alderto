@@ -64,10 +64,5 @@ namespace Alderto.Data.Models.GuildBank
             GuildId = guildId;
             Name = name;
         }
-
-        public new GuildBank MemberwiseClone()
-        {
-            return (GuildBank) base.MemberwiseClone();
-        }
     }
 }

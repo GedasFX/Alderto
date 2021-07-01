@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>c53fe5d3-16e9-400d-a588-4859345371e5</UserSecretsId>
-    <StartupObject>Alderto.Bot.Program</StartupObject>
-    <Configurations>Debug;Release</Configurations>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -28,17 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="commands.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Discord.Net.Labs.Commands" Version="2.3.4" />
     <PackageReference Include="Discord.Net.Labs.Core" Version="2.3.8" />
     <PackageReference Include="Discord.Net.Labs.WebSocket" Version="2.3.8" />
@@ -50,7 +35,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Alderto.Application\Alderto.Application.csproj" />
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
-    <ProjectReference Include="..\Alderto.Services\Alderto.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

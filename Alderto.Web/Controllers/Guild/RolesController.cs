@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Alderto.Services.Exceptions;
-using Alderto.Web.Models;
-using Discord;
+using Alderto.Application.Features.Discord.Dto;
+using Alderto.Application.Features.Discord.Query;
+using Alderto.Web.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild
@@ -10,21 +11,17 @@ namespace Alderto.Web.Controllers.Guild
     [Route("guilds/{guildId}/roles")]
     public class RolesController : ApiControllerBase
     {
-        private readonly IDiscordClient _client;
+        private readonly IMediator _mediator;
 
-        public RolesController(IDiscordClient client)
+        public RolesController(IMediator mediator)
         {
-            _client = client;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListRoles(ulong guildId)
+        public async Task<IList<DiscordRoleDto>> ListRoles(ulong guildId)
         {
-            var guild = await _client.GetGuildAsync(guildId);
-            if (guild == null)
-                throw new GuildNotFoundException();
-
-            return Content(guild.Roles.Select(c => new ApiGuildRole(c.Id, c.Name)));
+            return await _mediator.Send(new Roles.List<DiscordRoleDto>(guildId, User.GetId()));
         }
     }
 }

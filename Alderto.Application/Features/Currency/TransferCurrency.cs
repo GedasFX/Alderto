@@ -51,17 +51,17 @@ namespace Alderto.Application.Features.Currency
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var currency = await _context.Currencies.SingleOrDefaultAsync(c =>
+                var currency = await _context.Currencies.AsQueryable().SingleOrDefaultAsync(c =>
                         c.GuildId == request.GuildId && c.Name == request.CurrencyName,
                     cancellationToken: cancellationToken);
 
                 if (currency == null)
-                    throw new BadRequestDomainException("Specified currency was not found");
+                    throw new ValidationDomainException("Specified currency was not found");
 
                 if (!request.IsAward && currency.IsLocked)
-                    throw new BadRequestDomainException("This currency is locked and can only be given out by admins");
+                    throw new ValidationDomainException("This currency is locked and can only be given out by admins");
 
-                var recipientWallets = await _context.GuildMemberWallets
+                var recipientWallets = await _context.GuildMemberWallets.AsQueryable()
                     .Where(w => w.CurrencyId == currency.Id)
                     .Where(w => request.RecipientIds.Any(i => w.MemberId == i))
                     .ToListAsync(cancellationToken: cancellationToken);
@@ -80,17 +80,17 @@ namespace Alderto.Application.Features.Currency
 
                     if (!request.IsAward)
                     {
-                        var senderWallet = await _context.GuildMemberWallets.SingleOrDefaultAsync(w =>
+                        var senderWallet = await _context.GuildMemberWallets.AsQueryable().SingleOrDefaultAsync(w =>
                                 w.MemberId == request.MemberId &&
                                 w.CurrencyId == currency.Id,
                             cancellationToken: cancellationToken);
 
                         if (senderWallet == null)
-                            throw new BadRequestDomainException(
+                            throw new ValidationDomainException(
                                 "Sender does not have a wallet associated with the specified currency");
 
                         if (senderWallet.Amount < request.Amount)
-                            throw new BadRequestDomainException(
+                            throw new ValidationDomainException(
                                 $"Sender does not have enough currency. Required - {request.Amount}, available - {senderWallet.Amount}");
 
                         senderWallet.Amount -= request.Amount;

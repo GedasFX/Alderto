@@ -1,8 +1,6 @@
-﻿using Alderto.Services;
-using Alderto.Web.Models;
+﻿using Alderto.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Alderto.Web.Controllers.Guild

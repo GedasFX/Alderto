@@ -67,7 +67,7 @@ namespace Alderto.Application.Features.Currency
 
                 // It is intentional that amount is allowed to be negative.
                 if (wallet.Currency!.TimelyInterval == null || wallet.Currency.TimelyAmount == 0)
-                    throw new BadRequestDomainException("This currency does not grant currency on a timely basis");
+                    throw new ValidationDomainException("This currency does not grant currency on a timely basis");
 
                 var timeRemaining = wallet.TimelyLastClaimed.AddSeconds((int) wallet.Currency.TimelyInterval) -
                                     DateTimeOffset.UtcNow;

@@ -107,7 +107,7 @@ namespace Alderto.Domain.Services
             var command = await context.GuildCommandAliases.FindAsync(guildId, alias);
 
             if (command == null)
-                throw new BadRequestDomainException("Requested alias was not found.");
+                throw new ValidationDomainException("Requested alias was not found.");
 
             context.GuildCommandAliases.Remove(command);
             await context.SaveChangesAsync();

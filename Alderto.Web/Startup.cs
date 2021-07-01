@@ -9,7 +9,7 @@ using Alderto.Application;
 using Alderto.Bot;
 using Alderto.Bot.Services;
 using Alderto.Data;
-using Alderto.Services.Exceptions;
+using Alderto.Domain.Exceptions;
 using Alderto.Web.Helpers;
 using Alderto.Web.Services;
 using Discord;
@@ -31,6 +31,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ErrorMessage = Alderto.Domain.Exceptions.ErrorMessage;
 
 namespace Alderto.Web
 {
@@ -56,7 +57,6 @@ namespace Alderto.Web
                                      Configuration["Database:Extras"];
 
             // === <General> ===
-            // Add database.
             services.AddDbContext<AldertoDbContext>(options =>
             {
                 options.UseNpgsql(dbConnectionString,
@@ -65,13 +65,7 @@ namespace Alderto.Web
                 if (Env.IsDevelopment())
                     options.EnableSensitiveDataLogging();
             });
-
             services.AddMemoryCache();
-
-            // Add database accessors.
-            services.AddBotManagers();
-
-            services.AddMessagesManager();
 
             services.AddAlderto();
 
@@ -175,18 +169,16 @@ namespace Alderto.Web
             // Add Mvc
             services
                 .AddMvcCore()
-                .AddDataAnnotations()
                 .AddApiExplorer()
                 .ConfigureApiBehaviorOptions(options =>
                 {
-                    options.InvalidModelStateResponseFactory = context =>
-                    {
-                        var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
-                        var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
-                                       value.Errors[0].ErrorMessage;
-                        return new BadRequestObjectResult(
-                            new Alderto.Services.Exceptions.ErrorMessage(400, 0, errorMsg));
-                    };
+                    // options.InvalidModelStateResponseFactory = context =>
+                    // {
+                    //     var (key, value) = context.ModelState.First(s => s.Value.Errors.Count > 0);
+                    //     var errorMsg = (string.IsNullOrWhiteSpace(key) ? "" : $"{key}: ") +
+                    //                    value.Errors[0].ErrorMessage;
+                    //     return new BadRequestObjectResult(new ValidationDomainException(errorMsg));
+                    // };
                 })
                 .AddJsonOptions(options =>
                 {
@@ -200,16 +192,13 @@ namespace Alderto.Web
 
             // === <Bot> ===
             // Add discord socket client
-            services.AddDiscordSocketClient(Configuration["DiscordAPI:BotToken"],
-                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
-
-            // Add command handling services
-            services.AddCommandService(serviceConfig =>
-            {
-                serviceConfig.DefaultRunMode = RunMode.Sync;
-                serviceConfig.IgnoreExtraArgs = true;
-            });
-            services.AddCommandHandler();
+            services.AddDiscordBot(Configuration["DiscordAPI:BotToken"],
+                cfg => { cfg.LogLevel = LogSeverity.Debug; },
+                cfg =>
+                {
+                    cfg.DefaultRunMode = RunMode.Sync;
+                    cfg.IgnoreExtraArgs = true;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -245,47 +234,49 @@ namespace Alderto.Web
                     }
                     catch (Exception e)
                     {
-                        // Handle known API Exceptions.
-                        if (e is ApiException apiException)
+                        switch (e)
                         {
-                            context.Response.OnStarting(() =>
-                            {
-                                context.Response.ContentType = "application/json";
-                                context.Response.StatusCode = (apiException.Error.Code / 1000) switch
+                            // Handle known API Exceptions.
+                            case DomainException domainException:
+                                context.Response.OnStarting(() =>
                                 {
-                                    1 => StatusCodes.Status403Forbidden,
-                                    2 => StatusCodes.Status404NotFound,
-                                    3 => StatusCodes.Status400BadRequest,
-                                    _ => throw e
-                                };
+                                    context.Response.ContentType = "application/json";
+                                    context.Response.StatusCode = (int) domainException.ErrorState.StatusCode;
 
-                                return Task.CompletedTask;
-                            });
+                                    return Task.CompletedTask;
+                                });
 
-                            await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(apiException.Error,
-                                    new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
-                        }
-                        else if (e is HttpException discordException)
-                        {
-                            context.Response.OnStarting(() =>
-                            {
-                                context.Response.ContentType = "application/json";
-                                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                                await context.Response.WriteAsync(
+                                    JsonSerializer.Serialize(
+                                        new { domainException.ErrorState, domainException.Message },
+                                        new JsonSerializerOptions
+                                            { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                                break;
 
-                                return Task.CompletedTask;
-                            });
-
-                            await context.Response.WriteAsync(JsonSerializer.Serialize(
-                                discordException.DiscordCode switch
+                            case HttpException discordException:
+                                context.Response.OnStarting(() =>
                                 {
-                                    50001 => ErrorMessages.MissingChannelAccess,
-                                    50013 => ErrorMessages.MissingWritePermissions,
-                                    _ => throw e
-                                }, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                                    context.Response.ContentType = "application/json";
+                                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                                    return Task.CompletedTask;
+                                });
+
+                                await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                                {
+                                    ErrorState = new ErrorState(ErrorStatusCode.BadRequest),
+                                    Message = discordException.DiscordCode switch
+                                    {
+                                        50001 => ErrorMessage.DISCORD_MISSING_PERMISSION_CHANNEL_READ,
+                                        50013 => ErrorMessage.DISCORD_MISSING_PERMISSION_CHANNEL_WRITE,
+                                        _ => throw e
+                                    }
+                                }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                                break;
+
+                            default:
+                                throw;
                         }
-                        else
-                            throw;
                     }
                 });
 
@@ -309,8 +300,9 @@ namespace Alderto.Web
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 
-            await using var applicationDbContext = serviceScope.ServiceProvider.GetService<AldertoDbContext>();
-            var applicationDbContextLogger = serviceScope.ServiceProvider.GetService<ILogger<AldertoDbContext>>();
+            await using var applicationDbContext = serviceScope.ServiceProvider.GetRequiredService<AldertoDbContext>();
+            var applicationDbContextLogger =
+                serviceScope.ServiceProvider.GetRequiredService<ILogger<AldertoDbContext>>();
 
             applicationDbContextLogger.LogInformation("Initializing Application Database...");
             await applicationDbContext.Database.MigrateAsync();
@@ -318,9 +310,9 @@ namespace Alderto.Web
 
 
             await using var persistedGrantDbContext =
-                serviceScope.ServiceProvider.GetService<PersistedGrantDbContext>();
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
             var persistedGrantDbContextLogger =
-                serviceScope.ServiceProvider.GetService<ILogger<PersistedGrantDbContext>>();
+                serviceScope.ServiceProvider.GetRequiredService<ILogger<PersistedGrantDbContext>>();
 
             persistedGrantDbContextLogger.LogInformation("Initializing Auth Database...");
             await persistedGrantDbContext.Database.MigrateAsync();

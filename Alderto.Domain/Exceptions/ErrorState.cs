@@ -13,6 +13,7 @@ namespace Alderto.Domain.Exceptions
     public enum ErrorStatusCode
     {
         BadRequest = 400,
-        Forbidden = 403
+        Forbidden = 403,
+        NotFound = 404,
     }
 }

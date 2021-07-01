@@ -66,14 +66,14 @@ namespace Alderto.Application.Features.Currency.Query
             public async Task<Dto?> Handle(FindByName request, CancellationToken cancellationToken)
             {
                 return await _mapper
-                    .ProjectTo<Dto>(_context.Currencies.Where(c =>
+                    .ProjectTo<Dto>(_context.Currencies.AsQueryable().Where(c =>
                         c.GuildId == request.GuildId && c.Name == request.Name))
                     .SingleOrDefaultAsync(cancellationToken: cancellationToken);
             }
 
             public async Task<IList<Dto>> Handle(List request, CancellationToken cancellationToken)
             {
-                return await _mapper.ProjectTo<Dto>(_context.Currencies.Where(c => c.GuildId == request.GuildId))
+                return await _mapper.ProjectTo<Dto>(_context.Currencies.AsQueryable().Where(c => c.GuildId == request.GuildId))
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

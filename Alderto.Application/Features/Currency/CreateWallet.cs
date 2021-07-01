@@ -2,12 +2,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Alderto.Application.Features.GuildMember;
+using Alderto.Application.Features.Guild;
 using Alderto.Data;
 using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
-using Alderto.Domain.Services;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +42,7 @@ namespace Alderto.Application.Features.Currency
                     cancellationToken: cancellationToken);
 
                 if (currency == null)
-                    throw new BadRequestDomainException($"Currency '{request.CurrencyName}' does not exit");
+                    throw new ValidationDomainException($"Currency '{request.CurrencyName}' does not exit");
 
                 // Make sure member is registered.
                 await _mediator.Send(new RegisterGuildMember.Command(request.GuildId, request.MemberId),
@@ -55,7 +53,7 @@ namespace Alderto.Application.Features.Currency
                     cancellationToken: cancellationToken);
 
                 if (wallet != null)
-                    throw new BadRequestDomainException("Specified wallet already exists");
+                    throw new ValidationDomainException("Specified wallet already exists");
 
                 wallet = new GuildMemberWallet(currency.Id, request.MemberId);
 
