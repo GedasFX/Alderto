@@ -5,12 +5,14 @@ using Alderto.Application.Features.Bank.Dto;
 using Alderto.Application.Features.Bank.Query;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
+using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
+    [RequireGuildMember]
     [Route("guilds/{guildId}/banks/{bankId:int}/items")]
     public class BankItemsController : ApiControllerBase
     {
@@ -38,6 +40,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         }
 
         [HttpPost]
+        [RequireGuildModerator]
         public async Task<GuildBankItem> CreateBankItem(ulong guildId, int bankId,
             CreateBankItem.Command command)
         {
@@ -49,6 +52,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         }
 
         [HttpPatch("{itemId}")]
+        [RequireGuildModerator]
         public async Task<GuildBankItem> EditBankItem(ulong guildId, int bankId, int itemId,
             UpdateBankItem.Command command)
         {
@@ -61,6 +65,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         }
 
         [HttpDelete("{itemId}")]
+        [RequireGuildModerator]
         public async Task<GuildBankItem> RemoveBankItem(ulong guildId, int bankId, int itemId)
         {
             return await _mediator.Send(new DeleteBankItem.Command(guildId, User.GetId(), itemId));

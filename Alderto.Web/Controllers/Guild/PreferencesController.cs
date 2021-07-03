@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Alderto.Application.Features.GuildConfiguration;
 using Alderto.Domain.Services;
+using Alderto.Web.Attributes;
 using MediatR;
 
 namespace Alderto.Web.Controllers.Guild
 {
+    [RequireGuildMember]
     [Route("guilds/{guildId}/preferences")]
     public class PreferencesController : ApiControllerBase
     {
@@ -34,6 +36,7 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpPatch]
+        [RequireGuildAdmin]
         public async Task<ActionResult> UpdateGuildPreferencesAsync(ulong guildId, GuildPreferencesInputModel model)
         {
             // Ensure user has admin rights 

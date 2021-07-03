@@ -4,12 +4,14 @@ using Alderto.Application.Features.ManagedMessage;
 using Alderto.Application.Features.ManagedMessage.Dto;
 using Alderto.Application.Features.ManagedMessage.Query;
 using Alderto.Data.Models;
+using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild
 {
+    [RequireGuildMember]
     [Route("guilds/{guildId}/messages")]
     public class MessagesController : ApiControllerBase
     {
@@ -33,12 +35,10 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpPost]
+        [RequireGuildAdmin]
         public async Task<GuildManagedMessage> CreateMessage(ulong guildId,
             CreateMessage.Command command)
         {
-            // if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-            //     throw new UserNotGuildAdminException();
-
             command.GuildId = guildId;
             command.MemberId = User.GetId();
 
@@ -46,12 +46,10 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpPatch("{messageId}")]
+        [RequireGuildModerator]
         public async Task<GuildManagedMessage> EditMessage(ulong guildId, ulong messageId,
             UpdateMessage.Command command)
         {
-            // if (message.ModeratorRoleId != null && !await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-            //     throw new UserNotGuildAdminException();
-
             command.GuildId = guildId;
             command.MemberId = User.GetId();
             command.MessageId = messageId;
@@ -60,11 +58,9 @@ namespace Alderto.Web.Controllers.Guild
         }
 
         [HttpDelete("{messageId}")]
+        [RequireGuildAdmin]
         public async Task<GuildManagedMessage> RemoveMessage(ulong guildId, ulong messageId)
         {
-            // if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-            //     throw new UserNotGuildAdminException();
-
             return await _mediator.Send(new DeleteMessage.Command(guildId, User.GetId(), messageId));
         }
     }

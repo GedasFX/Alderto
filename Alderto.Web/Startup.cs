@@ -127,7 +127,7 @@ namespace Alderto.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Handle Service errors
+            app.UseMiddleware<ValidateGuildPermissionsMiddleware>();
             app.UseMiddleware<DomainErrorHandlingMiddleware>();
 
             app.UseEndpoints(p => { p.MapControllers(); });
