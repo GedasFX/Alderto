@@ -14,7 +14,7 @@ namespace Alderto.Application.Features.ManagedMessage
 {
     public static class UpdateMessage
     {
-        public class Command : Request<GuildManagedMessage>
+        public class Command : CommandRequest<GuildManagedMessage>
         {
             [Range(1, ulong.MaxValue)]
             public ulong MessageId { get; set; }

@@ -12,7 +12,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class DeleteCurrency
     {
-        public class Command : Request<Model>
+        public class Command : CommandRequest<Model>
         {
             [MaxLength(50)]
             public string Name { get; }

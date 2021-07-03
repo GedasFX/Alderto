@@ -11,7 +11,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class UpdateCurrency
     {
-        public class Command : Request
+        public class Command : CommandRequest
         {
             [MaxLength(50)]
             public string Name { get; }

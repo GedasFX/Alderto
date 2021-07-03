@@ -9,9 +9,9 @@ using MediatR;
 
 namespace Alderto.Application.Features.ManagedMessage
 {
-    public class CreateMessage
+    public static class CreateMessage
     {
-        public class Command : Request<GuildManagedMessage>
+        public class Command : CommandRequest<GuildManagedMessage>
         {
             [Range(1, int.MaxValue)]
             public ulong ChannelId { get; }

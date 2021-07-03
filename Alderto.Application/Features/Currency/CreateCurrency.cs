@@ -11,7 +11,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class CreateCurrency
     {
-        public class Command : Request<Guid>
+        public class Command : CommandRequest<Guid>
         {
             [MaxLength(50)]
             public string Name { get; }

@@ -11,7 +11,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class LogCurrencyTransaction
     {
-        public class Command : Request
+        public class Command : CommandRequest
         {
             [Required]
             public ulong RecipientId { get; }

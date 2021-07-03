@@ -16,7 +16,7 @@ namespace Alderto.Application.Features.Bank
 {
     public static class UpdateBank
     {
-        public class Command : Request<GuildBank>
+        public class Command : CommandRequest<GuildBank>
         {
             public int? Id { get; set; }
 

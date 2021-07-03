@@ -6,11 +6,10 @@ namespace Alderto.Application.Features.Bank.Dto
     {
         public ICollection<BankItemDto> Contents { get; set; }
 
-        public BankDto(int id, string name, ICollection<BankItemDto> contents) : base(id, name)
+        public BankDto(int id, string name) : base(id, name)
         {
             Id = id;
             Name = name;
-            Contents = contents;
         }
     }
 }

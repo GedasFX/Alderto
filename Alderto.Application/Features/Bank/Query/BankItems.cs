@@ -14,19 +14,18 @@ namespace Alderto.Application.Features.Bank.Query
 {
     public static class BankItems
     {
-        public class List<TOut> : PagedQuery<IList<TOut>>
+        public class List<TOut> : QueryRequest<IList<TOut>>
         {
             [Range(1, int.MaxValue)]
             public int BankId { get; }
 
-            public List(ulong guildId, ulong memberId, int bankId, int page = 1, int take = 30) : base(guildId,
-                memberId, page, take)
+            public List(ulong guildId, ulong memberId, int bankId) : base(guildId, memberId)
             {
                 BankId = bankId;
             }
         }
 
-        public class Find<TOut> : Request<TOut?>
+        public class Find<TOut> : QueryRequest<TOut?>
         {
             [Range(1, int.MaxValue)]
             public int Id { get; }
@@ -70,9 +69,7 @@ namespace Alderto.Application.Features.Bank.Query
                 return await _mapper.ProjectTo<BankItemDto>(_context.GuildBankItems
                         .Include(b => b.GuildBank)
                         .Where(b => b.GuildBank!.GuildId == request.GuildId)
-                        .Where(b => b.GuildBankId == request.BankId)
-                        .Skip(request.Page * request.Take)
-                        .Take(request.Take))
+                        .Where(b => b.GuildBankId == request.BankId))
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

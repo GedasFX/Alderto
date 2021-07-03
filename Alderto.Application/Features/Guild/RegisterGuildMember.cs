@@ -7,7 +7,7 @@ namespace Alderto.Application.Features.Guild
 {
     public static class RegisterGuildMember
     {
-        public class Command : Request
+        public class Command : CommandRequest
         {
             public Command(ulong guildId, ulong memberId) : base(guildId, memberId)
             {

@@ -13,7 +13,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class TransferCurrency
     {
-        public class Command : Request
+        public class Command : CommandRequest
         {
             [Required]
             public IEnumerable<ulong> RecipientIds { get; }

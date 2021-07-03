@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Application.Features.Currency
 {
-    public class GrantTimelyReward
+    public static class GrantTimelyReward
     {
-        public class Command : Request<Model>
+        public class Command : CommandRequest<Model>
         {
             public string CurrencyName { get; set; }
 

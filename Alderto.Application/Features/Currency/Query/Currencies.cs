@@ -13,14 +13,14 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class Currencies
     {
-        public class List : Request<IList<Dto>>
+        public class List : QueryRequest<IList<Dto>>
         {
             public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {
             }
         }
 
-        public class FindByName : Request<Dto?>
+        public class FindByName : QueryRequest<Dto?>
         {
             [MaxLength(50)]
             public string Name { get; }

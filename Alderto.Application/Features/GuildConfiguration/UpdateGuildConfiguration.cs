@@ -8,9 +8,9 @@ using MediatR;
 
 namespace Alderto.Application.Features.GuildConfiguration
 {
-    public class UpdateGuildConfiguration
+    public static class UpdateGuildConfiguration
     {
-        public class Command : Request
+        public class Command : CommandRequest
         {
             [MaxLength(20)]
             public string? Prefix { get; }

@@ -12,7 +12,7 @@ namespace Alderto.Application.Features.Discord.Query
 {
     public static class Roles
     {
-        public class List<TOut> : Request<IList<TOut>>
+        public class List<TOut> : QueryRequest<IList<TOut>>
         {
             public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {

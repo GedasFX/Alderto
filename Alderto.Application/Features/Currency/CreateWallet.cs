@@ -13,7 +13,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class CreateWallet
     {
-        public class Command : Request<Guid>
+        public class Command : CommandRequest<Guid>
         {
             [MaxLength(50)]
             public string CurrencyName { get; }

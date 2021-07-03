@@ -12,7 +12,7 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class Wallets
     {
-        public class FindByName : Request<Model>
+        public class FindByName : QueryRequest<Model>
         {
             [MaxLength(50)]
             public string Name { get; }

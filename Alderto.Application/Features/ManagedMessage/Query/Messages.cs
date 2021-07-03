@@ -14,15 +14,14 @@ namespace Alderto.Application.Features.ManagedMessage.Query
 {
     public static class Messages
     {
-        public class List<TOut> : PagedQuery<IList<TOut>>
+        public class List<TOut> : QueryRequest<IList<TOut>>
         {
-            public List(ulong guildId, ulong memberId, int page = 1, int take = 25) : base(guildId, memberId, page,
-                take)
+            public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {
             }
         }
 
-        public class Find<TOut> : Request<TOut?>
+        public class Find<TOut> : QueryRequest<TOut?>
         {
             [Range(1, ulong.MaxValue)]
             public ulong Id { get; }
@@ -58,9 +57,7 @@ namespace Alderto.Application.Features.ManagedMessage.Query
                 CancellationToken cancellationToken)
             {
                 return await _mapper.ProjectTo<ManagedMessageDto>(_context.GuildManagedMessages.AsQueryable()
-                        .Where(b => b.GuildId == request.GuildId)
-                        .Skip(request.Page * request.Take)
-                        .Take(request.Take))
+                        .Where(b => b.GuildId == request.GuildId))
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

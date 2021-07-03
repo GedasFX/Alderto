@@ -21,6 +21,10 @@ namespace Alderto.Application.Behaviors
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
+            // Skip creating a transaction if request is not of a command
+            if (request is not CommandRequest<TResponse>)
+                return await next();
+
             // Skip creating a transaction if one is already in place
             if (_context.Database.CurrentTransaction != null)
                 return await next();

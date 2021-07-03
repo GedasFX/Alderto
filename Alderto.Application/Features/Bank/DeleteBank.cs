@@ -16,7 +16,7 @@ namespace Alderto.Application.Features.Bank
 {
     public static class DeleteBank
     {
-        public class Command : Request<GuildBank>
+        public class Command : CommandRequest<GuildBank>
         {
             public int? Id { get; }
 

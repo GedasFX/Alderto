@@ -12,7 +12,7 @@ namespace Alderto.Application.Features.Bank
 {
     public static class CreateBank
     {
-        public class Command : Request<GuildBank>
+        public class Command : CommandRequest<GuildBank>
         {
             [MaxLength(32), Required]
             public string Name { get; }

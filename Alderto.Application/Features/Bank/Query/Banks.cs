@@ -14,14 +14,14 @@ namespace Alderto.Application.Features.Bank.Query
 {
     public static class Banks
     {
-        public class List<TOut> : PagedQuery<IList<TOut>>
+        public class List<TOut> : QueryRequest<IList<TOut>>
         {
-            public List(ulong guildId, ulong memberId, int page = 1, int take = 30) : base(guildId, memberId, page, take)
+            public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {
             }
         }
 
-        public class Find<TOut> : Request<TOut?>
+        public class Find<TOut> : QueryRequest<TOut?>
         {
             public int? Id { get; }
 
@@ -40,7 +40,8 @@ namespace Alderto.Application.Features.Bank.Query
         }
 
         public class QueryHandler : IRequestHandler<Find<BankDto>, BankDto?>,
-            IRequestHandler<List<BankBriefDto>, IList<BankBriefDto>>
+            IRequestHandler<List<BankBriefDto>, IList<BankBriefDto>>,
+            IRequestHandler<List<BankDto>, IList<BankDto>>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -74,9 +75,15 @@ namespace Alderto.Application.Features.Bank.Query
                 CancellationToken cancellationToken)
             {
                 return await _mapper.ProjectTo<BankBriefDto>(_context.GuildBanks.AsQueryable()
-                        .Where(b => b.GuildId == request.GuildId)
-                        .Skip(request.Page * request.Take)
-                        .Take(request.Take))
+                        .Where(b => b.GuildId == request.GuildId))
+                    .ToListAsync(cancellationToken: cancellationToken);
+            }
+
+            public async Task<IList<BankDto>> Handle(List<BankDto> request, CancellationToken cancellationToken)
+            {
+                return await _mapper.ProjectTo<BankDto>(_context.GuildBanks.AsQueryable()
+                        .Include(b => b.Contents)
+                        .Where(b => b.GuildId == request.GuildId))
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

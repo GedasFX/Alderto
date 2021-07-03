@@ -11,19 +11,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Application.Features.Currency.Query
 {
-    public class CurrencyTransactions
+    public static class CurrencyTransactions
     {
-        public class List : Request<Dto>
+        public class List : PagedQueryRequest<Dto>
         {
             public string CurrencyName { get; }
 
-            [Range(1, Int32.MaxValue)]
-            public int Page { get; }
-
-            public List(ulong guildId, ulong memberId, string currencyName, int page = 1) : base(guildId, memberId)
+            public List(ulong guildId, ulong memberId, string currencyName, int page = 1, int take = 25)
+                : base(guildId, memberId, page, take)
             {
                 CurrencyName = currencyName;
-                Page = page;
             }
         }
 

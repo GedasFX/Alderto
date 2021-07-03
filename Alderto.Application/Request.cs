@@ -3,25 +3,7 @@ using MediatR;
 
 namespace Alderto.Application
 {
-    public abstract class Request : RequestBase, IRequest
-    {
-        protected Request(ulong guildId, ulong memberId)
-        {
-            GuildId = guildId;
-            MemberId = memberId;
-        }
-    }
-
-    public abstract class Request<TOut> : RequestBase, IRequest<TOut>
-    {
-        protected Request(ulong guildId, ulong memberId)
-        {
-            GuildId = guildId;
-            MemberId = memberId;
-        }
-    }
-
-    public abstract class RequestBase
+    public abstract class Request<TOut> : IRequest<TOut>
     {
         /// <summary>
         /// Guild Id. If set to 0, means the request was outside of guild scope.
@@ -34,5 +16,11 @@ namespace Alderto.Application
         /// </summary>
         [Required]
         public ulong MemberId { get; set; }
+
+        protected Request(ulong guildId, ulong memberId)
+        {
+            GuildId = guildId;
+            MemberId = memberId;
+        }
     }
 }

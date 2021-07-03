@@ -15,7 +15,7 @@ namespace Alderto.Application.Features.Bank
 {
     public static class CreateBankItem
     {
-        public class Command : Request<GuildBankItem>
+        public class Command : CommandRequest<GuildBankItem>
         {
             [Range(1, int.MaxValue)]
             public int BankId { get; set; }

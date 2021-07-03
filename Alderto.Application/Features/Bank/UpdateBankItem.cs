@@ -16,7 +16,7 @@ namespace Alderto.Application.Features.Bank
 {
     public static class UpdateBankItem
     {
-        public class Command : Request<GuildBankItem>
+        public class Command : CommandRequest<GuildBankItem>
         {
             [Range(1, int.MaxValue, ErrorMessage = "Invalid item id")]
             public int Id { get; set; }

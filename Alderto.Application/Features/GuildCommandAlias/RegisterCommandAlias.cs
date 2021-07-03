@@ -9,7 +9,7 @@ namespace Alderto.Application.Features.GuildCommandAlias
 {
     public static class RegisterCommandAlias
     {
-        public class RhCommand : Request
+        public class RhCommand : CommandRequest
         {
             [MaxLength(50)]
             public string Alias { get; }
