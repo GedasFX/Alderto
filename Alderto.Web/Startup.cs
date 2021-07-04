@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Alderto.Application;
 using Alderto.Bot;
@@ -84,12 +84,15 @@ namespace Alderto.Web
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    using var httpClient = new HttpClient();
+                    var jwk = httpClient.GetStringAsync(Configuration["OAuth:PkiUri"]).Result;
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = false,
                         ValidateIssuer = false,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new JsonWebKey(File.ReadAllText("pki.jwk"))
+                        IssuerSigningKey = new JsonWebKey(jwk)
                     };
                 });
 
@@ -115,7 +118,7 @@ namespace Alderto.Web
         public static void Configure(IApplicationBuilder app, CommandHandler cmdHandler)
         {
             // Make sure the database is up to date
-            Task.Run(() => UpdateDatabase(app));
+            Task.Run(() => UpdateDatabaseAsync(app));
 
             // Start the bot.
             Task.Run(cmdHandler.StartAsync);
@@ -133,7 +136,7 @@ namespace Alderto.Web
             app.UseEndpoints(p => { p.MapControllers(); });
         }
 
-        private static async Task UpdateDatabase(IApplicationBuilder app)
+        private static async Task UpdateDatabaseAsync(IApplicationBuilder app)
         {
             using var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
