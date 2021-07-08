@@ -38,6 +38,11 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -143,6 +148,21 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -224,6 +244,17 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null,
+            IEnumerable<ulong> includeRoleIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -240,6 +271,11 @@ namespace Alderto.Tests.MockedEntities
         }
 
         public Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -270,6 +306,7 @@ namespace Alderto.Tests.MockedEntities
         public string Name { get; set; }
         public int AFKTimeout { get; set; }
         public bool IsEmbeddable { get; set; }
+        public bool IsWidgetEnabled { get; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
         public MfaLevel MfaLevel { get; set; }
         public VerificationLevel VerificationLevel { get; set; }
@@ -278,11 +315,16 @@ namespace Alderto.Tests.MockedEntities
         public string IconUrl { get; set; }
         public string SplashId { get; set; }
         public string SplashUrl { get; set; }
+        public string DiscoverySplashId { get; }
+        public string DiscoverySplashUrl { get; }
         public bool Available { get; set; }
         public ulong? AFKChannelId { get; set; }
         public ulong DefaultChannelId { get; set; }
         public ulong? EmbedChannelId { get; set; }
+        public ulong? WidgetChannelId { get; }
         public ulong? SystemChannelId { get; set; }
+        public ulong? RulesChannelId { get; }
+        public ulong? PublicUpdatesChannelId { get; }
         public ulong OwnerId { get; set; }
         public ulong? ApplicationId { get; set; }
         public string VoiceRegionId { get; set; }
@@ -305,6 +347,11 @@ namespace Alderto.Tests.MockedEntities
         public string Description => throw new NotImplementedException();
 
         public int PremiumSubscriptionCount => throw new NotImplementedException();
+        public int? MaxPresences { get; }
+        public int? MaxMembers { get; }
+        public int? MaxVideoChannelUsers { get; }
+        public int? ApproximateMemberCount { get; }
+        public int? ApproximatePresenceCount { get; }
 
         public string PreferredLocale => throw new NotImplementedException();
 

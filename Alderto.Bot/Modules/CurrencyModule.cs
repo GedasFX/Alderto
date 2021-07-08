@@ -1,153 +1,231 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Currency;
+using Alderto.Application.Features.Currency.Query;
 using Alderto.Bot.Extensions;
-using Alderto.Bot.Preconditions;
-using Alderto.Services;
+using Alderto.Domain.Services;
 using Discord;
 using Discord.Commands;
+using MediatR;
 
 namespace Alderto.Bot.Modules
 {
+    [Group("currency")]
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IGuildMemberManager _guildMemberManager;
-        private readonly IGuildPreferencesProvider _guildPreferences;
-        private readonly ICurrencyManager _currencyManager;
+        private readonly IMediator _mediator;
+        private readonly IGuildSetupService _setupService;
 
-        public CurrencyModule(
-            IGuildMemberManager guildMemberManager,
-            IGuildPreferencesProvider guildPreferences,
-            ICurrencyManager currencyManager)
+        public CurrencyModule(IMediator mediator, IGuildSetupService setupService)
         {
-            _guildMemberManager = guildMemberManager;
-            _guildPreferences = guildPreferences;
-            _currencyManager = currencyManager;
+            _mediator = mediator;
+            _setupService = setupService;
         }
 
-        [Command("Give")]
-        [Summary("Gives an amount of points to the listed users")]
-        [RequireRole("Admin")]
-        public async Task GiveAsync(
-            [Summary("Amount of points to give")] int qty,
-            [Summary("Users to give points to")] params IGuildUser[] users)
+        [Command("list"), Priority(1)]
+        public async Task ListAsync()
         {
-            // This is for giving, not taking
-            if (qty <= 0)
+            if (Context.User is not IGuildUser author)
+                return;
+
+            var list = await _mediator.Send(new Currencies.List(author.GuildId, author.Id));
+            var fields = list.Select(c =>
             {
-                await this.ReplyErrorEmbedAsync("Quantity must be greater than 0.");
+                var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
+                    ? $"✅ Timely grants {c.TimelyAmount} {c.Symbol} every {TimeSpan.FromSeconds((int) c.TimelyInterval):g}"
+                    : "❌ Timely is disabled";
+                return ($"[{c.Name}] {c.Symbol}",
+                    $"{c.Description}```{timelyString}```");
+            });
+
+            await this.ReplyEmbedAsync($"List of currencies in {author.Guild.Name}", extra: b =>
+            {
+                foreach (var (name, value) in fields)
+                {
+                    b.AddField(name, value);
+                }
+            });
+        }
+
+        [Command]
+        public async Task GetAsync(string currencyName)
+        {
+            if (Context.User is not IGuildUser author)
+                return;
+
+            var currency = await _mediator.Send(new Currencies.FindByName(author.GuildId, author.Id, currencyName));
+
+            if (currency == null)
+            {
+                await this.ReplyErrorEmbedAsync("Currency not found");
                 return;
             }
 
-            if (users.Length == 0)
-            {
-                await this.ReplyErrorEmbedAsync("At least one user must be specified.");
-                return;
-            }
+            var timelyString = currency.TimelyAmount > 0 && currency.TimelyInterval > 0
+                ? $"✅ Timely grants {currency.TimelyAmount} {currency.Symbol} every {TimeSpan.FromSeconds((int) currency.TimelyInterval):g}"
+                : "❌ Timely is disabled";
 
-            var reply = await ModifyAsyncExec(qty, users);
-
-            await ReplyAsync(embed: reply);
+            await this.ReplyEmbedAsync($"List of currencies in {author.Guild.Name}",
+                extra: b =>
+                {
+                    b.AddField($"[{currency.Name}] {currency.Symbol}", $"{currency.Description}```{timelyString}```");
+                });
         }
 
-        [Command("Take")]
-        [Summary("Takes an amount of points from the listed users")]
-        [RequireRole("Admin")]
-        public async Task TakeAsync(
-            [Summary("Amount of points to take")] int qty,
-            [Summary("Users to take points from")] params IGuildUser[] users)
+        [Command, Priority(1)]
+        public async Task HandleAsync(
+            [Summary("")] string currencyName,
+            [Summary("")] string action,
+            params string[] tokens)
         {
-            // This is for taking, not giving
-            if (qty <= 0)
-            {
-                await this.ReplyErrorEmbedAsync("Quantity must be greater than 0.");
+            if (Context.User is not IGuildUser author)
                 return;
-            }
 
-            if (users.Length == 0)
+            action = action.ToLowerInvariant();
+            switch (action)
             {
-                await this.ReplyErrorEmbedAsync("At least one user must be specified.");
-                return;
+                case "get":
+                case "info":
+                case "inspect":
+                    await GetAsync(currencyName);
+                    return;
+
+                case "give":
+                case "send":
+                case "award":
+                    await TransferCurrency(currencyName, action, tokens, author);
+                    return;
+
+                case "$":
+                case "check":
+                    await CheckCurrency(currencyName, tokens, author);
+                    return;
+
+                case "timely":
+                    await Timely(currencyName, author);
+                    return;
+
+                case "history":
+                case "logs":
+                    await Logs(currencyName, tokens, author);
+                    return;
             }
-
-            var reply = await ModifyAsyncExec(-qty, users);
-
-            await ReplyAsync(embed: reply);
         }
 
-        private async Task<Embed> ModifyAsyncExec(int qty, IEnumerable<IGuildUser> guildUsers)
+        private async Task Logs(string currencyName, IReadOnlyList<string> tokens, IGuildUser author)
         {
-            var author = (IGuildUser)Context.Message.Author;
-            var currencySymbol = (await _guildPreferences.GetPreferencesAsync(author.GuildId)).CurrencySymbol;
-            var reply = new EmbedBuilder()
-                .WithDefault(embedColor: EmbedColor.Success, author: author);
+            if (tokens.Count == 0 || !MentionUtils.TryParseUser(tokens[0], out var memberId))
+                throw new EntryPointNotFoundException("Mention the user to view logs of");
 
-            var no = 1;
-            foreach (var user in guildUsers)
+            if (!(tokens.Count > 1 && int.TryParse(tokens[1], out var pageNo)))
+                pageNo = 1;
+
+            pageNo -= 1;
+
+            var logs = await _mediator.Send(new CurrencyTransactions.List(author.GuildId, memberId,
+                currencyName, pageNo));
+
+            (string, string, string) GetSymbols(CurrencyTransactions.Dto.TransactionEntry t)
             {
-                var member = (await _guildMemberManager.GetGuildMemberAsync(user))!;
-                await _currencyManager.ModifyPointsAsync(member, qty);
+                if (t.IsAward)
+                {
+                    if (t.SenderId == t.RecipientId)
+                        return ("⏰", "👌", MentionUtils.MentionUser(t.RecipientId));
 
-                // Format a nice output.
-                reply.AddField($"No. {no++}:", $"{user.Mention}: {member.CurrencyCount - qty} -> {member.CurrencyCount} {currencySymbol}");
+                    if (t.SenderId == memberId)
+                        return ("🎁", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+                    if (t.RecipientId == memberId)
+                        return ("🏆", "👈", MentionUtils.MentionUser(t.SenderId));
+                }
+
+                if (t.SenderId == memberId)
+                    return ("📉", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+                if (t.RecipientId == memberId)
+                    return ("📈", "👈", MentionUtils.MentionUser(t.SenderId));
+
+                // Should never happen
+                return ("❓", "❓", MentionUtils.MentionUser(memberId));
             }
 
-            return reply.Build();
-        }
-
-        [Command("$")]
-        [Summary("Checks the amount of points a given user has.")]
-        public async Task CheckAsync(
-            [Summary("Person to check. If no user was provided, checks personal points.")] IGuildUser? user = null)
-        {
-            if (user == null)
-                user = (IGuildUser)Context.Message.Author;
-
-            var currencySymbol = (await _guildPreferences.GetPreferencesAsync(user.GuildId)).CurrencySymbol;
-            var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user))!;
-
-            await this.ReplyEmbedAsync($"{user.Mention} has {dbUser.CurrencyCount} {currencySymbol}");
-        }
-
-        [Command("Timely"), Alias("Moon")]
-        [Summary("Grants a timely currency reward.")]
-        public async Task Timely()
-        {
-            var user = (IGuildUser)Context.User;
-            var dbUser = (await _guildMemberManager.GetGuildMemberAsync(user.GuildId, user.Id))!;
-
-            var preferences = await _guildPreferences.GetPreferencesAsync(user.GuildId);
-            var timelyCooldown = preferences.TimelyCooldown;
-            var currencySymbol = preferences.CurrencySymbol;
-            var timelyAmount = preferences.TimelyRewardQuantity;
-
-            var timeRemaining = await _currencyManager.GrantTimelyRewardAsync(dbUser, timelyAmount, timelyCooldown);
-
-            // If null - points were given out. Otherwise its time remaining until next claim.
-            if (timeRemaining != null)
+            var fields = logs.Transactions.Select(t =>
             {
-                await this.ReplyErrorEmbedAsync($"{user.Mention} will be able to claim more {currencySymbol} in **{timeRemaining}**.");
-                return;
-            }
+                var date = $"{t.Date:dd MMM yyy HH\\:mm\\:ss}";
+                var (symbol, direction, otherParty) = GetSymbols(t);
+                return (date, $"{symbol} **{t.Amount}** {logs.Symbol} {direction} {otherParty}");
+            });
 
-            // Points were given out.
-            await this.ReplySuccessEmbedAsync(($"{user.Mention} was given {timelyAmount} {currencySymbol}. New total: **{dbUser.CurrencyCount}**."));
+            await this.ReplyEmbedAsync($"Showing results {20 * pageNo + 1}-{20 * (pageNo + 1)}",
+                $"Transaction history for currency '{logs.Name}'", extra: b =>
+                {
+                    foreach (var (name, value) in fields)
+                    {
+                        b.AddField(name, value, true);
+                    }
+                });
         }
 
-        [Command("top")]
-        public async Task Top(int page = 1)
+        private async Task Timely(string currencyName, IGuildUser author)
         {
-            if (page < 1)
-            {
-                await this.ReplyErrorEmbedAsync("Selected page must be positive.");
-                return;
-            }
+            var gtrResult =
+                await _mediator.Send(new GrantTimelyReward.Command(author.GuildId, author.Id, currencyName));
 
-            var topN = await _currencyManager.GetRichestUsersAsync(Context.Guild.Id, 50, (page - 1) * 50);
+            var nextClaim = gtrResult.NextClaim.Days > 0
+                ? $"{gtrResult.NextClaim:d}d {gtrResult.NextClaim:hh\\:mm\\:ss}"
+                : $"{gtrResult.NextClaim:hh\\:mm\\:ss}";
 
-            var res = topN.Aggregate(new StringBuilder(), (c, n) => c.Append($"<@{n.MemberId}>: {n.CurrencyCount}\n"));
-            await this.ReplyEmbedAsync(res.ToString());
+            if (gtrResult.Success)
+                await this.ReplySuccessEmbedAsync(
+                    $"{author.Mention} has received {gtrResult.ReceivedAmount} {gtrResult.CurrencySymbol}!\nCan claim again in **{nextClaim}**");
+            else
+                await this.ReplyErrorEmbedAsync(
+                    $"{author.Mention} will be able to claim more {gtrResult.CurrencySymbol} in **{nextClaim}**.");
+        }
+
+        private async Task CheckCurrency(string currencyName, IReadOnlyList<string> tokens, IGuildUser author)
+        {
+            if (!(tokens.Count > 0 && MentionUtils.TryParseUser(tokens[0], out var memberId)))
+                memberId = author.Id;
+
+            var wallet = await _mediator.Send(new Wallets.FindByName(author.GuildId, memberId, currencyName));
+
+            await this.ReplyEmbedAsync(
+                $"{MentionUtils.MentionUser(memberId)} has {wallet.Amount} {wallet.CurrencySymbol}");
+        }
+
+        private async Task TransferCurrency(string currencyName, string action, string[] tokens, IGuildUser author)
+        {
+            if (tokens.Length < 2)
+                throw new ValidationException($"Amount to send and recipients are required");
+
+            if (!int.TryParse(tokens[0], out var amount))
+                throw new ValidationException($"Expected amount to transfer. Found '{tokens[0]}'");
+
+            if (action != "award" && amount <= 0)
+                throw new ValidationException("Amount to send must be positive ;)");
+
+            if (action == "award")
+                if (!author.GuildPermissions.Administrator)
+                {
+                    var setup = await _setupService.GetGuildSetupAsync(author.GuildId);
+                    if (setup.Configuration.ModeratorRoleId == null ||
+                        author.RoleIds.Contains((ulong) setup.Configuration.ModeratorRoleId))
+                        throw new ValidationException("Only admins are allowed to award currency");
+                }
+
+            await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id,
+                tokens[1..].Select(t =>
+                    MentionUtils.TryParseUser(t, out var id)
+                        ? id
+                        : throw new ValidationException($"Expected discord mention. Found '{t}'")
+                ), currencyName, amount, action == "award"));
+
+            await this.ReplySuccessEmbedAsync(
+                $"Successfully sent {amount} to {string.Join(", ", tokens[1..])}");
         }
     }
 }

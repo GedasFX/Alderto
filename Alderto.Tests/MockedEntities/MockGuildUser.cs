@@ -23,6 +23,7 @@ namespace Alderto.Tests.MockedEntities
         public bool IsWebhook { get; set; }
 
         public string Username { get; set; }
+        public UserProperties? PublicFlags { get; }
 
         public DateTimeOffset CreatedAt { get; set; }
 
@@ -57,7 +58,17 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +78,17 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -83,10 +104,12 @@ namespace Alderto.Tests.MockedEntities
         public IGuild Guild { get; set; }
         public ulong GuildId { get; set; }
         public IReadOnlyCollection<ulong> RoleIds { get; set; }
+        public bool? IsPending { get; }
 
         public DateTimeOffset? PremiumSince => throw new NotImplementedException();
 
         public IImmutableSet<ClientType> ActiveClients => throw new NotImplementedException();
+        public IImmutableList<IActivity> Activities { get; }
 
         public bool IsStreaming => throw new NotImplementedException();
     }

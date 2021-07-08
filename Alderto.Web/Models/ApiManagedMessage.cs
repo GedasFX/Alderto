@@ -16,7 +16,10 @@ namespace Alderto.Web.Models
         [StringLength(2000)]
         public string? Content { get; set; }
 
-        private ApiManagedMessage() { }
+        public ApiManagedMessage()
+        {
+        }
+
         public ApiManagedMessage(GuildManagedMessage message)
         {
             Id = message.MessageId;

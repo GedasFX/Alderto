@@ -115,6 +115,11 @@ namespace Alderto.Tests.MockedEntities
             throw new System.NotImplementedException();
         }
 
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public ConnectionState ConnectionState { get; set; }
         public ISelfUser CurrentUser { get; set; }
         public TokenType TokenType { get; set; }

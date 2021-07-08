@@ -9,7 +9,7 @@ namespace Alderto.Web.Models.Bank
     {
         public int Id { get; set; }
         public ulong GuildId { get; set; }
-        
+
         [Required]
         public string Name { get; set; }
 
@@ -18,9 +18,10 @@ namespace Alderto.Web.Models.Bank
 
         public IEnumerable<ApiGuildBankItem>? Contents { get; set; }
 
-#nullable disable
-        private ApiGuildBank() { }
-#nullable restore
+        public ApiGuildBank()
+        {
+        }
+
         public ApiGuildBank(GuildBank guildBank)
         {
             Id = guildBank.Id;

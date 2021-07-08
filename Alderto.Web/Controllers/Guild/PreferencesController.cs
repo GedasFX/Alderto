@@ -1,67 +1,49 @@
-﻿using Alderto.Data.Models;
-using Alderto.Services;
-using Alderto.Services.Exceptions;
+﻿using System;
+using Alderto.Data.Models;
 using Alderto.Web.Extensions;
 using Alderto.Web.Models.GuildPreferences;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Alderto.Application.Features.GuildConfiguration;
+using Alderto.Domain.Services;
+using Alderto.Web.Attributes;
+using MediatR;
 
 namespace Alderto.Web.Controllers.Guild
 {
+    [RequireGuildMember]
     [Route("guilds/{guildId}/preferences")]
     public class PreferencesController : ApiControllerBase
     {
-        private readonly IGuildPreferencesProvider _guildPreferencesProvider;
+        private readonly IGuildSetupService _guildSetupService;
+        private readonly IMediator _mediator;
         private readonly IDiscordClient _client;
 
-        public PreferencesController(IGuildPreferencesProvider guildPreferencesProvider, IDiscordClient discordClient)
+        public PreferencesController(IGuildSetupService guildSetupService, IMediator mediator,
+            IDiscordClient discordClient)
         {
-            _guildPreferencesProvider = guildPreferencesProvider;
+            _guildSetupService = guildSetupService;
+            _mediator = mediator;
             _client = discordClient;
         }
 
         [HttpGet]
         public async Task<ActionResult<GuildConfiguration>> GetGuildPreferencesAsync(ulong guildId)
         {
-            var preferences = await _guildPreferencesProvider.GetPreferencesAsync(guildId);
-            return preferences;
+            var preferences = await _guildSetupService.GetGuildSetupAsync(guildId);
+            return preferences.Configuration;
         }
 
         [HttpPatch]
+        [RequireGuildAdmin]
         public async Task<ActionResult> UpdateGuildPreferencesAsync(ulong guildId, GuildPreferencesInputModel model)
         {
             // Ensure user has admin rights 
             if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+                throw new NotImplementedException();
 
-            await _guildPreferencesProvider.UpdatePreferencesAsync(guildId, preferences =>
-            {
-                if (model.Prefix != null)
-                {
-                    preferences.Prefix = model.Prefix;
-                }
-
-                if (model.TimelyRewardQuantity != null)
-                {
-                    preferences.TimelyRewardQuantity = (int)model.TimelyRewardQuantity;
-                }
-
-                if (model.TimelyCooldown != null)
-                {
-                    preferences.TimelyCooldown = (int)model.TimelyCooldown;
-                }
-
-                if (model.CurrencySymbol != null)
-                {
-                    preferences.CurrencySymbol = model.CurrencySymbol;
-                }
-
-                if (model.AcceptedMemberRoleId != null)
-                {
-                    preferences.AcceptedMemberRoleId = (ulong)model.AcceptedMemberRoleId;
-                }
-            });
+            await _mediator.Send(new UpdateGuildConfiguration.Command(guildId, User.GetId(), model.Prefix));
 
             return Ok();
         }

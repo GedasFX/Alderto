@@ -1,30 +1,29 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Alderto.Services.Exceptions;
-using Alderto.Web.Models;
-using Discord;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Alderto.Application.Features.Discord.Dto;
+using Alderto.Web.Attributes;
+using Alderto.Web.Extensions;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alderto.Web.Controllers.Guild
 {
+    [RequireGuildMember]
     [Route("guilds/{guildId}/roles")]
     public class RolesController : ApiControllerBase
     {
-        private readonly IDiscordClient _client;
+        private readonly IMapper _mapper;
 
-        public RolesController(IDiscordClient client)
+        public RolesController(IMapper mapper)
         {
-            _client = client;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListRoles(ulong guildId)
+        public IEnumerable<DiscordRoleDto> ListRoles(ulong guildId)
         {
-            var guild = await _client.GetGuildAsync(guildId);
-            if (guild == null)
-                throw new GuildNotFoundException();
-
-            return Content(guild.Roles.Select(c => new ApiGuildRole(c.Id, c.Name)));
+            return HttpContext.GetDiscordGuild().Roles
+                .Select(r => _mapper.Map<DiscordRoleDto>(r));
         }
     }
 }

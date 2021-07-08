@@ -9,25 +9,37 @@ namespace Alderto.Bot.Extensions
         /// Adds frequently used elements <see cref="EmbedBuilder.WithDescription"/>, <see cref="EmbedBuilder.WithColor"/> to the embed builder.
         /// </summary>
         /// <param name="builder">Builder to configure.</param>
+        /// <param name="title"></param>
         /// <param name="description"><see cref="EmbedBuilder.WithDescription"/></param>
         /// <param name="embedColor"><see cref="Color"/> to be displayed to the right side of the embed.
         /// Use class <see cref="EmbedColor"/> properties, or a custom color. Defaults to <see cref="EmbedColor.Info"/></param>
         /// <param name="author"><see cref="EmbedBuilder.WithAuthor"/></param>
+        /// <param name="timestamp"></param>
         /// <param name="extra">Additional actions to apply to the builder.</param>
         /// <returns><see cref="builder"/></returns>
         public static EmbedBuilder WithDefault(this EmbedBuilder builder,
             string? description = null,
+            string? title = null,
             Color embedColor = default,
             IUser? author = null,
+            DateTimeOffset? timestamp = null,
             Action<EmbedBuilder>? extra = null)
         {
             builder.WithColor(embedColor == default ? EmbedColor.Info : embedColor);
+
+            if (title != null)
+                builder.WithTitle(title);
 
             if (description != null)
                 builder.WithDescription(description);
 
             if (author != null)
                 builder.WithFooter($"Req. by {author.Username}#{author.Discriminator}");
+
+            if (timestamp != null)
+                builder.WithTimestamp((DateTimeOffset) timestamp);
+            else
+                builder.WithCurrentTimestamp();
 
             // Apply additional changes.
             extra?.Invoke(builder);
