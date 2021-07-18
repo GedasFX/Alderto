@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Alderto.Domain.Exceptions;
@@ -42,6 +43,25 @@ namespace Alderto.Web.Middleware
                         await context.Response.WriteAsync(
                             JsonSerializer.Serialize(
                                 new { domainException.ErrorState, domainException.Message },
+                                _jsonSerializerOptions));
+                        break;
+
+                    case ValidationException validationException:
+                        context.Response.OnStarting(() =>
+                        {
+                            context.Response.ContentType = "application/json";
+                            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                            return Task.CompletedTask;
+                        });
+
+                        await context.Response.WriteAsync(
+                            JsonSerializer.Serialize(
+                                new
+                                {
+                                    ErrorState = new ErrorState(ErrorStatusCode.BadRequest),
+                                    validationException.Message
+                                },
                                 _jsonSerializerOptions));
                         break;
 

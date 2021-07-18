@@ -1,16 +1,14 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Bank.Events;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
-using Discord;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Alderto.Application.Features.Bank
 {
@@ -53,14 +51,14 @@ namespace Alderto.Application.Features.Bank
         public class CommandHandler : IRequestHandler<Command, GuildBankItem>
         {
             private readonly AldertoDbContext _context;
+            private readonly IMediator _mediator;
             private readonly IMapper _mapper;
-            private readonly ILogger<CommandHandler> _logger;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper, ILogger<CommandHandler> logger)
+            public CommandHandler(AldertoDbContext context, IMediator mediator, IMapper mapper)
             {
                 _context = context;
+                _mediator = mediator;
                 _mapper = mapper;
-                _logger = logger;
             }
 
             private IQueryable<GuildBankItem> GuildBankItems(ulong guildId, int bankId) =>
@@ -76,12 +74,9 @@ namespace Alderto.Application.Features.Bank
                     throw new ValidationDomainException(ErrorMessage.BANK_ITEM_NOT_FOUND);
 
                 _mapper.Map(request, item);
-
                 await _context.SaveChangesAsync(cancellationToken);
 
-                _logger.Log(LogLevel.Information, 420,
-                    "{GuildId}__{User} has updated an item '{ItemName}' in the '{BankName}' bank", request.GuildId,
-                    MentionUtils.MentionUser(request.MemberId), item.Name, item.GuildBank!.Name);
+                await _mediator.Publish(new BankItemUpdatedEvent(item, request), cancellationToken);
 
                 return item;
             }

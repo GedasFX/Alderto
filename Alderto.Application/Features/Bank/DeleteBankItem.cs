@@ -1,16 +1,13 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Bank.Events;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
-using AutoMapper;
-using Discord;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Alderto.Application.Features.Bank
 {
@@ -22,10 +19,11 @@ namespace Alderto.Application.Features.Bank
             public int Id { get; }
 
             [Range(1, int.MaxValue)]
-            public int BankId { get; set; }
+            public int BankId { get; }
 
-            public Command(ulong guildId, ulong memberId, int id) : base(guildId, memberId)
+            public Command(ulong guildId, ulong memberId, int bankId, int id) : base(guildId, memberId)
             {
+                BankId = bankId;
                 Id = id;
             }
         }
@@ -33,14 +31,12 @@ namespace Alderto.Application.Features.Bank
         public class CommandHandler : IRequestHandler<Command, GuildBankItem>
         {
             private readonly AldertoDbContext _context;
-            private readonly IMapper _mapper;
-            private readonly ILogger<CommandHandler> _logger;
+            private readonly IMediator _mediator;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper, ILogger<CommandHandler> logger)
+            public CommandHandler(AldertoDbContext context, IMediator mediator)
             {
                 _context = context;
-                _mapper = mapper;
-                _logger = logger;
+                _mediator = mediator;
             }
 
             private IQueryable<GuildBankItem> GuildBankItems(ulong guildId, int bankId) =>
@@ -58,8 +54,7 @@ namespace Alderto.Application.Features.Bank
                 _context.GuildBankItems.Remove(item);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                _logger.Log(LogLevel.Information, 420, "{GuildId}__{User} has removed '{ItemName}' the '{BankName}' bank",
-                    request.GuildId, MentionUtils.MentionUser(request.MemberId), item.Name, item.GuildBank!.Name);
+                await _mediator.Publish(new BankItemDeletedEvent(item, request), cancellationToken);
 
                 return item;
             }

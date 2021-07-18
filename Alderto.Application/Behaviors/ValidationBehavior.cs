@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +11,10 @@ namespace Alderto.Application.Behaviors
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            var validationResult = new List<ValidationResult>();
-            if (Validator.TryValidateObject(request, new ValidationContext(request), validationResult, true))
-            {
-                return await next();
-            }
+            // Throws ValidationException if is invalid.
+            Validator.ValidateObject(request, new ValidationContext(request), true);
 
-            throw new Exception(validationResult[0].ErrorMessage);
+            return await next();
         }
     }
 }

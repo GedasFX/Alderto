@@ -56,8 +56,6 @@ namespace Alderto.Web.Middleware
             if (!ulong.TryParse(context.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                 return StatusCodes.Status401Unauthorized;
 
-            if (!context.User.FindFirstValue("gid").Split(',').Contains(gid))
-                return StatusCodes.Status403Forbidden;
 
             // This can only happen if bot was removed from guild and token is still valid.
             var guild = await _discord.GetGuildAsync(guildId);

@@ -6,7 +6,7 @@ using Alderto.Web.Extensions;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Alderto.Web.Controllers.Guild
+namespace Alderto.Web.Controllers.Discord
 {
     [RequireGuildMember]
     [Route("guilds/{guildId}/roles")]

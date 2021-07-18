@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,6 +19,7 @@ namespace Alderto.Bot
         public static IServiceCollection AddDiscordBot(this IServiceCollection services, string botToken,
             Action<DiscordSocketConfig>? clientConfig = null, Action<CommandServiceConfig>? commandConfig = null) =>
             services
+                .AddMediatR(typeof(DependencyInjection))
                 .AddDiscordSocketClient(botToken, clientConfig)
                 .AddCommandService(commandConfig)
                 .AddCommandHandler();
@@ -119,16 +122,5 @@ namespace Alderto.Bot
         /// <param name="services"><see cref="IServiceCollection"/> to add to.</param>
         public static IServiceCollection AddCommandHandler(this IServiceCollection services) =>
             services.AddSingleton<CommandHandler>();
-
-        /// <summary>
-        /// Adds the discord logger.
-        /// </summary>
-        public static ILoggingBuilder AddDiscordLogger(
-            this ILoggingBuilder builder)
-        {
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DiscordLoggerProvider>());
-
-            return builder;
-        }
     }
 }

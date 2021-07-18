@@ -1,15 +1,12 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Bank.Events;
 using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
-using AutoMapper;
-using Discord;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Alderto.Application.Features.Bank
 {
@@ -30,7 +27,7 @@ namespace Alderto.Application.Features.Bank
             [MaxLength(280)]
             public string? Description { get; set; }
 
-            [MaxLength(140)]
+            [MaxLength(140), Url]
             public string? ImageUrl { get; set; }
 
             public Command(ulong guildId, ulong memberId, int bankId, string name, double value = 0,
@@ -49,16 +46,11 @@ namespace Alderto.Application.Features.Bank
         {
             private readonly AldertoDbContext _context;
             private readonly IMediator _mediator;
-            private readonly IMapper _mapper;
-            private readonly ILogger<CommandHandler> _logger;
 
-            public CommandHandler(AldertoDbContext context, IMediator mediator, IMapper mapper,
-                ILogger<CommandHandler> logger)
+            public CommandHandler(AldertoDbContext context, IMediator mediator)
             {
                 _context = context;
                 _mediator = mediator;
-                _mapper = mapper;
-                _logger = logger;
             }
 
             public async Task<GuildBankItem> Handle(Command request, CancellationToken cancellationToken)
@@ -75,14 +67,13 @@ namespace Alderto.Application.Features.Bank
                     Quantity = request.Quantity,
                     Value = request.Value,
                     GuildBankId = request.BankId,
+                    ImageUrl = request.ImageUrl,
                 };
 
                 _context.GuildBankItems.Add(item);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                _logger.Log(LogLevel.Information, 420,
-                    "{GuildId}__{User} has created an item '{ItemName}' in the '{BankName}' bank", request.GuildId,
-                    MentionUtils.MentionUser(request.MemberId), item.Name, bank.Name);
+                await _mediator.Publish(new BankItemCreatedEvent(item, request), cancellationToken);
 
                 return item;
             }

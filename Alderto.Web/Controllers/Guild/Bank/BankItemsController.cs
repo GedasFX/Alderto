@@ -7,6 +7,7 @@ using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
 using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,10 +18,12 @@ namespace Alderto.Web.Controllers.Guild.Bank
     public class BankItemsController : ApiControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public BankItemsController(IMediator mediator)
+        public BankItemsController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -41,19 +44,19 @@ namespace Alderto.Web.Controllers.Guild.Bank
 
         [HttpPost]
         [RequireGuildModerator]
-        public async Task<GuildBankItem> CreateBankItem(ulong guildId, int bankId,
+        public async Task<BankItemDto> CreateBankItem(ulong guildId, int bankId,
             CreateBankItem.Command command)
         {
             command.GuildId = guildId;
             command.MemberId = User.GetId();
             command.BankId = bankId;
 
-            return await _mediator.Send(command);
+            return _mapper.Map<BankItemDto>(await _mediator.Send(command));
         }
 
-        [HttpPatch("{itemId}")]
+        [HttpPatch("{itemId:int}")]
         [RequireGuildModerator]
-        public async Task<GuildBankItem> EditBankItem(ulong guildId, int bankId, int itemId,
+        public async Task<BankItemDto> EditBankItem(ulong guildId, int bankId, int itemId,
             UpdateBankItem.Command command)
         {
             command.GuildId = guildId;
@@ -61,14 +64,14 @@ namespace Alderto.Web.Controllers.Guild.Bank
             command.BankId = bankId;
             command.Id = itemId;
 
-            return await _mediator.Send(command);
+            return _mapper.Map<BankItemDto>(await _mediator.Send(command));
         }
 
-        [HttpDelete("{itemId}")]
+        [HttpDelete("{itemId:int}")]
         [RequireGuildModerator]
         public async Task<GuildBankItem> RemoveBankItem(ulong guildId, int bankId, int itemId)
         {
-            return await _mediator.Send(new DeleteBankItem.Command(guildId, User.GetId(), itemId));
+            return await _mediator.Send(new DeleteBankItem.Command(guildId, User.GetId(), bankId, itemId));
         }
     }
 }

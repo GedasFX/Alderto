@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Alderto.Application;
 using Alderto.Bot;
@@ -19,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Alderto.Web
 {
@@ -84,16 +82,8 @@ namespace Alderto.Web
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    using var httpClient = new HttpClient();
-                    var jwk = httpClient.GetStringAsync(Configuration["OAuth:PkiUri"]).Result;
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = false,
-                        ValidateIssuer = false,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new JsonWebKey(jwk)
-                    };
+                    options.Authority = Configuration["Oidc:Authority"];
+                    options.Audience = "api";
                 });
 
             services.AddAuthorization(o =>
@@ -102,6 +92,12 @@ namespace Alderto.Web
                     .RequireAuthenticatedUser()
                     .Build();
             });
+
+            services.AddCors(o => o.AddDefaultPolicy(p => p
+                .WithOrigins(Configuration["Cors:Origins"].Split(";"))
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()));
 
             // Mvc
             services
@@ -126,6 +122,8 @@ namespace Alderto.Web
             app.UseForwardedHeaders();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
