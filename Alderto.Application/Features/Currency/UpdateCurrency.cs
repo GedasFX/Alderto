@@ -1,4 +1,6 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
@@ -11,10 +13,12 @@ namespace Alderto.Application.Features.Currency
 {
     public static class UpdateCurrency
     {
-        public class Command : CommandRequest
+        public class Command : CommandRequest<Data.Models.Currency>
         {
+            public Guid? Id { get; set; }
+
             [MaxLength(50)]
-            public string Name { get; }
+            public string? Name { get; }
 
             [MaxLength(2000)]
             public string? Description { get; init; }
@@ -26,6 +30,12 @@ namespace Alderto.Application.Features.Currency
             public int? TimelyAmount { get; init; }
             public bool? IsLocked { get; set; }
 
+            public Command(ulong guildId, ulong memberId, Guid id)
+                : base(guildId, memberId)
+            {
+                Id = id;
+            }
+
             public Command(ulong guildId, ulong memberId, string name)
                 : base(guildId, memberId)
             {
@@ -33,7 +43,7 @@ namespace Alderto.Application.Features.Currency
             }
         }
 
-        public class CommandHandler : IRequestHandler<Command>
+        public class CommandHandler : IRequestHandler<Command, Data.Models.Currency>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -44,21 +54,24 @@ namespace Alderto.Application.Features.Currency
                 _mapper = mapper;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Data.Models.Currency> Handle(Command request, CancellationToken cancellationToken)
             {
-                var currency =
-                    await _context.Currencies.SingleOrDefaultAsync(c =>
-                        c.GuildId == request.GuildId && c.Name == request.Name, cancellationToken: cancellationToken);
+                var query = _context.Currencies.AsQueryable().Where(c => c.GuildId == request.GuildId);
+                query = request.Id != null
+                    ? query.Where(c => c.Id == request.Id)
+                    : query.Where(c => c.Name == request.Name);
+
+                var currency = await query.SingleOrDefaultAsync(cancellationToken);
 
                 if (currency == null)
-                    throw new ValidationDomainException($"Currency with the name '{request.Name}' was not found");
+                    throw new ValidationDomainException(ErrorMessage.CURRENCY_NOT_FOUND);
 
                 _mapper.Map(request, currency);
                 _context.Currencies.Update(currency);
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return Unit.Value;
+                return currency;
             }
         }
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Currency.Dto;
 using Alderto.Data;
 using AutoMapper;
 using MediatR;
@@ -13,46 +14,33 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class Currencies
     {
-        public class List : QueryRequest<IList<Dto>>
+        public class List<TOut> : QueryRequest<IList<TOut>>
         {
             public List(ulong guildId, ulong memberId) : base(guildId, memberId)
             {
             }
         }
 
-        public class FindByName : QueryRequest<Dto?>
+        public class Find<TOut> : QueryRequest<TOut?>
         {
+            public Guid? Id { get; }
+
             [MaxLength(50)]
-            public string Name { get; }
+            public string? Name { get; }
 
-            public FindByName(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
-            {
-                Name = name;
-            }
-        }
-
-        public class Dto
-        {
-            public Guid Id { get; set; }
-            public string Symbol { get; set; }
-            public string Name { get; set; }
-            public string? Description { get; set; }
-            public int? TimelyInterval { get; set; }
-            public int TimelyAmount { get; set; }
-            public bool IsLocked { get; set; }
-
-            public Dto(Guid id, string symbol, string name, string? description, int? timelyInterval, int timelyAmount)
+            public Find(ulong guildId, ulong memberId, Guid id) : base(guildId, memberId)
             {
                 Id = id;
-                Symbol = symbol;
+            }
+
+            public Find(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
+            {
                 Name = name;
-                Description = description;
-                TimelyInterval = timelyInterval;
-                TimelyAmount = timelyAmount;
             }
         }
 
-        public class QueryHandler : IRequestHandler<FindByName, Dto?>, IRequestHandler<List, IList<Dto>>
+        public class QueryHandler : IRequestHandler<Find<CurrencyDto>, CurrencyDto?>,
+            IRequestHandler<List<CurrencyDto>, IList<CurrencyDto>>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -63,18 +51,28 @@ namespace Alderto.Application.Features.Currency.Query
                 _mapper = mapper;
             }
 
-            public async Task<Dto?> Handle(FindByName request, CancellationToken cancellationToken)
+            public async Task<CurrencyDto?> Handle(Find<CurrencyDto> request, CancellationToken cancellationToken)
             {
+                var query = _context.Currencies.AsQueryable()
+                    .Where(c => c.GuildId == request.GuildId);
+
+                query = request.Id != null
+                    ? query.Where(c => c.Id == request.Id)
+                    : query.Where(c => c.Name == request.Name);
+
                 return await _mapper
-                    .ProjectTo<Dto>(_context.Currencies.AsQueryable().Where(c =>
-                        c.GuildId == request.GuildId && c.Name == request.Name))
-                    .SingleOrDefaultAsync(cancellationToken: cancellationToken);
+                    .ProjectTo<CurrencyDto>(query)
+                    .SingleOrDefaultAsync(cancellationToken);
             }
 
-            public async Task<IList<Dto>> Handle(List request, CancellationToken cancellationToken)
+            public async Task<IList<CurrencyDto>> Handle(List<CurrencyDto> request, CancellationToken cancellationToken)
             {
-                return await _mapper.ProjectTo<Dto>(_context.Currencies.AsQueryable().Where(c => c.GuildId == request.GuildId))
-                    .ToListAsync(cancellationToken: cancellationToken);
+                var query = _context.Currencies.AsQueryable()
+                    .Where(c => c.GuildId == request.GuildId);
+
+                return await _mapper
+                    .ProjectTo<CurrencyDto>(query)
+                    .ToListAsync(cancellationToken);
             }
         }
 
@@ -82,7 +80,7 @@ namespace Alderto.Application.Features.Currency.Query
         {
             public MapperProfile()
             {
-                CreateMap<Data.Models.Currency, Dto>();
+                CreateMap<Data.Models.Currency, CurrencyDto>();
             }
         }
     }

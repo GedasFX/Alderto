@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Data;
@@ -12,10 +13,19 @@ namespace Alderto.Application.Features.Currency
 {
     public static class DeleteCurrency
     {
-        public class Command : CommandRequest<Model>
+        public class Command : CommandRequest<Data.Models.Currency>
         {
+            public Guid? Id { get; set; }
+
             [MaxLength(50)]
-            public string Name { get; }
+            public string? Name { get; }
+
+            public Command(ulong guildId, ulong memberId, Guid id)
+                : base(guildId, memberId)
+            {
+                Id = id;
+            }
+
 
             public Command(ulong guildId, ulong memberId, string name) : base(guildId, memberId)
             {
@@ -23,28 +33,7 @@ namespace Alderto.Application.Features.Currency
             }
         }
 
-        public class Model
-        {
-            public Guid Id { get; }
-            public ulong GuildId { get; }
-            public string Symbol { get; }
-            public string Name { get; }
-            public string? Description { get; }
-            public int? TimelyInterval { get; }
-
-            public Model(Guid id, ulong guildId, string symbol, string name, string? description,
-                int? timelyInterval)
-            {
-                Id = id;
-                GuildId = guildId;
-                Symbol = symbol;
-                Name = name;
-                Description = description;
-                TimelyInterval = timelyInterval;
-            }
-        }
-
-        public class CommandHandler : IRequestHandler<Command, Model>
+        public class CommandHandler : IRequestHandler<Command, Data.Models.Currency>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -55,11 +44,14 @@ namespace Alderto.Application.Features.Currency
                 _mapper = mapper;
             }
 
-            public async Task<Model> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Data.Models.Currency> Handle(Command request, CancellationToken cancellationToken)
             {
-                var currency =
-                    await _context.Currencies.SingleOrDefaultAsync(c =>
-                        c.GuildId == request.GuildId && c.Name == request.Name, cancellationToken: cancellationToken);
+                var query = _context.Currencies.AsQueryable().Where(c => c.GuildId == request.GuildId);
+                query = request.Id != null
+                    ? query.Where(c => c.Id == request.Id)
+                    : query.Where(c => c.Name == request.Name);
+
+                var currency = await query.SingleOrDefaultAsync(cancellationToken);
 
                 if (currency == null)
                     throw new ValidationDomainException($"Currency with the name '{request.Name}' was not found");
@@ -67,15 +59,7 @@ namespace Alderto.Application.Features.Currency
                 _context.Currencies.Remove(currency);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return _mapper.Map<Model>(currency);
-            }
-        }
-
-        public class MapperProfile : Profile
-        {
-            public MapperProfile()
-            {
-                CreateMap<Data.Models.Currency, Model>();
+                return currency;
             }
         }
     }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
+using Alderto.Application.Features.Currency.Dto;
 using Alderto.Application.Features.Currency.Query;
 using Alderto.Bot.Extensions;
 using Alderto.Domain.Services;
@@ -31,7 +32,7 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var list = await _mediator.Send(new Currencies.List(author.GuildId, author.Id));
+            var list = await _mediator.Send(new Currencies.List<CurrencyDto>(author.GuildId, author.Id));
             var fields = list.Select(c =>
             {
                 var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
@@ -56,7 +57,8 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var currency = await _mediator.Send(new Currencies.FindByName(author.GuildId, author.Id, currencyName));
+            var currency =
+                await _mediator.Send(new Currencies.Find<CurrencyDto>(author.GuildId, author.Id, currencyName));
 
             if (currency == null)
             {
@@ -125,10 +127,11 @@ namespace Alderto.Bot.Modules
 
             pageNo -= 1;
 
-            var logs = await _mediator.Send(new CurrencyTransactions.List(author.GuildId, memberId,
+            var logs = await _mediator.Send(new CurrencyTransactions.List<CurrencyTransactionDto>(author.GuildId,
+                memberId,
                 currencyName, pageNo));
 
-            (string, string, string) GetSymbols(CurrencyTransactions.Dto.TransactionEntry t)
+            (string, string, string) GetSymbols(CurrencyTransactionDto.TransactionEntry t)
             {
                 if (t.IsAward)
                 {

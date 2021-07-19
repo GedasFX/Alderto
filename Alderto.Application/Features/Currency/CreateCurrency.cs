@@ -11,7 +11,7 @@ namespace Alderto.Application.Features.Currency
 {
     public static class CreateCurrency
     {
-        public class Command : CommandRequest<Guid>
+        public class Command : CommandRequest<Data.Models.Currency>
         {
             [MaxLength(50)]
             public string Name { get; }
@@ -29,7 +29,7 @@ namespace Alderto.Application.Features.Currency
             }
         }
 
-        public class CommandHandler : IRequestHandler<Command, Guid>
+        public class CommandHandler : IRequestHandler<Command, Data.Models.Currency>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -43,7 +43,7 @@ namespace Alderto.Application.Features.Currency
                 _memberService = memberService;
             }
 
-            public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Data.Models.Currency> Handle(Command request, CancellationToken cancellationToken)
             {
                 var currency = _mapper.Map<Data.Models.Currency>(request);
 
@@ -51,7 +51,7 @@ namespace Alderto.Application.Features.Currency
                 _context.Currencies.Add(currency);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return currency.Id;
+                return currency;
             }
         }
 

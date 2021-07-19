@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Features.Currency.Dto;
 using Alderto.Data;
 using AutoMapper;
 using MediatR;
@@ -13,8 +14,9 @@ namespace Alderto.Application.Features.Currency.Query
 {
     public static class CurrencyTransactions
     {
-        public class List : PagedQueryRequest<Dto>
+        public class List<TOut> : PagedQueryRequest<TOut>
         {
+            public Guid? Id { get; }
             public string CurrencyName { get; }
 
             public List(ulong guildId, ulong memberId, string currencyName, int page = 1, int take = 25)
@@ -22,25 +24,15 @@ namespace Alderto.Application.Features.Currency.Query
             {
                 CurrencyName = currencyName;
             }
-        }
 
-        public class Dto
-        {
-            public string Name { get; set; }
-            public string Symbol { get; set; }
-            public IList<TransactionEntry> Transactions { get; set; }
-
-            public class TransactionEntry
+            public List(ulong guildId, ulong memberId, Guid id, int page = 1, int take = 25)
+                : base(guildId, memberId, page, take)
             {
-                public DateTimeOffset Date { get; set; }
-                public ulong SenderId { get; set; }
-                public ulong RecipientId { get; set; }
-                public int Amount { get; set; }
-                public bool IsAward { get; set; }
+                Id = id;
             }
         }
 
-        public class QueryHandler : IRequestHandler<List, Dto>
+        public class QueryHandler : IRequestHandler<List<CurrencyTransactionDto>, CurrencyTransactionDto>
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
@@ -51,13 +43,14 @@ namespace Alderto.Application.Features.Currency.Query
                 _mapper = mapper;
             }
 
-            public async Task<Dto> Handle(List request, CancellationToken cancellationToken)
+            public async Task<CurrencyTransactionDto> Handle(List<CurrencyTransactionDto> request,
+                CancellationToken cancellationToken)
             {
                 return await _mapper
-                    .ProjectTo<Dto>(_context.Currencies.AsQueryable()
+                    .ProjectTo<CurrencyTransactionDto>(_context.Currencies.AsQueryable()
                             .Where(c => c.GuildId == request.GuildId && c.Name == request.CurrencyName),
-                        new { memberId = request.MemberId, page = request.Page })
-                    .SingleOrDefaultAsync(cancellationToken: cancellationToken);
+                        new { memberId = request.MemberId, page = request.Page, take = request.Take })
+                    .SingleOrDefaultAsync(cancellationToken);
             }
         }
 
@@ -65,15 +58,18 @@ namespace Alderto.Application.Features.Currency.Query
         {
             public MapperProfile()
             {
-                ulong memberId = 0;
-                int page = 0;
-                CreateMap<Data.Models.Currency, Dto>()
-                    .ForMember(d => d.Transactions, o => o.MapFrom(s => s.Transactions.Where(t =>
+                const ulong memberId = 0;
+                const int page = 0;
+                const int take = 0;
+
+                CreateMap<Data.Models.Currency, CurrencyTransactionDto>()
+                    .ForMember(d => d.Transactions, o => o.MapFrom(s => s.Transactions!
+                        .Where(t =>
                             t.SenderId == memberId || t.RecipientId == memberId)
                         .OrderByDescending(t => t.Date)
-                        .Skip(page * 20)
-                        .Take(20)));
-                CreateMap<Data.Models.CurrencyTransaction, Dto.TransactionEntry>();
+                        .Skip(page * take)
+                        .Take(take)));
+                CreateMap<Data.Models.CurrencyTransaction, CurrencyTransactionDto.TransactionEntry>();
             }
         }
     }
