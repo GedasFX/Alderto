@@ -101,7 +101,7 @@ namespace Alderto.Web
 
             // Mvc
             services
-                .AddMvcCore()
+                .AddMvcCore(o => { o.Filters.Add<ExceptionHandlerFilter>(); })
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -129,7 +129,6 @@ namespace Alderto.Web
             app.UseAuthorization();
 
             app.UseMiddleware<ValidateGuildPermissionsMiddleware>();
-            app.UseMiddleware<DomainErrorHandlingMiddleware>();
 
             app.UseEndpoints(p => { p.MapControllers(); });
         }
