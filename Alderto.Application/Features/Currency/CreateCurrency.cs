@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,14 +12,20 @@ namespace Alderto.Application.Features.Currency
     {
         public class Command : CommandRequest<Data.Models.Currency>
         {
-            [MaxLength(50)]
+            [Required, MinLength(1), MaxLength(50)]
             public string Name { get; }
 
             [MaxLength(2000)]
             public string? Description { get; init; }
 
-            [MaxLength(50), MinLength(1), Required]
+            [Required, MinLength(1), MaxLength(50)]
             public string Symbol { get; }
+
+            public bool IsLocked { get; set; } = true;
+            public bool TimelyEnabled { get; set; } = false;
+
+            public int? TimelyInterval { get; set; }
+            public int? TimelyAmount { get; set; }
 
             public Command(ulong guildId, ulong memberId, string name, string symbol) : base(guildId, memberId)
             {

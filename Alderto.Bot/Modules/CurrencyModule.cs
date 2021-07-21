@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
 using Alderto.Application.Features.Currency.Dto;
 using Alderto.Application.Features.Currency.Query;
+using Alderto.Application.Repository;
 using Alderto.Bot.Extensions;
+using Alderto.Data;
+using Alderto.Domain.Exceptions;
 using Alderto.Domain.Services;
 using Discord;
 using Discord.Commands;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Bot.Modules
 {
@@ -18,11 +22,16 @@ namespace Alderto.Bot.Modules
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
         private readonly IMediator _mediator;
+        private readonly CurrencyRepository _currencyRepository;
+        private readonly CurrencyTransactionRepository _currencyTransactionRepository;
         private readonly IGuildSetupService _setupService;
 
-        public CurrencyModule(IMediator mediator, IGuildSetupService setupService)
+        public CurrencyModule(IMediator mediator, CurrencyRepository currencyRepository,
+            CurrencyTransactionRepository currencyTransactionRepository, IGuildSetupService setupService)
         {
             _mediator = mediator;
+            _currencyRepository = currencyRepository;
+            _currencyTransactionRepository = currencyTransactionRepository;
             _setupService = setupService;
         }
 
@@ -32,11 +41,11 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var list = await _mediator.Send(new Currencies.List<CurrencyDto>(author.GuildId, author.Id));
+            var list = await _currencyRepository.List<CurrencyDto>(author.GuildId).ToListAsync();
             var fields = list.Select(c =>
             {
                 var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
-                    ? $"✅ Timely grants {c.TimelyAmount} {c.Symbol} every {TimeSpan.FromSeconds((int) c.TimelyInterval):g}"
+                    ? $"✅ Timely grants {c.TimelyAmount} {c.Symbol} every {TimeSpan.FromSeconds(c.TimelyInterval):g}"
                     : "❌ Timely is disabled";
                 return ($"[{c.Name}] {c.Symbol}",
                     $"{c.Description}```{timelyString}```");
@@ -57,8 +66,8 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var currency =
-                await _mediator.Send(new Currencies.Find<CurrencyDto>(author.GuildId, author.Id, currencyName));
+            var currency = await _currencyRepository.Find<CurrencyDto>(author.GuildId, currencyName)
+                .SingleOrDefaultAsync();
 
             if (currency == null)
             {
@@ -67,7 +76,7 @@ namespace Alderto.Bot.Modules
             }
 
             var timelyString = currency.TimelyAmount > 0 && currency.TimelyInterval > 0
-                ? $"✅ Timely grants {currency.TimelyAmount} {currency.Symbol} every {TimeSpan.FromSeconds((int) currency.TimelyInterval):g}"
+                ? $"✅ Timely grants {currency.TimelyAmount} {currency.Symbol} every {TimeSpan.FromSeconds(currency.TimelyInterval):g}"
                 : "❌ Timely is disabled";
 
             await this.ReplyEmbedAsync($"List of currencies in {author.Guild.Name}",
@@ -127,43 +136,23 @@ namespace Alderto.Bot.Modules
 
             pageNo -= 1;
 
-            var logs = await _mediator.Send(new CurrencyTransactions.List<CurrencyTransactionDto>(author.GuildId,
-                memberId,
-                currencyName, pageNo));
+            var currency = await _currencyRepository.Find<CurrencyNameDto>(author.GuildId, currencyName)
+                .SingleOrDefaultAsync();
+            if (currency == null)
+                throw new EntryPointNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND);
 
-            (string, string, string) GetSymbols(CurrencyTransactionDto.TransactionEntry t)
-            {
-                if (t.IsAward)
-                {
-                    if (t.SenderId == t.RecipientId)
-                        return ("⏰", "👌", MentionUtils.MentionUser(t.RecipientId));
+            var logs = await _currencyTransactionRepository.List<CurrencyTransactionDto>(author.GuildId, currency.Id,
+                author.Id).Page(pageNo, 25).ToListAsync();
 
-                    if (t.SenderId == memberId)
-                        return ("🎁", "👉", MentionUtils.MentionUser(t.RecipientId));
-
-                    if (t.RecipientId == memberId)
-                        return ("🏆", "👈", MentionUtils.MentionUser(t.SenderId));
-                }
-
-                if (t.SenderId == memberId)
-                    return ("📉", "👉", MentionUtils.MentionUser(t.RecipientId));
-
-                if (t.RecipientId == memberId)
-                    return ("📈", "👈", MentionUtils.MentionUser(t.SenderId));
-
-                // Should never happen
-                return ("❓", "❓", MentionUtils.MentionUser(memberId));
-            }
-
-            var fields = logs.Transactions.Select(t =>
+            var fields = logs.Select(t =>
             {
                 var date = $"{t.Date:dd MMM yyy HH\\:mm\\:ss}";
-                var (symbol, direction, otherParty) = GetSymbols(t);
-                return (date, $"{symbol} **{t.Amount}** {logs.Symbol} {direction} {otherParty}");
+                var (symbol, direction, otherParty) = GetLogsSymbols(t, memberId);
+                return (date, $"{symbol} **{t.Amount}** {currency.Symbol} {direction} {otherParty}");
             });
 
             await this.ReplyEmbedAsync($"Showing results {20 * pageNo + 1}-{20 * (pageNo + 1)}",
-                $"Transaction history for currency '{logs.Name}'", extra: b =>
+                $"Transaction history for currency '{currency.Name}'", extra: b =>
                 {
                     foreach (var (name, value) in fields)
                     {
@@ -171,6 +160,31 @@ namespace Alderto.Bot.Modules
                     }
                 });
         }
+
+        private static (string, string, string) GetLogsSymbols(CurrencyTransactionDto t, ulong memberId)
+        {
+            if (t.IsAward)
+            {
+                if (t.SenderId == t.RecipientId)
+                    return ("⏰", "👌", MentionUtils.MentionUser(t.RecipientId));
+
+                if (t.SenderId == memberId)
+                    return ("🎁", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+                if (t.RecipientId == memberId)
+                    return ("🏆", "👈", MentionUtils.MentionUser(t.SenderId));
+            }
+
+            if (t.SenderId == memberId)
+                return ("📉", "👉", MentionUtils.MentionUser(t.RecipientId));
+
+            if (t.RecipientId == memberId)
+                return ("📈", "👈", MentionUtils.MentionUser(t.SenderId));
+
+            // Should never happen
+            return ("❓", "❓", MentionUtils.MentionUser(memberId));
+        }
+
 
         private async Task Timely(string currencyName, IGuildUser author)
         {
@@ -211,14 +225,13 @@ namespace Alderto.Bot.Modules
             if (action != "award" && amount <= 0)
                 throw new ValidationException("Amount to send must be positive ;)");
 
-            if (action == "award")
-                if (!author.GuildPermissions.Administrator)
-                {
-                    var setup = await _setupService.GetGuildSetupAsync(author.GuildId);
-                    if (setup.Configuration.ModeratorRoleId == null ||
-                        author.RoleIds.Contains((ulong) setup.Configuration.ModeratorRoleId))
-                        throw new ValidationException("Only admins are allowed to award currency");
-                }
+            if (action == "award" && !author.GuildPermissions.Administrator)
+            {
+                var setup = await _setupService.GetGuildSetupAsync(author.GuildId);
+                if (setup.Configuration.ModeratorRoleId == null ||
+                    author.RoleIds.Contains((ulong) setup.Configuration.ModeratorRoleId))
+                    throw new ValidationException("Only admins are allowed to award currency");
+            }
 
             await _mediator.Send(new TransferCurrency.Command(author.GuildId, author.Id,
                 tokens[1..].Select(t =>

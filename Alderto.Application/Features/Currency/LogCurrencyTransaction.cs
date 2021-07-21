@@ -13,7 +13,7 @@ namespace Alderto.Application.Features.Currency
     {
         public class Command : CommandRequest
         {
-            [Required]
+            [Required, Range(1, ulong.MaxValue)]
             public ulong RecipientId { get; }
 
             [Required]

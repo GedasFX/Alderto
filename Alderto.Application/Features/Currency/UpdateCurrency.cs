@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alderto.Application.Repository;
 using Alderto.Data;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
@@ -15,31 +15,25 @@ namespace Alderto.Application.Features.Currency
     {
         public class Command : CommandRequest<Data.Models.Currency>
         {
-            public Guid? Id { get; set; }
+            public Guid Id { get; set; }
 
             [MaxLength(50)]
-            public string? Name { get; }
+            public string? Name { get; set; }
 
             [MaxLength(2000)]
-            public string? Description { get; init; }
+            public string? Description { get; set; }
 
             [MaxLength(50), MinLength(1)]
-            public string? Symbol { get; init; }
+            public string? Symbol { get; set; }
 
-            public int? TimelyInterval { get; init; }
-            public int? TimelyAmount { get; init; }
+            public bool? TimelyEnabled { get; set; }
+            public int? TimelyInterval { get; set; }
+            public int? TimelyAmount { get; set; }
             public bool? IsLocked { get; set; }
 
-            public Command(ulong guildId, ulong memberId, Guid id)
-                : base(guildId, memberId)
+            public Command(ulong guildId, ulong memberId, Guid id) : base(guildId, memberId)
             {
                 Id = id;
-            }
-
-            public Command(ulong guildId, ulong memberId, string name)
-                : base(guildId, memberId)
-            {
-                Name = name;
             }
         }
 
@@ -47,28 +41,23 @@ namespace Alderto.Application.Features.Currency
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
+            private readonly CurrencyRepository _currencyRepository;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper)
+            public CommandHandler(AldertoDbContext context, IMapper mapper, CurrencyRepository currencyRepository)
             {
                 _context = context;
                 _mapper = mapper;
+                _currencyRepository = currencyRepository;
             }
 
             public async Task<Data.Models.Currency> Handle(Command request, CancellationToken cancellationToken)
             {
-                var query = _context.Currencies.AsQueryable().Where(c => c.GuildId == request.GuildId);
-                query = request.Id != null
-                    ? query.Where(c => c.Id == request.Id)
-                    : query.Where(c => c.Name == request.Name);
-
-                var currency = await query.SingleOrDefaultAsync(cancellationToken);
-
+                var currency = await _currencyRepository.Find(request.GuildId, request.Id)
+                    .SingleOrDefaultAsync(cancellationToken);
                 if (currency == null)
                     throw new ValidationDomainException(ErrorMessage.CURRENCY_NOT_FOUND);
 
                 _mapper.Map(request, currency);
-                _context.Currencies.Update(currency);
-
                 await _context.SaveChangesAsync(cancellationToken);
 
                 return currency;
@@ -79,11 +68,13 @@ namespace Alderto.Application.Features.Currency
         {
             public MapperProfile()
             {
+                CreateMap<int?, int>().ConvertUsing((s, d) => s ?? d);
+                CreateMap<bool?, bool>().ConvertUsing((s, d) => s ?? d);
+
                 CreateMap<Command, Data.Models.Currency>()
+                    .ForMember(d => d.Id, o => o.Ignore())
                     .ForMember(d => d.TimelyInterval,
-                        o => o.MapFrom(s => s.TimelyInterval > 0 ? s.TimelyInterval : null))
-                    .ForMember(d => d.TimelyAmount,
-                        o => o.MapFrom(s => s.TimelyAmount >= 0 ? s.TimelyAmount : 0))
+                        o => o.MapFrom(s => s.TimelyInterval == null || s.TimelyInterval > 0 ? s.TimelyInterval : 0))
                     .ForAllMembers(o => o.Condition((_, _, m) => m != null));
             }
         }

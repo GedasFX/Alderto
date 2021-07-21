@@ -30,13 +30,15 @@ namespace Alderto.Data.Models
         [MaxLength(2000)]
         public string? Description { get; set; }
 
+
+        public bool TimelyEnabled { get; set; }
+
         /// <summary>
         /// Timely interval.
         /// Period (in seconds), how frequently users are allowed to claim currency.
-        /// If set to null, it means that no user is allowed to claim this currency.
         /// </summary>
         [Range(1, int.MaxValue)]
-        public int? TimelyInterval { get; set; }
+        public int TimelyInterval { get; set; }
 
         /// <summary>
         /// Timely amount.

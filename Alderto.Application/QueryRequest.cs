@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Alderto.Application
 {
@@ -9,7 +11,7 @@ namespace Alderto.Application
         }
     }
 
-    public abstract class PagedQueryRequest<TOut> : QueryRequest<TOut>
+    public abstract class PagedQueryRequest<TOut> : QueryRequest<PagedResponse<TOut>>
     {
         [Range(1, int.MaxValue)]
         public virtual int Page { get; }
@@ -22,6 +24,23 @@ namespace Alderto.Application
         {
             Page = page;
             Take = take;
+        }
+    }
+
+    public class PagedResponse<T>
+    {
+        public int Page { get; set; }
+        public int Count { get; set; }
+        public int Limit { get; set; }
+
+        public ICollection<T> Items { get; set; }
+
+        public PagedResponse(int page, int limit, int count, ICollection<T> items)
+        {
+            Page = page;
+            Count = count;
+            Limit = limit;
+            Items = items;
         }
     }
 }

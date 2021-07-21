@@ -3,7 +3,6 @@ namespace Alderto.Application.Features.Bank.Dto
     public class BankItemDto
     {
         public int Id { get; set; }
-
         public string Name { get; set; }
         public double Value { get; set; }
         public double Quantity { get; set; }

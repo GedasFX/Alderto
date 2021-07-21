@@ -66,11 +66,12 @@ namespace Alderto.Application.Features.Currency
                 }
 
                 // It is intentional that amount is allowed to be negative.
-                if (wallet.Currency!.TimelyInterval == null || wallet.Currency.TimelyAmount == 0)
+                if (!wallet.Currency!.TimelyEnabled ||
+                    wallet.Currency.TimelyAmount == 0 || wallet.Currency.TimelyInterval == 0)
                     throw new ValidationDomainException("This currency does not grant currency on a timely basis");
 
-                var timeRemaining = wallet.TimelyLastClaimed.AddSeconds((int) wallet.Currency.TimelyInterval) -
-                                    DateTimeOffset.UtcNow;
+                var timeRemaining = wallet.TimelyLastClaimed.AddSeconds(
+                    wallet.Currency.TimelyInterval) - DateTimeOffset.UtcNow;
 
                 // If time remaining is positive, that means cooldown hasn't expired yet.
                 if (timeRemaining.Ticks > 0)
@@ -86,7 +87,7 @@ namespace Alderto.Application.Features.Currency
                     new LogCurrencyTransaction.Command(request.GuildId, request.MemberId, wallet.CurrencyId,
                         request.MemberId, wallet.Currency.TimelyAmount, true), cancellationToken);
 
-                return new Model(true, TimeSpan.FromSeconds((int) wallet.Currency.TimelyInterval),
+                return new Model(true, TimeSpan.FromSeconds(wallet.Currency.TimelyInterval),
                     wallet.Currency.Symbol, wallet.Currency.TimelyAmount);
             }
         }
