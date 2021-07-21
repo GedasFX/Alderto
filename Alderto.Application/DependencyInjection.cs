@@ -30,6 +30,7 @@ namespace Alderto.Application
         private static IServiceCollection AddRepositories(this IServiceCollection collection) =>
             collection
                 .AddScoped<CurrencyRepository>()
-                .AddScoped<CurrencyTransactionRepository>();
+                .AddScoped<CurrencyTransactionRepository>()
+                .AddScoped<CurrencyWalletRepository>();
     }
 }

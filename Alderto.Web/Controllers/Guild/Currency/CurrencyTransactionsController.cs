@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Alderto.Application;
 using Alderto.Application.Features.Currency.Dto;
 using Alderto.Application.Repository;
 using Alderto.Data;
