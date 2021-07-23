@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data.Models.GuildBank
 {
@@ -76,5 +78,19 @@ namespace Alderto.Data.Models.GuildBank
         {
             return (GuildBankItem) base.MemberwiseClone();
         }
+    }
+
+    public static class GuildBankItemRepository
+    {
+        public static IQueryable<GuildBankItem> ListItems(
+            this IQueryable<GuildBankItem> query, ulong guildId, int bankId) =>
+            query.Include(q => q.GuildBank)
+                .Where(b => b.GuildBank!.GuildId == guildId)
+                .Where(b => b.GuildBank!.Id == bankId);
+
+        public static IQueryable<GuildBankItem> FindItem(
+            this IQueryable<GuildBankItem> query, ulong guildId, int bankId, int itemId) =>
+            ListItems(query, guildId, bankId)
+                .Where(q => q.Id == itemId);
     }
 }

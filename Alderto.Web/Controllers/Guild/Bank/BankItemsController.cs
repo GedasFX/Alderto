@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Alderto.Application.Features.Bank;
 using Alderto.Application.Features.Bank.Dto;
-using Alderto.Application.Features.Bank.Query;
+using Alderto.Data;
 using Alderto.Data.Models.GuildBank;
 using Alderto.Domain.Exceptions;
 using Alderto.Web.Attributes;
@@ -10,6 +10,7 @@ using Alderto.Web.Extensions;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Web.Controllers.Guild.Bank
 {
@@ -19,27 +20,31 @@ namespace Alderto.Web.Controllers.Guild.Bank
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
+        private readonly AldertoDbContext _context;
 
-        public BankItemsController(IMediator mediator, IMapper mapper)
+        public BankItemsController(IMediator mediator, IMapper mapper, AldertoDbContext context)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<IEnumerable<BankItemDto>> ListBankItems(ulong guildId, int bankId)
         {
-            return await _mediator.Send(new BankItems.List<BankItemDto>(guildId, User.GetId(), bankId));
+            return await _mapper.ProjectTo<BankItemDto>(_context.GuildBankItems.ListItems(guildId, bankId))
+                .ToListAsync();
         }
 
         [HttpGet("{itemId:int}")]
         public async Task<BankItemDto> GetBankItem(ulong guildId, int bankId, int itemId)
         {
-            var bank = await _mediator.Send(new BankItems.Find<BankItemDto>(guildId, User.GetId(), bankId, itemId));
-            if (bank == null)
+            var item = await _mapper.ProjectTo<BankItemDto>(_context.GuildBankItems.FindItem(guildId, bankId, itemId))
+                .SingleOrDefaultAsync();
+            if (item == null)
                 throw new NotFoundDomainException(ErrorMessage.BANK_ITEM_NOT_FOUND);
 
-            return bank;
+            return item;
         }
 
         [HttpPost]

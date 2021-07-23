@@ -1,11 +1,11 @@
-namespace Alderto.Application.Features.Discord.Dto
+namespace Alderto.Web.Models
 {
-    public class DiscordRoleDto
+    public class ApiDiscordRole
     {
         public ulong Id { get; }
         public string Name { get; }
 
-        public DiscordRoleDto(ulong id, string name)
+        public ApiDiscordRole(ulong id, string name)
         {
             Id = id;
             Name = name;

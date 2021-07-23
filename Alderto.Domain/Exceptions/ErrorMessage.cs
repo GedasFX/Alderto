@@ -13,5 +13,7 @@ namespace Alderto.Domain.Exceptions
         public const string DISCORD_MISSING_PERMISSION_CHANNEL_READ = "DISCORD_MISSING_PERMISSION_CHANNEL_READ";
         public const string DISCORD_MISSING_PERMISSION_CHANNEL_WRITE = "DISCORD_MISSING_PERMISSION_CHANNEL_WRITE";
 
+        public const string MANAGED_MESSAGE_NOT_FOUND = "Requested message could not be found";
+
     }
 }

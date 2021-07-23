@@ -13,13 +13,13 @@ namespace Alderto.Web.Controllers.Discord
     public class ChannelsController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<IEnumerable<ApiGuildChannel>> ListChannels(ulong guildId)
+        public async Task<IEnumerable<ApiDiscordChannel>> ListChannels(ulong guildId)
         {
             var guild = HttpContext.GetDiscordGuild();
 
             var channels = await guild.GetTextChannelsAsync();
 
-            return channels.Select(c => new ApiGuildChannel(c.Id, c.Name));
+            return channels.Select(c => new ApiDiscordChannel(c.Id, c.Name));
         }
     }
 }

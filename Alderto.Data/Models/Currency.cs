@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Alderto.Data.Models
 {
@@ -65,5 +66,17 @@ namespace Alderto.Data.Models
             Symbol = symbol;
             Name = name;
         }
+    }
+
+    public static class CurrencyRepository
+    {
+        public static IQueryable<Currency> ListItems(this IQueryable<Currency> query, ulong guildId) =>
+            query.Where(s => s.GuildId == guildId);
+
+        public static IQueryable<Currency> FindItem(this IQueryable<Currency> query, ulong guildId, Guid id) =>
+            ListItems(query, guildId).Where(c => c.Id == id);
+
+        public static IQueryable<Currency> FindItem(this IQueryable<Currency> query, ulong guildId, string name) =>
+            ListItems(query, guildId).Where(c => c.Name == name);
     }
 }

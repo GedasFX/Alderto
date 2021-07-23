@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
 using Alderto.Application.Features.Currency.Dto;
-using Alderto.Application.Repository;
+using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,24 +20,27 @@ namespace Alderto.Web.Controllers.Guild.Currency
     public class CurrenciesController : ApiControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly CurrencyRepository _currencyRepository;
+        private readonly IMapper _mapper;
+        private readonly AldertoDbContext _context;
 
-        public CurrenciesController(IMediator mediator, CurrencyRepository currencyRepository)
+        public CurrenciesController(IMediator mediator, IMapper mapper, AldertoDbContext context)
         {
             _mediator = mediator;
-            _currencyRepository = currencyRepository;
+            _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<IList<CurrencyDto>> ListCurrencies(ulong guildId)
         {
-            return await _currencyRepository.List<CurrencyDto>(guildId).ToListAsync();
+            return await _mapper.ProjectTo<CurrencyDto>(_context.Currencies.ListItems(guildId)).ToListAsync();
         }
 
         [HttpGet("{currencyId:guid}")]
         public async Task<CurrencyDto?> Get(ulong guildId, Guid currencyId)
         {
-            var currency = await _currencyRepository.Find<CurrencyDto>(guildId, currencyId).SingleOrDefaultAsync();
+            var currency = await _mapper.ProjectTo<CurrencyDto>(_context.Currencies.FindItem(guildId, currencyId))
+                .SingleOrDefaultAsync();
             if (currency == null)
                 throw new NotFoundDomainException(ErrorMessage.CURRENCY_NOT_FOUND);
 

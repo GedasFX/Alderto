@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Alderto.Bot
 {
-    public class DiscordApplicationEventLogger :
+    public class ApplicationDiscordLogger :
         INotificationHandler<BankCreatedEvent>,
         INotificationHandler<BankUpdatedEvent>,
         INotificationHandler<BankDeletedEvent>,
@@ -20,7 +20,7 @@ namespace Alderto.Bot
         private readonly IDiscordClient _client;
         private readonly IGuildSetupService _guildSetupService;
 
-        public DiscordApplicationEventLogger(IDiscordClient client, IGuildSetupService guildSetupService)
+        public ApplicationDiscordLogger(IDiscordClient client, IGuildSetupService guildSetupService)
         {
             _client = client;
             _guildSetupService = guildSetupService;

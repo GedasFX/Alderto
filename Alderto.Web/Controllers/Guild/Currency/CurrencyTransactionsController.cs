@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency.Dto;
-using Alderto.Application.Repository;
 using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
 using AutoMapper;
@@ -17,13 +17,12 @@ namespace Alderto.Web.Controllers.Guild.Currency
     public class CurrencyTransactionsController : ApiControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly CurrencyTransactionRepository _currencyTransactionRepository;
+        private readonly AldertoDbContext _context;
 
-        public CurrencyTransactionsController(IMapper mapper,
-            CurrencyTransactionRepository currencyTransactionRepository)
+        public CurrencyTransactionsController(IMapper mapper, AldertoDbContext context)
         {
             _mapper = mapper;
-            _currencyTransactionRepository = currencyTransactionRepository;
+            _context = context;
         }
 
         [RequireGuildMember]
@@ -42,7 +41,7 @@ namespace Alderto.Web.Controllers.Guild.Currency
 
             limit = limit < 50 ? limit : 50;
 
-            var query = _currencyTransactionRepository.List(guild.Id, currencyId, userId);
+            var query = _context.CurrencyTransactions.ListItems(guild.Id, currencyId, userId);
 
             return await _mapper.ProjectTo<CurrencyTransactionDto>(query
                     .OrderByDescending(q => q.Id)

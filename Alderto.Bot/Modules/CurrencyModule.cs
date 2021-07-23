@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
 using Alderto.Application.Features.Currency.Dto;
 using Alderto.Application.Features.Currency.Query;
-using Alderto.Application.Repository;
 using Alderto.Bot.Extensions;
 using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using Alderto.Domain.Services;
+using AutoMapper;
 using Discord;
 using Discord.Commands;
 using MediatR;
@@ -22,16 +23,16 @@ namespace Alderto.Bot.Modules
     public class CurrencyModule : ModuleBase<SocketCommandContext>
     {
         private readonly IMediator _mediator;
-        private readonly CurrencyRepository _currencyRepository;
-        private readonly CurrencyTransactionRepository _currencyTransactionRepository;
+        private readonly IMapper _mapper;
+        private readonly AldertoDbContext _context;
         private readonly IGuildSetupService _setupService;
 
-        public CurrencyModule(IMediator mediator, CurrencyRepository currencyRepository,
-            CurrencyTransactionRepository currencyTransactionRepository, IGuildSetupService setupService)
+        public CurrencyModule(IMediator mediator, IMapper mapper, AldertoDbContext context,
+            IGuildSetupService setupService)
         {
             _mediator = mediator;
-            _currencyRepository = currencyRepository;
-            _currencyTransactionRepository = currencyTransactionRepository;
+            _mapper = mapper;
+            _context = context;
             _setupService = setupService;
         }
 
@@ -41,7 +42,8 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var list = await _currencyRepository.List<CurrencyDto>(author.GuildId).ToListAsync();
+            var list = await _mapper.ProjectTo<CurrencyDto>(
+                _context.Currencies.ListItems(author.GuildId)).ToListAsync();
             var fields = list.Select(c =>
             {
                 var timelyString = c.TimelyAmount > 0 && c.TimelyInterval > 0
@@ -66,8 +68,8 @@ namespace Alderto.Bot.Modules
             if (Context.User is not IGuildUser author)
                 return;
 
-            var currency = await _currencyRepository.Find<CurrencyDto>(author.GuildId, currencyName)
-                .SingleOrDefaultAsync();
+            var currency = await _mapper.ProjectTo<CurrencyDto>(
+                _context.Currencies.FindItem(author.GuildId, currencyName)).SingleOrDefaultAsync();
 
             if (currency == null)
             {
@@ -136,13 +138,14 @@ namespace Alderto.Bot.Modules
 
             pageNo -= 1;
 
-            var currency = await _currencyRepository.Find<CurrencyNameDto>(author.GuildId, currencyName)
-                .SingleOrDefaultAsync();
+            var currency = await _mapper.ProjectTo<CurrencyNameDto>(
+                _context.Currencies.FindItem(author.GuildId, currencyName)).SingleOrDefaultAsync();
             if (currency == null)
                 throw new EntryPointNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND);
 
-            var logs = await _currencyTransactionRepository.List<CurrencyTransactionDto>(author.GuildId, currency.Id,
-                author.Id).Page(pageNo, 25).ToListAsync();
+
+            var logs = await _mapper.ProjectTo<CurrencyTransactionDto>(_context.CurrencyTransactions
+                .ListItems(author.GuildId, currency.Id, author.Id).Page(pageNo, 25)).ToListAsync();
 
             var fields = logs.Select(t =>
             {

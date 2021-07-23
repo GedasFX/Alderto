@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Alderto.Data.Models
 {
@@ -42,5 +43,13 @@ namespace Alderto.Data.Models
             MemberId = memberId;
             Amount = amount;
         }
+    }
+
+    public static class GuildMemberWalletRepository
+    {
+        public static IQueryable<GuildMemberWallet> ListItems(
+            this IQueryable<GuildMemberWallet> query, ulong guildId, Guid currencyId) => query
+            .Where(c => c.Currency!.GuildId == guildId)
+            .Where(c => c.CurrencyId == currencyId);
     }
 }

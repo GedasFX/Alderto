@@ -2,8 +2,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Alderto.Application.Repository;
 using Alderto.Data;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
@@ -41,18 +41,16 @@ namespace Alderto.Application.Features.Currency
         {
             private readonly AldertoDbContext _context;
             private readonly IMapper _mapper;
-            private readonly CurrencyRepository _currencyRepository;
 
-            public CommandHandler(AldertoDbContext context, IMapper mapper, CurrencyRepository currencyRepository)
+            public CommandHandler(AldertoDbContext context, IMapper mapper)
             {
                 _context = context;
                 _mapper = mapper;
-                _currencyRepository = currencyRepository;
             }
 
             public async Task<Data.Models.Currency> Handle(Command request, CancellationToken cancellationToken)
             {
-                var currency = await _currencyRepository.Find(request.GuildId, request.Id)
+                var currency = await _context.Currencies.FindItem(request.GuildId, request.Id)
                     .SingleOrDefaultAsync(cancellationToken);
                 if (currency == null)
                     throw new ValidationDomainException(ErrorMessage.CURRENCY_NOT_FOUND);

@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data.Models
 {
@@ -53,17 +55,26 @@ namespace Alderto.Data.Models
 
         public CurrencyTransaction()
         {
-            
         }
+
         public CurrencyTransaction(Guid currencyId, ulong senderId, ulong recipientId, int amount,
             bool isAward = false)
         {
-            // Date = date != default ? date : DateTimeOffset.Now;
             CurrencyId = currencyId;
             SenderId = senderId;
             RecipientId = recipientId;
             Amount = amount;
             IsAward = isAward;
         }
+    }
+
+    public static class CurrencyTransactionRepository
+    {
+        public static IQueryable<CurrencyTransaction> ListItems(this IQueryable<CurrencyTransaction> query,
+            ulong guildId, Guid currencyId, ulong userId) => query
+            .Include(c => c.Currency)
+            .Where(c => c.Currency!.GuildId == guildId)
+            .Where(c => c.CurrencyId == currencyId)
+            .Where(c => c.SenderId == userId || c.RecipientId == userId);
     }
 }
