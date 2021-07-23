@@ -48,7 +48,7 @@ namespace Alderto.Data
                 .IsUnique();
 
             modelBuilder.Entity<GuildManagedMessage>()
-                .HasKey(m => new { m.GuildId, m.MessageId });
+                .HasKey(m => new { m.GuildId, m.Id });
 
             modelBuilder.Entity<GuildCommandAlias>()
                 .HasKey(c => new { c.GuildId, c.Alias });

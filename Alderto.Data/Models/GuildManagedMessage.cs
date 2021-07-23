@@ -15,7 +15,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Key. Id of discord message this bot is managing.
         /// </summary>
-        public ulong MessageId { get; set; }
+        public ulong Id { get; set; }
 
         /*
          * NOTE: ChannelId is not part of the primary key, and collisions may occur, as Message Id's are unique within a channel context, not guild context.
@@ -52,12 +52,12 @@ namespace Alderto.Data.Models
         {
         }
 
-        public GuildManagedMessage(ulong guildId, ulong channelId, ulong messageId, string content,
+        public GuildManagedMessage(ulong guildId, ulong channelId, ulong id, string content,
             DateTimeOffset? lastUpdate = null)
         {
             GuildId = guildId;
             ChannelId = channelId;
-            MessageId = messageId;
+            Id = id;
 
             Content = content;
             LastModified = lastUpdate ?? DateTimeOffset.UtcNow;
@@ -72,6 +72,6 @@ namespace Alderto.Data.Models
 
         public static IQueryable<GuildManagedMessage> FindItem(
             this IQueryable<GuildManagedMessage> query, ulong guildId, ulong id) =>
-            ListItems(query, guildId).Where(c => c.MessageId == id);
+            ListItems(query, guildId).Where(c => c.Id == id);
     }
 }
