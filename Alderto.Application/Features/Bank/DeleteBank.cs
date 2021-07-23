@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Bank.Events;
 using Alderto.Data;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

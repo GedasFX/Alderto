@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Bank.Events;
 using Alderto.Application.Features.Guild;
 using Alderto.Data;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using MediatR;
 
 namespace Alderto.Application.Features.Bank

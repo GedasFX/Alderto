@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.ManagedMessage.Util;
 using Alderto.Data;
 using Alderto.Data.Models;
-using Alderto.Data.Models.GuildBank;
 using Discord;
 using MediatR;
 

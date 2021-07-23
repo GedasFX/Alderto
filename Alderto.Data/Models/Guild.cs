@@ -41,7 +41,7 @@ namespace Alderto.Data.Models
         /// <summary>
         /// A collection of guild managed banks.
         /// </summary>
-        public virtual IList<GuildBank.GuildBank>? GuildBanks { get; set; }
+        public virtual IList<GuildBank>? GuildBanks { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Guild"/>, with primary key <see cref="Id"/> set.

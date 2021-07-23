@@ -1,5 +1,4 @@
 ﻿using Alderto.Data.Models;
-using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data

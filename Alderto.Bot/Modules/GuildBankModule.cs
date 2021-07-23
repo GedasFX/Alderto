@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Bank.Dto;
 using Alderto.Bot.Extensions;
 using Alderto.Data;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using AutoMapper;
 using Discord.Commands;

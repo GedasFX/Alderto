@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Bank;
 using Alderto.Application.Features.Bank.Dto;
 using Alderto.Data;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
@@ -32,7 +32,7 @@ namespace Alderto.Web.Controllers.Guild.Bank
         [HttpGet]
         public async Task<IList<BankDto>> ListBanks(ulong guildId)
         {
-            return await _mapper.ProjectTo<BankDto>(_context.GuildBanks.ListItems(guildId)).ToListAsync();
+            return await _mapper.ProjectTo<BankDto>(GuildBankRepository.ListItems(_context.GuildBanks, guildId)).ToListAsync();
         }
 
         [HttpGet("{bankId:int}")]

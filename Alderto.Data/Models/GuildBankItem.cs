@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace Alderto.Data.Models.GuildBank
+namespace Alderto.Data.Models
 {
     public class GuildBankItem
     {
@@ -72,11 +72,6 @@ namespace Alderto.Data.Models.GuildBank
         {
             Id = id;
             GuildBankId = bankId;
-        }
-
-        public new GuildBankItem MemberwiseClone()
-        {
-            return (GuildBankItem) base.MemberwiseClone();
         }
     }
 

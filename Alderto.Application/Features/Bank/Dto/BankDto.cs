@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using AutoMapper;
 
 namespace Alderto.Application.Features.Bank.Dto

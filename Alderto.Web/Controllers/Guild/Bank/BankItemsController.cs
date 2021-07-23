@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Alderto.Application.Features.Bank;
 using Alderto.Application.Features.Bank.Dto;
 using Alderto.Data;
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using Alderto.Domain.Exceptions;
 using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;

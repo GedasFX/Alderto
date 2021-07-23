@@ -1,4 +1,4 @@
-using Alderto.Data.Models.GuildBank;
+using Alderto.Data.Models;
 using MediatR;
 
 namespace Alderto.Application.Features.Bank.Events

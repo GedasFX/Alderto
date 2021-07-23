@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace Alderto.Data.Models.GuildBank
+namespace Alderto.Data.Models
 {
     public class GuildBank
     {
