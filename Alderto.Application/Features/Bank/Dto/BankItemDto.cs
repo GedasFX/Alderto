@@ -1,3 +1,6 @@
+using Alderto.Data.Models.GuildBank;
+using AutoMapper;
+
 namespace Alderto.Application.Features.Bank.Dto
 {
     public class BankItemDto
@@ -17,6 +20,14 @@ namespace Alderto.Application.Features.Bank.Dto
             Quantity = quantity;
             Description = description;
             ImageUrl = imageUrl;
+        }
+
+        private class MapperProfile : Profile
+        {
+            public MapperProfile()
+            {
+                CreateMap<GuildBankItem, BankItemDto>();
+            }
         }
     }
 }
