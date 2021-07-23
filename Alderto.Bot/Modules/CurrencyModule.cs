@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alderto.Application.Features.Currency;
 using Alderto.Application.Features.Currency.Dto;
-using Alderto.Application.Features.Currency.Query;
 using Alderto.Bot.Extensions;
 using Alderto.Data;
 using Alderto.Data.Models;
@@ -211,10 +210,18 @@ namespace Alderto.Bot.Modules
             if (!(tokens.Count > 0 && MentionUtils.TryParseUser(tokens[0], out var memberId)))
                 memberId = author.Id;
 
-            var wallet = await _mediator.Send(new Wallets.FindByName(author.GuildId, memberId, currencyName));
+            var currency = await _mapper
+                .ProjectTo<CurrencyNameDto>(_context.Currencies.FindItem(author.GuildId, currencyName))
+                .SingleOrDefaultAsync();
+            if (currency == null)
+                throw new ValidationDomainException(ErrorMessage.CURRENCY_NOT_FOUND);
+
+            var wallet = await _mapper
+                .ProjectTo<CurrencyWalletDto>(
+                    _context.GuildMemberWallets.FindItem(author.GuildId, currency.Id, memberId)).SingleOrDefaultAsync();
 
             await this.ReplyEmbedAsync(
-                $"{MentionUtils.MentionUser(memberId)} has {wallet.Amount} {wallet.CurrencySymbol}");
+                $"{MentionUtils.MentionUser(memberId)} has {wallet?.Amount ?? 0} {currency.Symbol}");
         }
 
         private async Task TransferCurrency(string currencyName, string action, string[] tokens, IGuildUser author)

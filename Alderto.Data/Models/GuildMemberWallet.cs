@@ -51,5 +51,9 @@ namespace Alderto.Data.Models
             this IQueryable<GuildMemberWallet> query, ulong guildId, Guid currencyId) => query
             .Where(c => c.Currency!.GuildId == guildId)
             .Where(c => c.CurrencyId == currencyId);
+
+        public static IQueryable<GuildMemberWallet> FindItem(
+            this IQueryable<GuildMemberWallet> query, ulong guildId, Guid currencyId, ulong userId) =>
+            ListItems(query, guildId, currencyId).Where(w => w.MemberId == userId);
     }
 }
