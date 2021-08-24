@@ -35,10 +35,10 @@ steps:
 
 - task: Docker@2
   inputs:
-    command: 'login'
-  
-- task: Docker@2
-  inputs:
+    containerRegistry: 'Docker Hub'
     repository: 'gedasfx/alderto'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
+      next
