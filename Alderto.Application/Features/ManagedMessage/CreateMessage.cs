@@ -13,7 +13,7 @@ namespace Alderto.Application.Features.ManagedMessage
     {
         public class Command : CommandRequest<GuildManagedMessage>
         {
-            [Range(1, int.MaxValue)]
+            [Range(1, ulong.MaxValue)]
             public ulong ChannelId { get; }
 
             [MaxLength(2000)]
