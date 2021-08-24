@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Alderto.Bot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +16,15 @@ namespace Alderto.Bot
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddDiscordBot(this IServiceCollection services, string botToken,
+            Action<DiscordSocketConfig>? clientConfig = null, Action<CommandServiceConfig>? commandConfig = null) =>
+            services
+                .AddMediatR(typeof(DependencyInjection))
+                .AddDiscordSocketClient(botToken, clientConfig)
+                .AddCommandService(commandConfig)
+                .AddCommandHandler();
+
+
         /// <summary>
         /// Adds a singleton instance of <see cref="DiscordSocketClient"/> to the service collection. Can specify a Log Level.
         /// </summary>
@@ -32,16 +44,20 @@ namespace Alderto.Bot
         {
             public string? BotToken { get; set; }
         }
+
         private class DiscordSocketClientWrapper : DiscordSocketClient
         {
-            public DiscordSocketClientWrapper(ILogger<DiscordSocketClient> logger,
-                IOptions<DiscordSocketConfigWrapper> config) : base(config.Value)
+            // ReSharper disable once ContextualLoggerProblem
+            public DiscordSocketClientWrapper(
+                ILogger<DiscordSocketClient> logger,
+                IOptions<DiscordSocketConfigWrapper> config)
+                : base(config.Value)
             {
                 Log += message =>
                 {
                     logger.Log(
-                        (LogLevel)Math.Abs((int)message.Severity - 5),
-                        eventId: 0,
+                        (LogLevel) Math.Abs((int) message.Severity - 5),
+                        0,
                         message,
                         message.Exception,
                         delegate { return message.ToString(); });
@@ -69,12 +85,13 @@ namespace Alderto.Bot
 
         private class CommandServiceWrapper : CommandService
         {
+            // ReSharper disable once ContextualLoggerProblem
             public CommandServiceWrapper(IDiscordClient client, ILogger<CommandService> logger,
                 IOptions<CommandServiceConfig> cmdServiceConfig, IConfiguration config) : base(cmdServiceConfig.Value)
             {
                 if (ulong.TryParse(config["LoggingChannelId"], out var loggingChannelId))
                 {
-                    var channel = (IMessageChannel)client.GetChannelAsync(loggingChannelId).Result;
+                    var channel = (IMessageChannel) client.GetChannelAsync(loggingChannelId).Result;
                     Log += async message =>
                     {
                         if (message.Exception is CommandException commandException)
@@ -88,7 +105,7 @@ namespace Alderto.Bot
                 Log += message =>
                 {
                     logger.Log(
-                        (LogLevel)Math.Abs((int)message.Severity - 5),
+                        (LogLevel) Math.Abs((int) message.Severity - 5),
                         eventId: 0,
                         message,
                         message.Exception,

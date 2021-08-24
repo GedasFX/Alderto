@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>c53fe5d3-16e9-400d-a588-4859345371e5</UserSecretsId>
-    <StartupObject>Alderto.Bot.Program</StartupObject>
-    <Configurations>Debug;Release</Configurations>
-    <LangVersion>8.0</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -28,26 +24,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="commands.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <PackageReference Include="Discord.Net.Labs.Commands" Version="2.3.5" />
+    <PackageReference Include="Discord.Net.Labs.Core" Version="2.4.6" />
+    <PackageReference Include="Discord.Net.Labs.WebSocket" Version="2.4.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.3" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Alderto.Application\Alderto.Application.csproj" />
     <ProjectReference Include="..\Alderto.Data\Alderto.Data.csproj" />
-    <ProjectReference Include="..\Alderto.Services\Alderto.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

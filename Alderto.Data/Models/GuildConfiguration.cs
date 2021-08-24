@@ -5,45 +5,13 @@ namespace Alderto.Data.Models
 {
     public class GuildConfiguration
     {
-        /// <summary>
-        /// Default configuration
-        /// </summary>
-        public static GuildConfiguration DefaultConfiguration => (GuildConfiguration)CfgDefaults.MemberwiseClone();
-
-        /// <summary>
-        /// Default value for <see cref="Prefix"/>
-        /// </summary>
-        public static string DefaultPrefix { get; } = ".";
-
-        /// <summary>
-        /// Default value for <see cref="CurrencySymbol"/>
-        /// </summary>
-        public static string DefaultCurrencySymbol { get; } = "⚽";
-
-        /// <summary>
-        /// Default value for <see cref="TimelyRewardQuantity"/>
-        /// </summary>
-        public static int DefaultTimelyRewardQuantity { get; } = 1;
-
-        /// <summary>
-        /// Default value for <see cref="TimelyCooldown"/>
-        /// </summary>
-        public static int DefaultTimelyCooldown { get; } = 86400; // 24h
-
-        /// <summary>
-        /// Default value for <see cref="AcceptedMemberRoleId"/>
-        /// </summary>
-        public static ulong DefaultAcceptedMemberRoleId { get; } = 0;
-
-
-        private static readonly GuildConfiguration CfgDefaults = new GuildConfiguration
+        public static class Defaults
         {
-            Prefix = DefaultPrefix,
-            CurrencySymbol = DefaultCurrencySymbol,
-            TimelyRewardQuantity = DefaultTimelyRewardQuantity,
-            TimelyCooldown = DefaultTimelyCooldown,
-            AcceptedMemberRoleId = DefaultAcceptedMemberRoleId
-        };
+            /// <summary>
+            /// Default value for <see cref="Prefix"/>
+            /// </summary>
+            public const string Prefix = ".";
+        }
 
 
         /// <summary>
@@ -56,40 +24,28 @@ namespace Alderto.Data.Models
         /// <summary>
         /// Prefix for commands.
         /// </summary>
-        [MaxLength(20), MinLength(1), Required]
+        [MaxLength(20), MinLength(1)]
         public string Prefix { get; set; }
 
         /// <summary>
-        /// Text/EmoteString used for displaying currency.
+        /// Log channel id for logging messages to.
         /// </summary>
-        [MaxLength(50), MinLength(1), Required]
-        public string CurrencySymbol { get; set; }
-
-        /// <summary>
-        /// Timely currency claim reward quantity.
-        /// </summary>
-        public int TimelyRewardQuantity { get; set; }
-
-        /// <summary>
-        /// Timely currency claim reward cooldown. This is time measured in seconds.
-        /// </summary>
-        public int TimelyCooldown { get; set; }
+        public ulong? LogChannelId { get; set; }
 
         /// <summary>
         /// Id of role to add the user to, whenever user was accepted to the guild.
         /// </summary>
-        public ulong AcceptedMemberRoleId { get; set; }
+        public ulong? ModeratorRoleId { get; set; }
 
         /// <summary>
         /// <see cref="Guild"/> of which owns this configuration.
         /// </summary>
         public virtual Guild? Guild { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="GuildConfiguration"/>, with configuration defaults
-        /// </summary>
-#nullable disable
-        private GuildConfiguration() { }
-#nullable restore
+        public GuildConfiguration(string prefix = Defaults.Prefix, ulong? moderatorRoleId = null)
+        {
+            Prefix = prefix;
+            ModeratorRoleId = moderatorRoleId;
+        }
     }
 }

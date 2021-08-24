@@ -1,50 +1,47 @@
-﻿using System.Threading.Tasks;
-using Alderto.Services.Exceptions;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Alderto.Domain.Services;
+using Alderto.Web.Attributes;
 using Alderto.Web.Extensions;
+using Alderto.Web.Models;
 using Discord;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Alderto.Web.Controllers
+namespace Alderto.Web.Controllers.Guild
 {
-    [Route("guilds/{guildId}/users")]
+    [Route("guilds/{guildId}")]
     public class GuildUserController : ApiControllerBase
     {
-        private readonly IDiscordClient _client;
+        private readonly IGuildSetupService _guildSetupService;
 
-        public GuildUserController(IDiscordClient client)
+        public GuildUserController(IGuildSetupService guildSetupService)
         {
-            _client = client;
+            _guildSetupService = guildSetupService;
         }
 
-        [HttpGet("@me/roles")]
-        public async Task<IActionResult> ListMyRoles(ulong guildId)
+        [HttpGet("@me")]
+        [RequireGuildMember]
+        public async Task<ApiGuildUserInfo> GetUserInfo(ulong guildId)
         {
-            var guild = await _client.GetGuildAsync(guildId);
-            if (guild == null)
-                throw new GuildNotFoundException();
-
-            var user = await guild.GetUserAsync(User.GetId());
-            if (user == null)
-                throw new UserNotFoundException();
-
-            return Content(user.RoleIds);
+            return new()
+            {
+                AccessLevel = await CalcAccessLevel(guildId, HttpContext.GetDiscordUser())
+            };
         }
 
-        [HttpGet("{userId}/roles")]
-        public async Task<IActionResult> ListUserRoles(ulong guildId, ulong userId)
+        private async Task<AccessLevel> CalcAccessLevel(ulong guildId, IGuildUser user)
         {
-            if (!await _client.ValidateGuildAdminAsync(User.GetId(), guildId))
-                throw new UserNotGuildAdminException();
+            if (user.GuildPermissions.Administrator)
+                return AccessLevel.Admin;
 
-            var guild = await _client.GetGuildAsync(guildId);
-            if (guild == null)
-                throw new GuildNotFoundException();
 
-            var user = await guild.GetUserAsync(userId);
-            if (user == null)
-                throw new UserNotFoundException();
+            var setup = await _guildSetupService.GetGuildSetupAsync(guildId);
+            var modRoleId = setup.Configuration.ModeratorRoleId;
 
-            return Content(user.RoleIds);
+            if (modRoleId != null && user.RoleIds.Contains((ulong) modRoleId))
+                return AccessLevel.Moderator;
+
+            return AccessLevel.Member;
         }
     }
 }

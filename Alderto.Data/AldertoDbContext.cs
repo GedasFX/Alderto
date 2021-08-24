@@ -1,27 +1,31 @@
 ﻿using Alderto.Data.Models;
-using Alderto.Data.Models.GuildBank;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alderto.Data
 {
     public class AldertoDbContext : DbContext
     {
-        public DbSet<Guild> Guilds { get; set; }
-        public DbSet<GuildMember> GuildMembers { get; set; }
-        public DbSet<Member> Members { get; set; }
+        public DbSet<Guild> Guilds => Set<Guild>();
+        public DbSet<GuildMember> GuildMembers => Set<GuildMember>();
+        public DbSet<Member> Members => Set<Member>();
 
-        public DbSet<CustomCommand> CustomCommands { get; set; }
+        public DbSet<CustomCommand> CustomCommands => Set<CustomCommand>();
 
-        public DbSet<GuildConfiguration> GuildPreferences { get; set; }
+        public DbSet<GuildConfiguration> GuildPreferences => Set<GuildConfiguration>();
+        public DbSet<GuildCommandAlias> GuildCommandAliases => Set<GuildCommandAlias>();
 
-        public DbSet<GuildBank> GuildBanks { get; set; }
-        public DbSet<GuildBankItem> GuildBankItems { get; set; }
+        public DbSet<GuildBank> GuildBanks => Set<GuildBank>();
+        public DbSet<GuildBankItem> GuildBankItems => Set<GuildBankItem>();
 
-        public DbSet<GuildManagedMessage> GuildManagedMessages { get; set; }
+        public DbSet<GuildManagedMessage> GuildManagedMessages => Set<GuildManagedMessage>();
 
-#nullable disable
-        public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options) { }
-#nullable restore
+        public DbSet<Currency> Currencies => Set<Currency>();
+        public DbSet<CurrencyTransaction> CurrencyTransactions => Set<CurrencyTransaction>();
+        public DbSet<GuildMemberWallet> GuildMemberWallets => Set<GuildMemberWallet>();
+
+        public AldertoDbContext(DbContextOptions<AldertoDbContext> options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,8 +43,15 @@ namespace Alderto.Data
                 .HasIndex(b => new { b.GuildId, b.Name })
                 .IsUnique();
 
+            modelBuilder.Entity<Currency>()
+                .HasIndex(c => new { c.GuildId, c.Name })
+                .IsUnique();
+
             modelBuilder.Entity<GuildManagedMessage>()
-                .HasKey(m => new { m.GuildId, m.MessageId });
+                .HasKey(m => new { m.GuildId, m.Id });
+
+            modelBuilder.Entity<GuildCommandAlias>()
+                .HasKey(c => new { c.GuildId, c.Alias });
 
             modelBuilder.Entity<CustomCommand>()
                 .HasKey(m => new { m.GuildId, m.TriggerKeyword });

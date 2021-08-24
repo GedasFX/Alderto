@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,19 +24,9 @@ namespace Alderto.Data.Models
         public string? Nickname { get; set; }
 
         /// <summary>
-        /// Time of last currency claim.
-        /// </summary>
-        public DateTimeOffset CurrencyLastClaimed { get; set; }
-
-        /// <summary>
         /// Time the user joined the guild.
         /// </summary>
         public DateTimeOffset? JoinedAt { get; set; }
-
-        /// <summary>
-        /// Amount of currency a person has.
-        /// </summary>
-        public int CurrencyCount { get; set; }
 
         /// <summary>
         /// Id of member, who recruited the current member.
