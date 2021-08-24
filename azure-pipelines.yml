@@ -35,7 +35,8 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
-- task: PublishBuildArtifacts@1
+- task: Docker@2
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'Alderto'
+    repository: 'gedasfx/alderto'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
