@@ -12,6 +12,11 @@ namespace Alderto.Tests.MockedEntities
     {
         public ulong Id { get; set; }
 
+        public Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public string AvatarId { get; set; }
 
         public string Discriminator { get; set; }
@@ -23,6 +28,7 @@ namespace Alderto.Tests.MockedEntities
         public bool IsWebhook { get; set; }
 
         public string Username { get; set; }
+        public UserProperties? PublicFlags { get; }
 
         public DateTimeOffset CreatedAt { get; set; }
 
@@ -31,6 +37,9 @@ namespace Alderto.Tests.MockedEntities
         public IActivity Activity { get; set; }
 
         public UserStatus Status { get; set; }
+        IReadOnlyCollection<ClientType> IPresence.ActiveClients => ActiveClients;
+
+        public IReadOnlyCollection<IActivity> Activities { get; }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) => throw new NotImplementedException();
         public string GetDefaultAvatarUrl() => throw new NotImplementedException();
@@ -47,6 +56,16 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task KickAsync(string reason = null, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -57,7 +76,17 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +96,17 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -77,17 +116,35 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveTimeOutAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public DateTimeOffset? JoinedAt { get; set; }
+        public string DisplayName { get; }
         public string Nickname { get; set; }
+        public string DisplayAvatarId { get; }
+        public string GuildAvatarId { get; }
         public GuildPermissions GuildPermissions { get; set; }
         public IGuild Guild { get; set; }
         public ulong GuildId { get; set; }
         public IReadOnlyCollection<ulong> RoleIds { get; set; }
+        public bool? IsPending { get; }
+        public int Hierarchy { get; }
+        public DateTimeOffset? TimedOutUntil { get; }
 
         public DateTimeOffset? PremiumSince => throw new NotImplementedException();
 
         public IImmutableSet<ClientType> ActiveClients => throw new NotImplementedException();
 
         public bool IsStreaming => throw new NotImplementedException();
+        public bool IsVideoing { get; }
+        public DateTimeOffset? RequestToSpeakTimestamp { get; }
     }
 }

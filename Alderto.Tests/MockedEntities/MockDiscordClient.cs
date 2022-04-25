@@ -65,6 +65,26 @@ namespace Alderto.Tests.MockedEntities
             throw new System.NotImplementedException();
         }
 
+        public Task<IApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IApplicationCommand> CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             return Task.FromResult(_guilds.SingleOrDefault(o => o.Id == id));
@@ -115,8 +135,17 @@ namespace Alderto.Tests.MockedEntities
             throw new System.NotImplementedException();
         }
 
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public ConnectionState ConnectionState { get; set; }
         public ISelfUser CurrentUser { get; set; }
         public TokenType TokenType { get; set; }
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

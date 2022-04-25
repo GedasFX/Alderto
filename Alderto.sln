@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Tests", "Alderto.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Web", "Alderto.Web\Alderto.Web.csproj", "{815977C3-0731-47EF-BF1D-291114E51468}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Bot.Lua", "Alderto.Bot.Lua\Alderto.Bot.Lua.csproj", "{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alderto.Services", "Alderto.Services\Alderto.Services.csproj", "{D7311A64-27AC-4949-BCCB-573BED3028DA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OAuth.Discord", "AspNet.Security.OAuth.Discord\AspNet.Security.OAuth.Discord.csproj", "{2CCE8A32-8527-4609-823B-A83741BD0ECC}"
@@ -54,12 +52,6 @@ Global
 		{815977C3-0731-47EF-BF1D-291114E51468}.Release|Any CPU.Build.0 = Release|Any CPU
 		{815977C3-0731-47EF-BF1D-291114E51468}.Testing|Any CPU.ActiveCfg = Debug|Any CPU
 		{815977C3-0731-47EF-BF1D-291114E51468}.Testing|Any CPU.Build.0 = Debug|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Testing|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDB4F632-8FD4-4AB1-BFDF-B3FC3E16D3A1}.Testing|Any CPU.Build.0 = Debug|Any CPU
 		{D7311A64-27AC-4949-BCCB-573BED3028DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7311A64-27AC-4949-BCCB-573BED3028DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7311A64-27AC-4949-BCCB-573BED3028DA}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -42,6 +42,7 @@ namespace Alderto.Bot.Services
                 {
                     Console.WriteLine($"{before.Username} + {after.Username}");
                 }
+
                 return Task.CompletedTask;
             };
 
@@ -56,7 +57,7 @@ namespace Alderto.Bot.Services
             using var scope = _services.CreateScope();
             await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), scope.ServiceProvider);
         }
-        
+
         public async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
@@ -121,9 +122,8 @@ namespace Alderto.Bot.Services
                 catch (Discord.Net.HttpException e)
                 {
                     // 50013 occurs when bot cannot send embedded messages. All error reports use embeds.
-                    if (e.DiscordCode == 50013)
-                        await context.Channel.SendMessageAsync(
-                            "Bot requires guild permission EmbedLinks to function properly.");
+                    if (e.DiscordCode == DiscordErrorCode.InsufficientPermissions)
+                        await context.Channel.SendMessageAsync("Bot requires guild permission EmbedLinks to function properly.");
                 }
             }
         }

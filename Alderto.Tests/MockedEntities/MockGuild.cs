@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -12,6 +13,7 @@ namespace Alderto.Tests.MockedEntities
     {
         private readonly IGuildUser[] _users;
         private readonly ITextChannel[] _channels;
+        private GuildFeatures _features;
 
         public MockGuild(ulong guildId, IGuildUser[] users, ITextChannel[] channels)
         {
@@ -33,7 +35,7 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
-        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
+        public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -49,6 +51,21 @@ namespace Alderto.Tests.MockedEntities
         }
 
         public Task LeaveAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = 1000, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = 1000, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = 1000, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -123,6 +140,16 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task<IStageChannel> GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IStageChannel>> GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -134,6 +161,31 @@ namespace Alderto.Tests.MockedEntities
         }
 
         public Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -153,6 +205,11 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -163,12 +220,12 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
+        Task<IReadOnlyCollection<IIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
+        public Task DeleteIntegrationAsync(ulong id, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -199,6 +256,11 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task DisconnectAsync(IGuildUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             return Task.FromResult<IReadOnlyCollection<IGuildUser>>(_users);
@@ -224,7 +286,13 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
-        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
+        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -244,6 +312,11 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -259,7 +332,79 @@ namespace Alderto.Tests.MockedEntities
             throw new NotImplementedException();
         }
 
+        public Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<ICustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IGuildScheduledEvent> GetEventAsync(ulong id, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IGuildScheduledEvent>> GetEventsAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IGuildScheduledEvent> CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel = GuildScheduledEventPrivacyLevel.Private,
+            string description = null, DateTimeOffset? endTime = null, ulong? channelId = null, string location = null, Image? coverImage = null,
+            RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }
@@ -269,6 +414,7 @@ namespace Alderto.Tests.MockedEntities
 
         public string Name { get; set; }
         public int AFKTimeout { get; set; }
+        public bool IsWidgetEnabled { get; }
         public bool IsEmbeddable { get; set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
         public MfaLevel MfaLevel { get; set; }
@@ -278,17 +424,26 @@ namespace Alderto.Tests.MockedEntities
         public string IconUrl { get; set; }
         public string SplashId { get; set; }
         public string SplashUrl { get; set; }
+        public string DiscoverySplashId { get; }
+        public string DiscoverySplashUrl { get; }
         public bool Available { get; set; }
         public ulong? AFKChannelId { get; set; }
+        public ulong? WidgetChannelId { get; }
         public ulong DefaultChannelId { get; set; }
         public ulong? EmbedChannelId { get; set; }
         public ulong? SystemChannelId { get; set; }
+        public ulong? RulesChannelId { get; }
+        public ulong? PublicUpdatesChannelId { get; }
         public ulong OwnerId { get; set; }
         public ulong? ApplicationId { get; set; }
         public string VoiceRegionId { get; set; }
         public IAudioClient AudioClient { get; set; }
         public IRole EveryoneRole { get; set; }
         public IReadOnlyCollection<GuildEmote> Emotes { get; set; }
+        public IReadOnlyCollection<ICustomSticker> Stickers { get; }
+
+        GuildFeatures IGuild.Features => _features;
+
         public IReadOnlyCollection<string> Features { get; set; }
         public IReadOnlyCollection<IRole> Roles { get; set; }
 
@@ -305,10 +460,19 @@ namespace Alderto.Tests.MockedEntities
         public string Description => throw new NotImplementedException();
 
         public int PremiumSubscriptionCount => throw new NotImplementedException();
+        public int? MaxPresences { get; }
+        public int? MaxMembers { get; }
+        public int? MaxVideoChannelUsers { get; }
+        public int? ApproximateMemberCount { get; }
+        public int? ApproximatePresenceCount { get; }
+        public int MaxBitrate { get; }
 
         public string PreferredLocale => throw new NotImplementedException();
+        public NsfwLevel NsfwLevel { get; }
 
         public CultureInfo PreferredCulture => throw new NotImplementedException();
+        public bool IsBoostProgressBarEnabled { get; }
+        public ulong MaxUploadLimit { get; }
 #nullable restore
     }
 }

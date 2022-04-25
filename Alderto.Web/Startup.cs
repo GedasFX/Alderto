@@ -279,8 +279,8 @@ namespace Alderto.Web
                             await context.Response.WriteAsync(JsonSerializer.Serialize(
                                 discordException.DiscordCode switch
                                 {
-                                    50001 => ErrorMessages.MissingChannelAccess,
-                                    50013 => ErrorMessages.MissingWritePermissions,
+                                    DiscordErrorCode.MissingPermissions => ErrorMessages.MissingChannelAccess,
+                                    DiscordErrorCode.InsufficientPermissions => ErrorMessages.MissingWritePermissions,
                                     _ => throw e
                                 }, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                         }

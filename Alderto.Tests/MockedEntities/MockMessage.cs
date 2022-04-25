@@ -25,13 +25,20 @@ namespace Alderto.Tests.MockedEntities
         public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => throw new NotImplementedException();
         public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => throw new NotImplementedException();
         public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => throw new NotImplementedException();
 
         public MessageType Type { get; set; }
         public MessageSource Source { get; set; }
         public bool IsTTS { get; set; }
         public bool IsPinned { get; set; }
+        public bool MentionedEveryone { get; }
         public string Content { get; set; }
+        public string CleanContent { get; }
         public DateTimeOffset Timestamp { get; set; }
         public DateTimeOffset? EditedTimestamp { get; set; }
         public IMessageChannel Channel { get; set; }
@@ -50,5 +57,9 @@ namespace Alderto.Tests.MockedEntities
         public MessageReference Reference => throw new NotImplementedException();
 
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
+        public IReadOnlyCollection<IMessageComponent> Components { get; }
+        public IReadOnlyCollection<IStickerItem> Stickers { get; }
+        public MessageFlags? Flags { get; }
+        public IMessageInteraction Interaction { get; }
     }
 }
