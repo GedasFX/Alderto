@@ -153,7 +153,7 @@ namespace Alderto.Web
 
             services.AddHttpClient<DiscordHttpClient>(o =>
             {
-                o.BaseAddress = new Uri("https://discordapp.com/api/v6");
+                o.BaseAddress = new Uri("https://discordapp.com/api/v9");
                 o.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
             services.AddScoped<AuthService>();
@@ -195,7 +195,11 @@ namespace Alderto.Web
             // === <Bot> ===
             // Add discord socket client
             services.AddDiscordSocketClient(Configuration["DiscordAPI:BotToken"],
-                socketConfig => { socketConfig.LogLevel = LogSeverity.Debug; });
+                socketConfig =>
+                {
+                    socketConfig.LogLevel = LogSeverity.Debug;
+                    socketConfig.GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildPresences;
+                });
 
             // Add command handling services
             services.AddCommandService(serviceConfig =>
