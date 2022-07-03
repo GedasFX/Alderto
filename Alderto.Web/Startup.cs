@@ -128,7 +128,7 @@ namespace Alderto.Web
                     new IdentityResources.Profile()
                 })
                 .AddInMemoryApiScopes(new[] { new ApiScope("api") })
-                .AddInMemoryApiResources(new[] { new ApiResource("api") })
+                .AddInMemoryApiResources(new[] { new ApiResource { Name = "api", Scopes = { "api" } } })
                 .AddInMemoryClients(new[]
                 {
                     new Client
