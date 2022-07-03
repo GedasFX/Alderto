@@ -127,6 +127,7 @@ namespace Alderto.Web
                     new IdentityResources.OpenId(),
                     new IdentityResources.Profile()
                 })
+                .AddInMemoryApiScopes(new[] { new ApiScope("api") })
                 .AddInMemoryApiResources(new[] { new ApiResource("api") })
                 .AddInMemoryClients(new[]
                 {
@@ -268,7 +269,8 @@ namespace Alderto.Web
                             });
 
                             await context.Response.WriteAsync(
-                                JsonSerializer.Serialize(apiException.Error, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                                JsonSerializer.Serialize(apiException.Error,
+                                    new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                         }
                         else if (e is HttpException discordException)
                         {
