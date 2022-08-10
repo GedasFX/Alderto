@@ -21,7 +21,7 @@ namespace Alderto.Data.Models.GuildBank
         /// Name of the bank.
         /// </summary>
         [MaxLength(32), Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Id of channel to log changes to the bank to.
@@ -48,9 +48,7 @@ namespace Alderto.Data.Models.GuildBank
         /// Initializes a new empty instance of <see cref="GuildBank"/>.
         /// For use by Entity Framework.
         /// </summary>
-#nullable disable
-        private GuildBank() { }
-#nullable restore
+        public GuildBank() { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="GuildBank"/>, with <see cref="GuildId"/>) property set.

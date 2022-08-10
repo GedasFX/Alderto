@@ -20,7 +20,7 @@ namespace Alderto.Data.Models.GuildBank
         /// Name of the item.
         /// </summary>
         [MaxLength(70), Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Monetary value per unit.
@@ -54,9 +54,7 @@ namespace Alderto.Data.Models.GuildBank
         /// Initializes a new empty instance of <see cref="GuildBankItem"/>.
         /// For use by Entity Framework.
         /// </summary>
-#nullable disable
-        private GuildBankItem() { }
-#nullable restore
+        public GuildBankItem() { }
 
         public GuildBankItem(string name)
         {
